@@ -9,7 +9,6 @@ on:
       - "scripts/build_frontend.py"
       - "election_counter/publish.py"
       - ".github/workflows/deploy-frontend.yml"
-  workflow_dispatch:
 
 jobs:
   deploy:

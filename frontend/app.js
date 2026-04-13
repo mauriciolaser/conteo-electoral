@@ -218,7 +218,7 @@ const MAIN_CHART_MODE_META = {
     tooltipSuffix: "votos proyectados modo rural",
   },
   megaRural: {
-    note: "VOTO MEGA-RURAL: en regiones donde lidera Sánchez, se ajusta crecimiento pendiente con ×1.50 para Sánchez y ×0.50 para López Aliaga; resto mantiene sesgo rural (Top 6)",
+    note: "VOTO MEGA-RURAL: en regiones donde lidera Sánchez, el voto pendiente se reparte con ×1.50 para Sánchez y ×0.50 para López Aliaga; los demás partidos reparten su crecimiento pendiente con los multiplicadores rurales por popularidad local (Top 6)",
     tooltipSuffix: "votos proyectados modo mega-rural",
   },
   megaRuralFallback: {
