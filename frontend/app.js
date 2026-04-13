@@ -6,6 +6,7 @@
 //    <BASE_URL>/history_index.json   ← generado por el pipeline
 // ─────────────────────────────────────────────
 const BASE_URL = __BASE_URL__;
+const PARTIES_CATALOG_URL = "./parties.json";
 
 // ─────────────────────────────────────────────
 //  Paleta de colores por partido (igual a Python)
@@ -34,6 +35,28 @@ const PALETTE = [
   "#9c755f","#bab0ac",
 ];
 
+const PARTY_ABBREVIATIONS = {
+  "FUERZA POPULAR": "FP",
+  "RENOVACION POPULAR": "RP",
+  "PARTIDO DEL BUEN GOBIERNO": "BG",
+  "JUNTOS POR EL PERU": "JP",
+  "PARTIDO CIVICO OBRAS": "OB",
+  "PARTIDO PAIS PARA TODOS": "PP",
+};
+
+const PARTY_ALIAS_TO_CANONICAL = {
+  "LOPEZ ALIAGA": "RENOVACION POPULAR",
+  "RENOVACIÓN POPULAR": "RENOVACION POPULAR",
+  "JUNTOS POR EL PERÚ": "JUNTOS POR EL PERU",
+  "PARTIDO PAÍS PARA TODOS": "PARTIDO PAIS PARA TODOS",
+  "PARTIDO CÍVICO OBRAS": "PARTIDO CIVICO OBRAS",
+};
+
+const PARTY_INITIALS_STOPWORDS = new Set([
+  "A", "AL", "AN", "ANTE", "CON", "DE", "DEL", "EL", "EN", "LA", "LAS",
+  "LOS", "PARA", "PARTIDO", "PARTIDOS", "POLITICO", "POLITICA", "POR", "Y",
+]);
+
 function partyColor(name, idx) {
   const n = name.toUpperCase();
   for (const [key, color] of Object.entries(PARTY_COLORS)) {
@@ -57,6 +80,101 @@ function normalizeName(name) {
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
     .trim();
+}
+
+function canonicalPartyName(name) {
+  const normalized = normalizeName(name);
+  return PARTY_ALIAS_TO_CANONICAL[normalized] || normalized;
+}
+
+function isMobileViewport() {
+  return window.matchMedia("(max-width: 620px)").matches;
+}
+
+function buildPartyInitials(name) {
+  const canonical = canonicalPartyName(name);
+  if (PARTY_ABBREVIATIONS[canonical]) return PARTY_ABBREVIATIONS[canonical];
+
+  const words = canonical
+    .split(/[^A-Z0-9]+/)
+    .filter(Boolean)
+    .filter(word => !PARTY_INITIALS_STOPWORDS.has(word));
+  const sourceWords = words.length ? words : canonical.split(/[^A-Z0-9]+/).filter(Boolean);
+  return sourceWords.slice(0, 2).map(word => word[0]).join("") || canonical.slice(0, 2);
+}
+
+let partiesCatalogPromise = null;
+let partyDisplayMap = new Map();
+let mobilePartyIconPluginRegistered = false;
+const partyImageCache = new Map();
+
+function buildPartyDisplayMap(rows) {
+  const nextMap = new Map();
+  for (const row of rows || []) {
+    const canonical = canonicalPartyName(row.name);
+    nextMap.set(canonical, {
+      imageSrc: row.partyImage || "",
+      shortLabel: PARTY_ABBREVIATIONS[canonical] || buildPartyInitials(canonical),
+    });
+  }
+  partyDisplayMap = nextMap;
+}
+
+async function ensurePartiesCatalog() {
+  if (!partiesCatalogPromise) {
+    partiesCatalogPromise = fetchJSON(PARTIES_CATALOG_URL)
+      .then(rows => {
+        buildPartyDisplayMap(Array.isArray(rows) ? rows : []);
+      })
+      .catch(() => {
+        buildPartyDisplayMap([]);
+      });
+  }
+  return partiesCatalogPromise;
+}
+
+function getPartyDisplayMeta(name) {
+  const canonical = canonicalPartyName(name);
+  const fromCatalog = partyDisplayMap.get(canonical);
+  return {
+    fullLabel: name,
+    shortLabel: fromCatalog?.shortLabel || PARTY_ABBREVIATIONS[canonical] || buildPartyInitials(canonical),
+    imageSrc: fromCatalog?.imageSrc || "",
+  };
+}
+
+function ensureMobilePartyIconPlugin() {
+  if (mobilePartyIconPluginRegistered || typeof Chart === "undefined") return;
+  Chart.register({
+    id: "mobilePartyIcons",
+    afterDraw(chart, _args, options) {
+      if (!options?.enabled || !isMobileViewport()) return;
+      const yScale = chart.scales?.y;
+      const items = options.items || [];
+      if (!yScale || !items.length) return;
+
+      const { ctx } = chart;
+      ctx.save();
+      for (let index = 0; index < items.length; index += 1) {
+        const item = items[index];
+        if (!item?.imageSrc) continue;
+        if (!item.image) {
+          const img = new Image();
+          img.src = item.imageSrc;
+          img.onload = () => chart.draw();
+          item.image = img;
+        }
+        if (!item.image.complete) continue;
+
+        const size = 16;
+        const x = yScale.left + 2;
+        const y = yScale.getPixelForTick(index) - (size / 2);
+        ctx.drawImage(item.image, x, y, size, size);
+      }
+      ctx.restore();
+    },
+  });
+  mobilePartyIconPluginRegistered = true;
 }
 
 async function fetchJSON(url) {
@@ -255,6 +373,7 @@ function updateMainChartButtons() {
 }
 
 function renderMainChart() {
+  ensureMobilePartyIconPlugin();
   const canvas = document.getElementById("main-chart");
   const noteEl = document.getElementById("main-chart-note");
   if (!canvas || !mainChartData) return;
@@ -262,10 +381,12 @@ function renderMainChart() {
   if (mainChartInstance) mainChartInstance.destroy();
 
   const source = mainChartData[mainChartMode] || mainChartData.actual;
-  const labels = source.topCandidates.map(([name]) => name);
+  const displayItems = source.topCandidates.map(([name]) => getPartyDisplayMeta(name));
+  const labels = displayItems.map(item => isMobileViewport() ? item.shortLabel : item.fullLabel);
+  const fullLabels = displayItems.map(item => item.fullLabel);
   const values = source.topCandidates.map(([, votes]) => votes);
   const pcts = values.map(v => source.totalValidVotes > 0 ? (v / source.totalValidVotes * 100) : 0);
-  const colors = labels.map((name, i) => partyColor(name, i));
+  const colors = fullLabels.map((name, i) => partyColor(name, i));
   const modeMeta = mainChartMode === "rural" && source.isFallback
     ? MAIN_CHART_MODE_META.ruralFallback
     : (MAIN_CHART_MODE_META[mainChartMode] || MAIN_CHART_MODE_META.actual);
@@ -297,9 +418,13 @@ function renderMainChart() {
             label: ctx => {
               const pct = ctx.parsed.x.toFixed(2);
               const votes = values[ctx.dataIndex].toLocaleString("es-PE");
-              return ` ${pct}%  (${votes} ${modeMeta.tooltipSuffix})`;
+              return ` ${fullLabels[ctx.dataIndex]}: ${pct}% (${votes} ${modeMeta.tooltipSuffix})`;
             },
           },
+        },
+        mobilePartyIcons: {
+          enabled: true,
+          items: displayItems,
         },
       },
       scales: {
@@ -311,9 +436,15 @@ function renderMainChart() {
           grid: { color: "#2a2d3a" },
         },
         y: {
+          afterFit: scale => {
+            if (isMobileViewport()) {
+              scale.width += 22;
+            }
+          },
           ticks: {
             color: "#e8eaf0",
             font: { size: 11 },
+            padding: isMobileViewport() ? 22 : 8,
           },
           grid: { display: false },
         },
@@ -326,18 +457,25 @@ function renderMainChart() {
 //  Trend chart: evolución temporal top 5
 // ─────────────────────────────────────────────
 function renderTrendChart(snapshots, top5Names) {
+  ensureMobilePartyIconPlugin();
   const canvas = document.getElementById("trend-chart");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   if (trendChartInstance) trendChartInstance.destroy();
 
   const labels = snapshots.map(s => {
-    const d = new Date(s.dt);
+    const bucketMs = Math.floor(s.dt.getTime() / HALF_HOUR_MS) * HALF_HOUR_MS;
+    const d = new Date(bucketMs);
     return d.toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit", timeZone: "America/Lima" });
   });
 
-  const datasets = top5Names.map((name, i) => ({
-    label: name,
+  const datasets = top5Names.map((name, i) => {
+    const display = getPartyDisplayMeta(name);
+    return {
+    label: isMobileViewport() ? display.shortLabel : display.fullLabel,
+    fullLabel: display.fullLabel,
+    shortLabel: display.shortLabel,
+    imageSrc: display.imageSrc,
     data: snapshots.map(s => s.totals[name] || 0),
     borderColor: partyColor(name, i),
     backgroundColor: partyColor(name, i) + "33",
@@ -345,7 +483,8 @@ function renderTrendChart(snapshots, top5Names) {
     pointRadius: 4,
     tension: 0.3,
     fill: false,
-  }));
+    };
+  });
 
   trendChartInstance = new Chart(ctx, {
     type: "line",
@@ -355,12 +494,36 @@ function renderTrendChart(snapshots, top5Names) {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          labels: { color: "#e8eaf0", font: { size: 11 } },
+          labels: {
+            color: "#e8eaf0",
+            font: { size: 11 },
+            generateLabels(chart) {
+              const defaults = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+              if (!isMobileViewport()) return defaults;
+              return defaults.map((item, i) => {
+                const ds = chart.data.datasets[i];
+                item.text = ds.shortLabel || item.text;
+                if (ds.imageSrc) {
+                  let img = partyImageCache.get(ds.imageSrc);
+                  if (!img) {
+                    img = new Image(16, 16);
+                    img.src = ds.imageSrc;
+                    img.onload = () => { if (chart) chart.update("none"); };
+                    partyImageCache.set(ds.imageSrc, img);
+                  }
+                  item.pointStyle = img;
+                  item.usePointStyle = true;
+                }
+                return item;
+              });
+            },
+            usePointStyle: true,
+          },
           position: "bottom",
         },
         tooltip: {
           callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString("es-PE")} votos`,
+            label: ctx => ` ${ctx.dataset.fullLabel || ctx.dataset.label}: ${ctx.parsed.y.toLocaleString("es-PE")} votos`,
           },
         },
       },
@@ -414,6 +577,7 @@ function updateStatusBar(latestPayload) {
 // ─────────────────────────────────────────────
 async function loadAndRender() {
   hideError();
+  await ensurePartiesCatalog();
 
   // 1. Obtener índice de snapshots disponibles
   let timestamps = [];

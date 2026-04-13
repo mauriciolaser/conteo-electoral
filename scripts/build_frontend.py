@@ -77,6 +77,14 @@ def build(project_root: Path | None = None) -> None:
             shutil.copy2(item, target)
     print(f"[build] copiado frontend/* -> {dist}")
 
+    public_parties_src = src / "assets" / "partidos"
+    public_parties_dist = dist / "partidos"
+    if public_parties_src.exists():
+        if public_parties_dist.exists():
+            shutil.rmtree(public_parties_dist)
+        shutil.copytree(public_parties_src, public_parties_dist)
+        print(f"[build] partidos públicos -> {public_parties_dist}")
+
     app_src = (src / "app.js").read_text(encoding="utf-8")
     app_out = app_src.replace('__BASE_URL__', f'"{base_url}"')
     (dist / "app.js").write_text(app_out, encoding="utf-8")
