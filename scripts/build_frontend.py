@@ -62,35 +62,51 @@ def build(project_root: Path | None = None) -> None:
 
     src = root / "frontend"
     dist = src / "dist"
+
+    print(f"[build] eliminando dist existente: {dist}")
     if dist.exists():
         shutil.rmtree(dist)
+        print("[build] dist eliminado")
     dist.mkdir(parents=True, exist_ok=True)
-    for item in src.rglob("*"):
-        if item == dist or dist in item.parents:
-            continue
+    print("[build] dist/ creado, copiando archivos...")
+
+    parties_src = src / "assets" / "partidos"
+    items_to_copy = [
+        item for item in src.rglob("*")
+        if item != dist
+        and dist not in item.parents
+        and item != parties_src
+        and parties_src not in item.parents
+    ]
+    print(f"[build] {len(items_to_copy)} entradas a copiar")
+    for item in items_to_copy:
         rel = item.relative_to(src)
         target = dist / rel
         if item.is_dir():
             target.mkdir(parents=True, exist_ok=True)
         else:
             target.parent.mkdir(parents=True, exist_ok=True)
+            print(f"[build]   copiando {rel}")
             shutil.copy2(item, target)
     print(f"[build] copiado frontend/* -> {dist}")
 
     public_parties_src = src / "assets" / "partidos"
     public_parties_dist = dist / "partidos"
     if public_parties_src.exists():
+        print(f"[build] copiando partidos: {public_parties_src} -> {public_parties_dist}")
         if public_parties_dist.exists():
             shutil.rmtree(public_parties_dist)
         shutil.copytree(public_parties_src, public_parties_dist)
         print(f"[build] partidos públicos -> {public_parties_dist}")
 
+    print("[build] procesando app.js...")
     app_src = (src / "app.js").read_text(encoding="utf-8")
     app_out = app_src.replace('__BASE_URL__', f'"{base_url}"')
     (dist / "app.js").write_text(app_out, encoding="utf-8")
     print(f"[build] app.js -> BASE_URL={base_url}")
 
     ga_id = env.get("GA_ID", "").strip()
+    print(f"[build] procesando index.html (GA_ID={'definido' if ga_id else 'no definido'})...")
     index_dist = dist / "index.html"
     index_src = index_dist.read_text(encoding="utf-8")
     if ga_id:

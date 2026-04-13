@@ -29,20 +29,26 @@ def publish_frontend(project_root: Path, env_path: Path | None = None) -> None:
         print("[publish] DEPLOY_FRONTEND no definido en .env — deploy omitido")
         return
 
+    print(f"[publish] conectando FTP a {env.get('FTP_HOST', '?')}...")
     ftp = _ftp_connect(env)
+    print("[publish] FTP conectado")
     base = _to_remote_dir(dest)
-    uploaded = 0
+    all_files = [item for item in sorted(dist_dir.rglob("*")) if not item.is_dir()]
+    total = len(all_files)
+    uploaded = skipped = 0
     try:
-        for item in sorted(dist_dir.rglob("*")):
-            if item.is_dir():
-                continue
+        for i, item in enumerate(all_files, 1):
             rel = item.relative_to(dist_dir).as_posix()
-            _ftp_upload(ftp, item, f"{base}/{rel}" if base else rel)
-            uploaded += 1
+            remote = f"{base}/{rel}" if base else rel
+            print(f"[publish] ({i}/{total}) {rel}")
+            if _ftp_upload(ftp, item, remote):
+                uploaded += 1
+            else:
+                skipped += 1
     finally:
         ftp.quit()
 
-    print(f"[publish] frontend OK: {uploaded} archivos -> {base}")
+    print(f"[publish] frontend OK: {uploaded} subidos, {skipped} sin cambios -> {base}")
 
 
 def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
@@ -65,14 +71,16 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
     ftp = _ftp_connect(env)
     base = _to_remote_dir(dest)
     remote_root = f"{base}/raw_history" if base else "raw_history"
-    uploaded = 0
+    uploaded = skipped = 0
     try:
         for item in sorted(local_history_root.rglob("*")):
             if item.is_dir():
                 continue
             rel = item.relative_to(local_history_root).as_posix()
-            _ftp_upload(ftp, item, f"{remote_root}/{rel}")
-            uploaded += 1
+            if _ftp_upload(ftp, item, f"{remote_root}/{rel}"):
+                uploaded += 1
+            else:
+                skipped += 1
 
         # history_index.json junto al raw_history/
         timestamps = sorted(
@@ -85,7 +93,7 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
     finally:
         ftp.quit()
 
-    print(f"[publish] raw_history OK: {uploaded} archivos -> {remote_root}")
+    print(f"[publish] raw_history OK: {uploaded} subidos, {skipped} sin cambios -> {remote_root}")
     print(f"[publish] history_index.json: {len(timestamps)} snapshots")
 
 
@@ -104,17 +112,35 @@ def _ftp_connect(env: dict[str, str]) -> FTP:
     return ftp
 
 
-def _ftp_upload(ftp: FTP, local: Path, remote: str) -> None:
+def _ftp_remote_size(ftp: FTP, remote: str) -> int | None:
+    """Devuelve el tamaño del archivo remoto, o None si no existe."""
+    try:
+        return ftp.size(remote)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _ftp_upload(ftp: FTP, local: Path, remote: str) -> bool:
+    """Sube local a remote solo si el tamaño difiere. Devuelve True si subió."""
+    local_size = local.stat().st_size
+    remote_size = _ftp_remote_size(ftp, remote)
+    if remote_size == local_size:
+        print(f"[ftp]   skip {remote!r} ({local_size} bytes, sin cambios)")
+        return False
+    print(f"[ftp]   ensure_parent {remote!r}...")
     _ftp_ensure_parent(ftp, remote)
     parent, name = remote.rsplit("/", 1) if "/" in remote else ("", remote)
     cwd = ftp.pwd()
     try:
         if parent:
             ftp.cwd(parent)
+        print(f"[ftp]   STOR {name!r} ({local_size} bytes, remoto era {remote_size})...")
         with local.open("rb") as fh:
             ftp.storbinary(f"STOR {name}", fh)
+        print(f"[ftp]   OK {name!r}")
     finally:
         ftp.cwd(cwd)
+    return True
 
 
 def _ftp_upload_bytes(ftp: FTP, data: bytes, remote: str) -> None:
