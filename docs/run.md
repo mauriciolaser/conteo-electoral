@@ -78,14 +78,14 @@ schtasks /delete /tn "ElectionCounter10m" /f
 
 ### Deploy desde GitHub Actions (remoto)
 
-El workflow `.github/workflows/deploy-frontend.yml` hace build + FTP deploy automáticamente.
+El workflow `.github/workflows/deploy-frontend.yml` (`Frontend Deploy`) hace build + FTP deploy automáticamente.
 
 **Trigger automático:** push a `main` cuando cambian archivos en `frontend/`, `scripts/build_frontend.py` o `election_counter/publish.py`.
 
-**Deploy manual (comando único recomendado):**
+**Deploy manual (comando único recomendado, PowerShell):**
 
-```bash
-gh workflow run deploy-frontend.yml --repo mauriciolaser/conteo-electoral && gh run watch --repo mauriciolaser/conteo-electoral
+```powershell
+gh workflow run deploy-frontend.yml --repo mauriciolaser/conteo-electoral; Start-Sleep -Seconds 2; $id = gh run list --repo mauriciolaser/conteo-electoral --workflow "Frontend Deploy" --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId'; gh run watch $id --repo mauriciolaser/conteo-electoral --exit-status
 ```
 
 **Secrets requeridos en GitHub** (`Settings → Secrets and variables → Actions`):
