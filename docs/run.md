@@ -80,7 +80,13 @@ schtasks /delete /tn "ElectionCounter10m" /f
 
 El workflow `.github/workflows/deploy-frontend.yml` hace build + FTP deploy automáticamente.
 
-**Trigger único (directo):** push a `main` cuando cambian archivos en `frontend/`, `scripts/build_frontend.py` o `election_counter/publish.py`.
+**Trigger automático:** push a `main` cuando cambian archivos en `frontend/`, `scripts/build_frontend.py` o `election_counter/publish.py`.
+
+**Deploy manual (comando único recomendado):**
+
+```bash
+gh workflow run deploy-frontend.yml --repo mauriciolaser/conteo-electoral && gh run watch --repo mauriciolaser/conteo-electoral
+```
 
 **Secrets requeridos en GitHub** (`Settings → Secrets and variables → Actions`):
 
