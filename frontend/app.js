@@ -562,7 +562,7 @@ function renderTrendChart(snapshots, top5Names) {
 function updateStatusBar(latestPayload) {
   const meta = latestPayload.metadata || {};
   const actasPct = typeof meta.actas_pct_global === "number"
-    ? meta.actas_pct_global.toFixed(3) + "% actas"
+    ? meta.actas_pct_global.toFixed(3)
     : "—";
   const extractedAt = meta.extracted_at_utc
     ? new Date(meta.extracted_at_utc).toLocaleString("es-PE", {
@@ -574,7 +574,7 @@ function updateStatusBar(latestPayload) {
 
   const actasEl = document.getElementById("actas-pct");
   const extractedEl = document.getElementById("extracted-at");
-  actasEl.textContent = `Actas procesadas ${actasPct}`;
+  actasEl.textContent = `${actasPct}`;
   extractedEl.textContent = extractedAt;
 
   return extractedAt;
