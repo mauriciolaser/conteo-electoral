@@ -341,7 +341,7 @@ python -m election_counter --mode full --allow-fallback
 
 Por defecto, fallback está desactivado.
 
-### 8.6 Programación automática cada 10 minutos (Windows PowerShell)
+### 8.6 Programación automática cada 30 minutos (Windows PowerShell)
 
 Crear tarea:
 
@@ -352,7 +352,7 @@ schtasks /create /tn "ElectionCounter30m" /sc minute /mo 30 /tr "powershell -NoP
 Ejecutar tarea al instante:
 
 ```powershell
-schtasks /run /tn "ElectionCounter10m"
+schtasks /run /tn "ElectionCounter30m"
 ```
 
 Si se usa `/rl HIGHEST` y aparece `Acceso denegado`, ejecutar PowerShell como Administrador o crear la tarea sin elevación.

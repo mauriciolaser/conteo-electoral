@@ -48,9 +48,9 @@ python -m election_counter --mode full --headed --browser-channel msedge
 
 ---
 
-### Cron de backend cada 10 minutos
+### Cron de backend cada 30 minutos
 
-Arranca el loop: corre el run individual y sube datos cada 10 minutos. Si falla, reintenta en 60 segundos.
+Arranca el loop: corre el run individual y sube datos cada 30 minutos. Si falla, reintenta en 60 segundos.
 
 ```bat
 scripts\start_pipeline.bat
@@ -65,20 +65,20 @@ schtasks /create /tn "ElectionCounter30m" /sc minute /mo 30 /tr "powershell.exe 
 Ver estado:
 
 ```powershell
-schtasks /query /tn "ElectionCounter10m" /v /fo list
+schtasks /query /tn "ElectionCounter30m" /v /fo list
 ```
 
 Eliminar:
 
 ```powershell
-schtasks /delete /tn "ElectionCounter10m" /f
+schtasks /delete /tn "ElectionCounter30m" /f
 ```
 
 ---
 
 ### Backend como servicio en VPS
 
-La forma recomendada para el VPS es `systemd` con timer cada 10 minutos.
+La forma recomendada para el VPS es `systemd` con timer cada 30 minutos.
 Ver `docs/vps-backend.md` para el comando, archivos de servicio y pasos de instalación.
 
 ---

@@ -1,10 +1,6 @@
 from __future__ import annotations
 
-"""VPS-oriented scraper that prefers ONPE backend JSON over frontend rendering.
-
-This module is intentionally separate from `scraper.py` so the local/manual
-flow can remain untouched while the VPS backend can evolve independently.
-"""
+"""VPS-oriented scraper that prefers ONPE backend JSON over frontend rendering."""
 
 import json
 from datetime import datetime, timezone
@@ -243,6 +239,7 @@ def _build_region_from_backend(
     part_rows = participantes_payload.get("data") or []
     emitidos = int(round(float(tot.get("totalVotosEmitidos") or 0)))
     actas = float(tot.get("actasContabilizadas") or 0.0)
+
     partidos: list[dict[str, object]] = []
     sum_votes = 0
     for row in part_rows:
@@ -251,16 +248,19 @@ def _build_region_from_backend(
             continue
         votes = int(round(float(row.get("totalVotosValidos") or 0)))
         sum_votes += votes
+        up = normalize_name(party)
         partidos.append(
             {
                 "nombre": party,
                 "votos": votes,
-                "es_blanco_o_nulo": "BLANCO" in normalize_name(party) or "NULO" in normalize_name(party),
+                "es_blanco_o_nulo": ("BLANCO" in up or "NULO" in up),
             }
         )
+
     diff = emitidos - sum_votes
     if diff > 0:
         partidos.append({"nombre": "AJUSTE", "votos": diff, "es_blanco_o_nulo": False})
+
     return {
         "region": region_name,
         "actas_pct": actas,
@@ -276,7 +276,7 @@ def _extract_party_logo_map(page) -> dict[str, str]:
             const cards=[...document.querySelectorAll('section.desplegable.full article.candidato')];
             return cards.map(c => {
                 const p = c.querySelector('.nombre p');
-                const logo = c.querySelector('.cont-info app-img .img img[alt=\"partidos\"], .cont-info .partido-logo img');
+                const logo = c.querySelector('.cont-info app-img .img img[alt="partidos"], .cont-info .partido-logo img');
                 return {
                     party: p?.textContent?.trim() || '',
                     logo: logo?.getAttribute('src') || '',

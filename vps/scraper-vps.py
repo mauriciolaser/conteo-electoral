@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from election_counter.scraper_vps import scrape_onpe_vps
+from vps.scraper_vps import scrape_onpe_vps
 
 
 def main() -> int:

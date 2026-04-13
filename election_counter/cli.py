@@ -17,13 +17,14 @@ from election_counter.reporting import (
 )
 from election_counter.scraper import scrape_onpe
 from election_counter.web import run_hud_server
+from vps.runner import run_vps_loop
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Scraping + proyección ONPE")
     parser.add_argument(
         "--mode",
-        choices=["scrape", "project", "report", "full", "serve", "publish", "deploy-frontend"],
+        choices=["scrape", "project", "report", "full", "serve", "publish", "deploy-frontend", "vps"],
         default="full",
     )
     parser.add_argument("--data-dir", default="data")
@@ -57,6 +58,22 @@ def main() -> int:
     if args.mode == "deploy-frontend":
         project_root = Path(__file__).resolve().parent.parent
         publish_frontend(project_root=project_root)
+        return 0
+
+    if args.mode == "vps":
+        project_root = Path(__file__).resolve().parent.parent
+        vps_browser_channel = args.browser_channel or "chromium"
+        run_vps_loop(
+            project_root=project_root,
+            data_dir=data_dir,
+            output_dir=output_dir,
+            browser_channel=vps_browser_channel,
+            user_data_dir=Path(args.user_data_dir) if args.user_data_dir else Path("/var/lib/election-counter/browser-profile"),
+            margin=args.margin,
+            top_n=args.top_n,
+            source_url=args.source_url,
+            interval_seconds=1800,
+        )
         return 0
 
     if args.mode == "publish":
