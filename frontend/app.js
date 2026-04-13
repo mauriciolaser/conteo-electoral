@@ -210,7 +210,7 @@ const MAIN_CHART_MODE_META = {
     tooltipSuffix: "votos interpolados",
   },
   rural: {
-    note: "Sesgo rural en top 10 regiones donde lidera Sánchez: redistribuye solo voto pendiente con ratio Rural/Urbano del cuadro (y OTROS para listas no explícitas), sin tocar votos ya contados (Top 6)",
+    note: "Sesgo rural en top 10 regiones donde lidera Sánchez: redistribuye solo voto pendiente con ratio Rural/Urbano del conteo Rápido de Ipsos presentado al mediodía del 12 de abril (y OTROS para listas no explícitas), sin tocar votos ya contados (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
   },
   ruralFallback: {
@@ -690,26 +690,7 @@ async function loadAndRender() {
 //  Init + auto-refresh cada 60s
 // ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
-  let headerTicking = false;
-  let headerCompact = false;
-  const COMPACT_ON = 120;
-  const COMPACT_OFF = 60;
-  const syncHeaderState = () => {
-    if (!headerCompact && window.scrollY > COMPACT_ON) {
-      headerCompact = true;
-      document.body.classList.add("header-compact");
-    } else if (headerCompact && window.scrollY < COMPACT_OFF) {
-      headerCompact = false;
-      document.body.classList.remove("header-compact");
-    }
-    headerTicking = false;
-  };
-  window.addEventListener("scroll", () => {
-    if (headerTicking) return;
-    headerTicking = true;
-    window.requestAnimationFrame(syncHeaderState);
-  }, { passive: true });
-  syncHeaderState();
+  document.body.classList.add("header-compact");
 
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
