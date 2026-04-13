@@ -1,6 +1,7 @@
 (function attachProjectionModes(global) {
   const TOP_N = 6;
   const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
+  const RLA_PARTY = "RENOVACION POPULAR";
 
   // Tiers basados en popularidad promedio real en las top 6 regiones pro-Sánchez
   // (medida sobre votos válidos acumulados en esas regiones, corte 54.5% actas):
@@ -134,7 +135,7 @@
     return RURAL_MULTIPLIER_D;
   }
 
-  function buildRuralValidProjection(region, baseProjectedByParty) {
+  function buildRuralValidProjection(region, baseProjectedByParty, multiplierResolver = multiplierForParty) {
     const validParties = (region.partidos || [])
       .filter(party => !isSpecial(party.nombre || ""))
       .map(party => ({
@@ -159,7 +160,7 @@
     for (const party of validParties) {
       const baseProjectedVotes = baseProjectedByParty[party.name] || 0;
       const growthBase = Math.max(0, baseProjectedVotes - party.currentVotes);
-      weightedGrowth[party.name] = growthBase * multiplierForParty(party.normalizedName);
+      weightedGrowth[party.name] = growthBase * multiplierResolver(party.normalizedName);
     }
 
     const weightedGrowthTotal = Object.values(weightedGrowth).reduce((sum, value) => sum + value, 0);
@@ -238,7 +239,7 @@
     };
   }
 
-  function buildRuralProjectionStats(latestPayload) {
+  function buildScenarioProjectionStats(latestPayload, multiplierResolver) {
     const regions = latestPayload.regions || [];
     const eligibleRegions = getTopRuralRegions(regions);
     const eligibleRegionNames = new Set(eligibleRegions.map(region => region.region || ""));
@@ -255,7 +256,7 @@
         continue;
       }
 
-      const ruralValidProjection = buildRuralValidProjection(region, baseProjectedByParty);
+      const ruralValidProjection = buildRuralValidProjection(region, baseProjectedByParty, multiplierResolver);
       const mergedProjection = {};
 
       for (const party of region.partidos || []) {
@@ -280,8 +281,23 @@
     };
   }
 
+  function multiplierForPartyMegaRural(partyNameNormalized) {
+    if (partyNameNormalized === SANCHEZ_PARTY) return 1.5;
+    if (partyNameNormalized === RLA_PARTY) return 0.5;
+    return multiplierForParty(partyNameNormalized);
+  }
+
+  function buildRuralProjectionStats(latestPayload) {
+    return buildScenarioProjectionStats(latestPayload, multiplierForParty);
+  }
+
+  function buildMegaRuralProjectionStats(latestPayload) {
+    return buildScenarioProjectionStats(latestPayload, multiplierForPartyMegaRural);
+  }
+
   global.ProjectionModes = {
     buildNationalProjectionStats,
     buildRuralProjectionStats,
+    buildMegaRuralProjectionStats,
   };
 })(window);

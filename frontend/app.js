@@ -217,6 +217,14 @@ const MAIN_CHART_MODE_META = {
     note: "VOTO RURAL sin regiones elegibles en este corte — se muestra interpolación base (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
   },
+  megaRural: {
+    note: "VOTO MEGA-RURAL: en regiones donde lidera Sánchez, se ajusta crecimiento pendiente con ×1.50 para Sánchez y ×0.50 para López Aliaga; resto mantiene sesgo rural (Top 6)",
+    tooltipSuffix: "votos proyectados modo mega-rural",
+  },
+  megaRuralFallback: {
+    note: "VOTO MEGA-RURAL sin regiones elegibles en este corte — se muestra interpolación base (Top 6)",
+    tooltipSuffix: "votos proyectados modo mega-rural",
+  },
 };
 
 const HALF_HOUR_MS = 30 * 60 * 1000;
@@ -366,10 +374,12 @@ function updateMainChartButtons() {
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
   const ruralBtn = document.getElementById("mode-rural");
-  if (!actualBtn || !interpolationBtn || !ruralBtn) return;
+  const megaRuralBtn = document.getElementById("mode-mega-rural");
+  if (!actualBtn || !interpolationBtn || !ruralBtn || !megaRuralBtn) return;
   actualBtn.classList.toggle("active", mainChartMode === "actual");
   interpolationBtn.classList.toggle("active", mainChartMode === "interpolation");
   ruralBtn.classList.toggle("active", mainChartMode === "rural");
+  megaRuralBtn.classList.toggle("active", mainChartMode === "megaRural");
 }
 
 function renderMainChart() {
@@ -387,8 +397,12 @@ function renderMainChart() {
   const values = source.topCandidates.map(([, votes]) => votes);
   const pcts = values.map(v => source.totalValidVotes > 0 ? (v / source.totalValidVotes * 100) : 0);
   const colors = fullLabels.map((name, i) => partyColor(name, i));
-  const modeMeta = mainChartMode === "rural" && source.isFallback
-    ? MAIN_CHART_MODE_META.ruralFallback
+  const fallbackMetaByMode = {
+    rural: MAIN_CHART_MODE_META.ruralFallback,
+    megaRural: MAIN_CHART_MODE_META.megaRuralFallback,
+  };
+  const modeMeta = source.isFallback
+    ? (fallbackMetaByMode[mainChartMode] || MAIN_CHART_MODE_META[mainChartMode] || MAIN_CHART_MODE_META.actual)
     : (MAIN_CHART_MODE_META[mainChartMode] || MAIN_CHART_MODE_META.actual);
   if (noteEl) {
     noteEl.textContent = modeMeta.note;
@@ -643,6 +657,7 @@ async function loadAndRender() {
   const proSanchezStats = buildProSanchezStats(latest.payload);
   const nationalStats = window.ProjectionModes.buildNationalProjectionStats(latest.payload);
   const ruralStats = window.ProjectionModes.buildRuralProjectionStats(latest.payload);
+  const megaRuralStats = window.ProjectionModes.buildMegaRuralProjectionStats(latest.payload);
   const extractedAtLabel = latest.payload?.metadata?.extracted_at_utc
     ? new Date(latest.payload.metadata.extracted_at_utc).toLocaleString("es-PE", {
         timeZone: "America/Lima",
@@ -662,6 +677,12 @@ async function loadAndRender() {
       totalValidVotes: ruralStats.totalValidProjectedVotes,
       isFallback: ruralStats.isFallback,
       eligibleRegionCount: ruralStats.eligibleRegionCount,
+    },
+    megaRural: {
+      topCandidates: megaRuralStats.projectedCandidates.slice(0, TOP_N),
+      totalValidVotes: megaRuralStats.totalValidProjectedVotes,
+      isFallback: megaRuralStats.isFallback,
+      eligibleRegionCount: megaRuralStats.eligibleRegionCount,
     },
   };
 
@@ -711,6 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
   const ruralBtn = document.getElementById("mode-rural");
+  const megaRuralBtn = document.getElementById("mode-mega-rural");
   if (actualBtn) {
     actualBtn.addEventListener("click", () => {
       mainChartMode = "actual";
@@ -726,6 +748,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (ruralBtn) {
     ruralBtn.addEventListener("click", () => {
       mainChartMode = "rural";
+      renderMainChart();
+    });
+  }
+  if (megaRuralBtn) {
+    megaRuralBtn.addEventListener("click", () => {
+      mainChartMode = "megaRural";
       renderMainChart();
     });
   }
