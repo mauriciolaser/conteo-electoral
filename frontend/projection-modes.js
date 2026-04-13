@@ -282,7 +282,7 @@
   }
 
   function multiplierForPartyMegaRural(partyNameNormalized) {
-    if (partyNameNormalized === SANCHEZ_PARTY) return 1.5;
+    if (partyNameNormalized === SANCHEZ_PARTY) return 2;
     if (partyNameNormalized === RLA_PARTY) return 0.5;
     return multiplierForParty(partyNameNormalized);
   }
