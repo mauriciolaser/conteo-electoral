@@ -346,7 +346,7 @@ Por defecto, fallback está desactivado.
 Crear tarea:
 
 ```powershell
-schtasks /create /tn "ElectionCounter10m" /sc minute /mo 10 /tr "powershell -NoProfile -ExecutionPolicy Bypass -Command `"Set-Location 'C:\Experimental\election-counter'; python -m election_counter --mode full --headed --browser-channel msedge`"" /f
+schtasks /create /tn "ElectionCounter30m" /sc minute /mo 30 /tr "powershell -NoProfile -ExecutionPolicy Bypass -Command `"Set-Location 'C:\Experimental\election-counter'; python -m election_counter --mode full --headed --browser-channel msedge`"" /f
 ```
 
 Ejecutar tarea al instante:

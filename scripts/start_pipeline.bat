@@ -3,7 +3,7 @@ setlocal EnableExtensions
 
 cd /d "%~dp0.."
 
-echo Iniciando pipeline cada 10 minutos...
+echo Iniciando pipeline cada 30 minutos...
 echo Cierra esta ventana para detenerlo.
 
 :loop
@@ -13,8 +13,7 @@ if errorlevel 1 (
   echo [%date% %time%] Pipeline termino con error. Reintentando en 60 segundos...
   timeout /t 60 /nobreak >nul
 ) else (
-  echo [%date% %time%] Pipeline OK. Proxima ejecucion en 600 segundos...
-  timeout /t 600 /nobreak >nul
+  echo [%date% %time%] Pipeline OK. Proxima ejecucion en 1800 segundos...
+  timeout /t 1800 /nobreak >nul
 )
 goto loop
-

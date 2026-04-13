@@ -59,7 +59,7 @@ scripts\start_pipeline.bat
 Para registrarlo como tarea de Windows (corre aunque no haya ventana abierta):
 
 ```powershell
-schtasks /create /tn "ElectionCounter10m" /sc minute /mo 10 /tr "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Set-Location 'C:\Experimental\election-counter'; python -m election_counter --mode full --headed --browser-channel msedge\"" /f
+schtasks /create /tn "ElectionCounter30m" /sc minute /mo 30 /tr "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ""Set-Location 'C:\Experimental\election-counter'; python -m election_counter --mode full --headed --browser-channel msedge""" /f
 ```
 
 Ver estado:
@@ -73,6 +73,13 @@ Eliminar:
 ```powershell
 schtasks /delete /tn "ElectionCounter10m" /f
 ```
+
+---
+
+### Backend como servicio en VPS
+
+La forma recomendada para el VPS es `systemd` con timer cada 10 minutos.
+Ver `docs/vps-backend.md` para el comando, archivos de servicio y pasos de instalación.
 
 ---
 
