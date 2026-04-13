@@ -78,18 +78,10 @@
         <button
           id="mode-rural"
           class="mode-btn"
-          data-tooltip="SESGO RURAL = una proyección especulativa que NO cambia los votos ya contados: solo reparte el voto pendiente en regiones donde Sánchez lidera, dando más o menos crecimiento según la fuerza local de cada partido. En este modo: Sánchez ~27% → ×1.45 · Cívico Obras ~15% y Ahora Nación ~12% → ×1.20 · Fuerza Popular ~7% y Buen Gobierno ~6.5% → ×1.00 · Renovación Popular y otros con 2–5% → ×0.80 · resto &lt;2% → ×0.55."
+          data-tooltip="SESGO RURAL = solo en las 10 regiones donde Sánchez lidera y más votos tiene, reparte el voto pendiente con ratio Rural/Urbano del cuadro (OTROS para listas no explícitas), sin tocar votos ya contados."
           type="button"
         >
           VOTO RURAL
-        </button>
-        <button
-          id="mode-mega-rural"
-          class="mode-btn"
-          data-tooltip="SESGO RURAL = repartir solo el voto pendiente en regiones donde Sánchez lidera, manteniendo los votos ya contados. VOTO MEGA-RURAL usa la misma lógica y añade un ajuste fuerte: crecimiento pendiente de Sánchez ×2.00 y de López Aliaga ×0.50."
-          type="button"
-        >
-          VOTO MEGA-RURAL
         </button>
       </div>
       <p class="chart-note" id="main-chart-note">Porcentaje de votos válidos del total (Top 6)</p>

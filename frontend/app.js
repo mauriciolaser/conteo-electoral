@@ -210,20 +210,12 @@ const MAIN_CHART_MODE_META = {
     tooltipSuffix: "votos interpolados",
   },
   rural: {
-    note: "Sesgo rural (popularidad real en todas las regiones donde lidera Sánchez): ×1.45 Sánchez · ×1.20 Cívico Obras/Ahora Nación · ×1.00 FP/Buen Gobierno · ×0.80 tier medio · ×0.55 resto (Top 6)",
+    note: "Sesgo rural en top 10 regiones donde lidera Sánchez: redistribuye solo voto pendiente con ratio Rural/Urbano del cuadro (y OTROS para listas no explícitas), sin tocar votos ya contados (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
   },
   ruralFallback: {
     note: "VOTO RURAL sin regiones elegibles en este corte — se muestra interpolación base (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
-  },
-  megaRural: {
-    note: "VOTO MEGA-RURAL: en regiones donde lidera Sánchez, el voto pendiente se reparte con ×2.00 para Sánchez y ×0.50 para López Aliaga; los demás partidos reparten su crecimiento pendiente con los multiplicadores rurales por popularidad local (Top 6)",
-    tooltipSuffix: "votos proyectados modo mega-rural",
-  },
-  megaRuralFallback: {
-    note: "VOTO MEGA-RURAL sin regiones elegibles en este corte — se muestra interpolación base (Top 6)",
-    tooltipSuffix: "votos proyectados modo mega-rural",
   },
 };
 
@@ -374,12 +366,10 @@ function updateMainChartButtons() {
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
   const ruralBtn = document.getElementById("mode-rural");
-  const megaRuralBtn = document.getElementById("mode-mega-rural");
-  if (!actualBtn || !interpolationBtn || !ruralBtn || !megaRuralBtn) return;
+  if (!actualBtn || !interpolationBtn || !ruralBtn) return;
   actualBtn.classList.toggle("active", mainChartMode === "actual");
   interpolationBtn.classList.toggle("active", mainChartMode === "interpolation");
   ruralBtn.classList.toggle("active", mainChartMode === "rural");
-  megaRuralBtn.classList.toggle("active", mainChartMode === "megaRural");
 }
 
 function renderMainChart() {
@@ -399,7 +389,6 @@ function renderMainChart() {
   const colors = fullLabels.map((name, i) => partyColor(name, i));
   const fallbackMetaByMode = {
     rural: MAIN_CHART_MODE_META.ruralFallback,
-    megaRural: MAIN_CHART_MODE_META.megaRuralFallback,
   };
   const modeMeta = source.isFallback
     ? (fallbackMetaByMode[mainChartMode] || MAIN_CHART_MODE_META[mainChartMode] || MAIN_CHART_MODE_META.actual)
@@ -657,7 +646,6 @@ async function loadAndRender() {
   const proSanchezStats = buildProSanchezStats(latest.payload);
   const nationalStats = window.ProjectionModes.buildNationalProjectionStats(latest.payload);
   const ruralStats = window.ProjectionModes.buildRuralProjectionStats(latest.payload);
-  const megaRuralStats = window.ProjectionModes.buildMegaRuralProjectionStats(latest.payload);
   const extractedAtLabel = latest.payload?.metadata?.extracted_at_utc
     ? new Date(latest.payload.metadata.extracted_at_utc).toLocaleString("es-PE", {
         timeZone: "America/Lima",
@@ -677,12 +665,6 @@ async function loadAndRender() {
       totalValidVotes: ruralStats.totalValidProjectedVotes,
       isFallback: ruralStats.isFallback,
       eligibleRegionCount: ruralStats.eligibleRegionCount,
-    },
-    megaRural: {
-      topCandidates: megaRuralStats.projectedCandidates.slice(0, TOP_N),
-      totalValidVotes: megaRuralStats.totalValidProjectedVotes,
-      isFallback: megaRuralStats.isFallback,
-      eligibleRegionCount: megaRuralStats.eligibleRegionCount,
     },
   };
 
@@ -732,7 +714,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
   const ruralBtn = document.getElementById("mode-rural");
-  const megaRuralBtn = document.getElementById("mode-mega-rural");
   if (actualBtn) {
     actualBtn.addEventListener("click", () => {
       mainChartMode = "actual";
@@ -748,12 +729,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (ruralBtn) {
     ruralBtn.addEventListener("click", () => {
       mainChartMode = "rural";
-      renderMainChart();
-    });
-  }
-  if (megaRuralBtn) {
-    megaRuralBtn.addEventListener("click", () => {
-      mainChartMode = "megaRural";
       renderMainChart();
     });
   }

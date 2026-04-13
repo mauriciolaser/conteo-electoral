@@ -1,38 +1,30 @@
 (function attachProjectionModes(global) {
   const TOP_N = 6;
+  const TOP_RURAL_REGIONS = 10;
   const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
-  const RLA_PARTY = "RENOVACION POPULAR";
 
-  // Tiers basados en popularidad promedio real en las top 6 regiones pro-Sánchez
-  // (medida sobre votos válidos acumulados en esas regiones, corte 54.5% actas):
-  //   Tier S: Sánchez          ~27%  → ×1.45 (fijo, es el candidato dominante)
-  //   Tier A: ≥10%             Cívico Obras ~15%, Ahora Nación ~12%  → ×1.20
-  //   Tier B: 5–10%            Fuerza Popular ~7%, Buen Gobierno ~6.5%  → ×1.00
-  //   Tier C: 2–5%             Cooperación Popular, Renovación Popular, Frente Esperanza,
-  //                            Sicreo, País para Todos, Venceremos, Primero la Gente  → ×0.80
-  //   Tier D: <2%              resto  → ×0.55
-  const RURAL_TIERS = {
-    S: { multiplier: 1.45, parties: new Set([SANCHEZ_PARTY]) },
-    A: { multiplier: 1.20, parties: new Set([
-      "PARTIDO CIVICO OBRAS",
-      "AHORA NACION - AN",
-    ]) },
-    B: { multiplier: 1.00, parties: new Set([
-      "FUERZA POPULAR",
-      "PARTIDO DEL BUEN GOBIERNO",
-    ]) },
-    C: { multiplier: 0.80, parties: new Set([
-      "PARTIDO POLITICO COOPERACION POPULAR",
-      "RENOVACION POPULAR",
-      "PARTIDO FRENTE DE LA ESPERANZA 2021",
-      "PARTIDO SICREO",
-      "PARTIDO PAIS PARA TODOS",
-      "ALIANZA ELECTORAL VENCEREMOS",
-      "PRIMERO LA GENTE - COMUNIDAD, ECOLOGIA, LIBERTAD Y PROGRESO",
-    ]) },
-    // Tier D (default): ×0.55
+  // Ratios Rural/Urbano del cuadro fuente (data/ratio.png).
+  // Cualquier lista no explícita cae a "OTROS".
+  const RURAL_URBAN_RATIOS = {
+    FUERZA_POPULAR: 15.9 / 17.4,
+    JUNTOS_POR_EL_PERU: 33.8 / 7.9,
+    RENOVACION_POPULAR: 3.0 / 13.1,
+    PARTIDO_DEL_BUEN_GOBIERNO: 2.9 / 12.3,
+    PARTIDO_CIVICO_OBRAS: 11.8 / 9.8,
+    PARTIDO_PAIS_PARA_TODOS: 3.5 / 8.9,
+    AHORA_NACION_AN: 7.0 / 7.5,
+    OTROS: 22.1 / 23.1,
   };
-  const RURAL_MULTIPLIER_D = 0.55;
+
+  const RURAL_RATIO_BY_PARTY = {
+    [SANCHEZ_PARTY]: RURAL_URBAN_RATIOS.JUNTOS_POR_EL_PERU,
+    FUERZA_POPULAR: RURAL_URBAN_RATIOS.FUERZA_POPULAR,
+    RENOVACION_POPULAR: RURAL_URBAN_RATIOS.RENOVACION_POPULAR,
+    PARTIDO_DEL_BUEN_GOBIERNO: RURAL_URBAN_RATIOS.PARTIDO_DEL_BUEN_GOBIERNO,
+    PARTIDO_CIVICO_OBRAS: RURAL_URBAN_RATIOS.PARTIDO_CIVICO_OBRAS,
+    PARTIDO_PAIS_PARA_TODOS: RURAL_URBAN_RATIOS.PARTIDO_PAIS_PARA_TODOS,
+    "AHORA NACION - AN": RURAL_URBAN_RATIOS.AHORA_NACION_AN,
+  };
 
   function normalizeName(name) {
     return (name || "")
@@ -125,14 +117,17 @@
   }
 
   function getTopRuralRegions(regions) {
-    return regions.filter(region => getLeadingValidParty(region).name === SANCHEZ_PARTY);
+    return regions
+      .filter(region => getLeadingValidParty(region).name === SANCHEZ_PARTY)
+      .sort(
+        (a, b) =>
+          getCurrentPartyVotes(b, SANCHEZ_PARTY) - getCurrentPartyVotes(a, SANCHEZ_PARTY)
+      )
+      .slice(0, TOP_RURAL_REGIONS);
   }
 
   function multiplierForParty(partyNameNormalized) {
-    for (const tier of Object.values(RURAL_TIERS)) {
-      if (tier.parties.has(partyNameNormalized)) return tier.multiplier;
-    }
-    return RURAL_MULTIPLIER_D;
+    return RURAL_RATIO_BY_PARTY[partyNameNormalized] || RURAL_URBAN_RATIOS.OTROS;
   }
 
   function buildRuralValidProjection(region, baseProjectedByParty, multiplierResolver = multiplierForParty) {
@@ -281,23 +276,12 @@
     };
   }
 
-  function multiplierForPartyMegaRural(partyNameNormalized) {
-    if (partyNameNormalized === SANCHEZ_PARTY) return 2;
-    if (partyNameNormalized === RLA_PARTY) return 0.5;
-    return multiplierForParty(partyNameNormalized);
-  }
-
   function buildRuralProjectionStats(latestPayload) {
     return buildScenarioProjectionStats(latestPayload, multiplierForParty);
-  }
-
-  function buildMegaRuralProjectionStats(latestPayload) {
-    return buildScenarioProjectionStats(latestPayload, multiplierForPartyMegaRural);
   }
 
   global.ProjectionModes = {
     buildNationalProjectionStats,
     buildRuralProjectionStats,
-    buildMegaRuralProjectionStats,
   };
 })(window);
