@@ -234,6 +234,52 @@
     };
   }
 
+  function buildSimpleProjectionByRegion(latestPayload) {
+    const regions = latestPayload.regions || [];
+    const projectedByRegion = {};
+
+    for (const region of regions) {
+      const regionProjection = buildRegionProjection(region);
+      const regionName = region.region || "";
+      projectedByRegion[regionName] = buildProjectedByParty(region, regionProjection.factor);
+    }
+
+    return projectedByRegion;
+  }
+
+  function buildRuralProjectionByRegion(latestPayload, multiplierResolver = multiplierForParty) {
+    const regions = latestPayload.regions || [];
+    const eligibleRegions = getTopRuralRegions(regions);
+    const eligibleRegionNames = new Set(eligibleRegions.map(region => region.region || ""));
+    const projectedByRegion = {};
+
+    for (const region of regions) {
+      const regionProjection = buildRegionProjection(region);
+      const baseProjectedByParty = buildProjectedByParty(region, regionProjection.factor);
+      const regionName = region.region || "";
+
+      if (!eligibleRegionNames.has(regionName)) {
+        projectedByRegion[regionName] = baseProjectedByParty;
+        continue;
+      }
+
+      const ruralValidProjection = buildRuralValidProjection(region, baseProjectedByParty, multiplierResolver);
+      const mergedProjection = {};
+
+      for (const party of region.partidos || []) {
+        const partyName = (party.nombre || "").trim();
+        if (!partyName) continue;
+        mergedProjection[partyName] = isSpecial(partyName)
+          ? baseProjectedByParty[partyName] || 0
+          : ruralValidProjection[partyName] || 0;
+      }
+
+      projectedByRegion[regionName] = mergedProjection;
+    }
+
+    return projectedByRegion;
+  }
+
   function buildScenarioProjectionStats(latestPayload, multiplierResolver) {
     const regions = latestPayload.regions || [];
     const eligibleRegions = getTopRuralRegions(regions);
@@ -283,5 +329,7 @@
   global.ProjectionModes = {
     buildNationalProjectionStats,
     buildRuralProjectionStats,
+    buildSimpleProjectionByRegion,
+    buildRuralProjectionByRegion,
   };
 })(window);

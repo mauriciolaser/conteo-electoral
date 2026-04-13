@@ -99,48 +99,32 @@
     </section>
 
     <section class="chart-section" id="pro-sanchez-section">
-      <h2>Top 5 regiones en las que Sánchez está primero</h2>
+      <div class="panel-title-row">
+        <h2 id="candidate-top-title">Top 9 regiones en las que Sánchez está primero</h2>
+        <label class="candidate-picker-label" for="candidate-picker">Candidato</label>
+        <select id="candidate-picker" class="candidate-picker" aria-label="Seleccionar candidato para tabla regional">
+          <option value="JUNTOS POR EL PERU" selected>Sánchez</option>
+          <option value="RENOVACION POPULAR">López Aliaga</option>
+          <option value="PARTIDO CIVICO OBRAS">Nieto</option>
+        </select>
+      </div>
       <div class="table-wrap">
         <table id="pro-sanchez-table">
           <thead>
             <tr>
-              <th>REGIÓN</th>
-              <th>VOTOS DE SÁNCHEZ</th>
-              <th>PORCENTAJE DE CONTEO</th>
-              <th>VOTOS INTERPOLADOS</th>
+              <th class="th-tooltip" data-tooltip="Departamento o región electoral donde el candidato seleccionado ocupa el primer lugar en votos válidos.">REGIÓN</th>
+              <th class="th-tooltip" data-tooltip="Porcentaje de actas contabilizadas para la región en el corte más reciente.">PORCENTAJE CONTEO</th>
+              <th class="th-tooltip" id="candidate-votes-header" data-tooltip="Votos válidos contabilizados del candidato seleccionado en la región.">VOTOS SÁNCHEZ</th>
+              <th class="th-tooltip" data-tooltip="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">PROYECCIÓN SIMPLE</th>
+              <th class="th-tooltip" data-tooltip="Proyección aplicando ajuste rural en regiones elegibles; fuera de esas regiones, coincide con la proyección simple.">PROYECCIÓN VOTO RURAL</th>
             </tr>
           </thead>
           <tbody id="pro-sanchez-table-body">
             <tr>
-              <td colspan="4">Cargando...</td>
+              <td colspan="5">Cargando...</td>
             </tr>
           </tbody>
         </table>
-      </div>
-    </section>
-
-    <section class="chart-section" id="showdown-section">
-      <h2>Sánchez vs. López Aliaga</h2>
-      <p id="showdown-data-date" class="showdown-date">Data del corte: —</p>
-      <div class="party-banner">
-        <article class="party-card party-card-jpp">
-          <img src="./assets/jpp-badge.svg" alt="Juntos por el Perú" />
-          <div>
-            <h3>Juntos por el Perú</h3>
-            <p>Roberto Sánchez</p>
-          </div>
-        </article>
-        <article class="party-card party-card-rp">
-          <img src="./assets/rp-badge.svg" alt="Renovación Popular" />
-          <div>
-            <h3>Renovación Popular</h3>
-            <p>Rafael López Aliaga</p>
-          </div>
-        </article>
-      </div>
-      <div class="showdown-group">
-        <p>Interpolación total de votos Pro-Sánchez en todas las regiones: <strong id="national-sanchez-total">—</strong></p>
-        <p>Interpolación total de votos para Rafael López Aliaga (Renovación Popular) en todas las regiones: <strong id="national-rla-total">—</strong></p>
       </div>
     </section>
 

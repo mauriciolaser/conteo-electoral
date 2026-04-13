@@ -221,7 +221,21 @@ const MAIN_CHART_MODE_META = {
 
 const HALF_HOUR_MS = 30 * 60 * 1000;
 const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
-const RLA_PARTY = "RENOVACION POPULAR";
+const CANDIDATE_OPTIONS = {
+  [SANCHEZ_PARTY]: {
+    label: "Sánchez",
+    votesHeader: "VOTOS SÁNCHEZ",
+  },
+  "RENOVACION POPULAR": {
+    label: "López Aliaga",
+    votesHeader: "VOTOS LÓPEZ ALIAGA",
+  },
+  "PARTIDO CIVICO OBRAS": {
+    label: "Nieto",
+    votesHeader: "VOTOS NIETO",
+  },
+};
+let selectedRegionalCandidate = SANCHEZ_PARTY;
 
 // ─────────────────────────────────────────────
 //  Procesado de snapshots crudos
@@ -285,47 +299,42 @@ function leadingPartyInRegion(region) {
     { name: "", votes: -1 });
 }
 
-function buildProSanchezStats(latestPayload) {
+function projectedVotesInRegion(projectedByParty, partyNameNormalized) {
+  if (!projectedByParty) return 0;
+  return Object.entries(projectedByParty)
+    .filter(([name]) => normalizeName(name) === partyNameNormalized)
+    .reduce((acc, [, votes]) => acc + (Number(votes) || 0), 0);
+}
+
+function buildTopRegionalLeaderStats(latestPayload, simpleProjectionByRegion, ruralProjectionByRegion, candidatePartyName = SANCHEZ_PARTY) {
   const regions = latestPayload.regions || [];
-  const proSanchezRegions = [];
+  const candidateRegions = [];
 
   for (const region of regions) {
     const leader = leadingPartyInRegion(region);
-    if (leader.name !== SANCHEZ_PARTY) continue;
+    if (leader.name !== candidatePartyName) continue;
 
     const actasPct = Number(region.actas_pct) || 0;
-    const emitidos = parseInt(region.emitidos_actual) || 0;
-    const projectedTotal = actasPct > 0
-      ? Math.round((emitidos * 100) / actasPct)
-      : emitidos;
-    const remainingVotes = Math.max(0, projectedTotal - emitidos);
+    const candidateVotes = partyVotesInRegion(region, candidatePartyName);
+    const regionName = region.region || "—";
+    const simpleProjection = projectedVotesInRegion(simpleProjectionByRegion[regionName], candidatePartyName);
+    const ruralProjection = projectedVotesInRegion(ruralProjectionByRegion[regionName], candidatePartyName);
 
-    const sanchezVotes = partyVotesInRegion(region, SANCHEZ_PARTY);
-    const rlaVotes = partyVotesInRegion(region, RLA_PARTY);
-    const sanchezShare = emitidos > 0 ? sanchezVotes / emitidos : 0;
-    const rlaShare = emitidos > 0 ? rlaVotes / emitidos : 0;
-
-    proSanchezRegions.push({
+    candidateRegions.push({
       region: region.region || "—",
       actasPct,
-      remainingVotes,
-      sanchezVotes,
-      sanchezProjectedVotes: Math.round(projectedTotal * sanchezShare),
-      rlaProjectedVotes: Math.round(projectedTotal * rlaShare),
+      candidateVotes,
+      simpleProjection: Math.round(simpleProjection || candidateVotes),
+      ruralProjection: Math.round(ruralProjection || simpleProjection || candidateVotes),
     });
   }
 
-  const top5Regions = [...proSanchezRegions]
-    .sort((a, b) => b.sanchezVotes - a.sanchezVotes)
-    .slice(0, 5);
+  const top9Regions = [...candidateRegions]
+    .sort((a, b) => b.candidateVotes - a.candidateVotes)
+    .slice(0, 9);
 
   return {
-    top5Regions,
-    totals: {
-      remainingVotes: proSanchezRegions.reduce((acc, r) => acc + r.remainingVotes, 0),
-      sanchezProjectedVotes: proSanchezRegions.reduce((acc, r) => acc + r.sanchezProjectedVotes, 0),
-      rlaProjectedVotes: proSanchezRegions.reduce((acc, r) => acc + r.rlaProjectedVotes, 0),
-    },
+    top9Regions,
   };
 }
 
@@ -333,33 +342,29 @@ function formatInt(n) {
   return Math.round(n || 0).toLocaleString("es-PE");
 }
 
-function renderProSanchezPanel(stats) {
+function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY) {
   const tbody = document.getElementById("pro-sanchez-table-body");
+  const title = document.getElementById("candidate-top-title");
+  const votesHeader = document.getElementById("candidate-votes-header");
+  const candidateLabel = CANDIDATE_OPTIONS[candidatePartyName]?.label || candidatePartyName;
+  const dynamicVotesHeader = CANDIDATE_OPTIONS[candidatePartyName]?.votesHeader || `VOTOS ${candidateLabel.toUpperCase()}`;
+  if (title) title.textContent = `Top 9 regiones en las que ${candidateLabel} está primero`;
+  if (votesHeader) votesHeader.textContent = dynamicVotesHeader;
   if (!tbody) return;
 
-  if (!stats.top5Regions.length) {
-    tbody.innerHTML = `<tr><td colspan="4">No hay regiones con liderazgo de Juntos por el Perú aún.</td></tr>`;
+  if (!stats.top9Regions.length) {
+    tbody.innerHTML = `<tr><td colspan="5">No hay regiones con liderazgo de ${candidateLabel} aún.</td></tr>`;
   } else {
-    tbody.innerHTML = stats.top5Regions.map(r => `
+    tbody.innerHTML = stats.top9Regions.map(r => `
       <tr>
         <td>${r.region}</td>
-        <td>${formatInt(r.sanchezVotes)}</td>
         <td>${r.actasPct.toFixed(3)}%</td>
-        <td>${formatInt(r.sanchezProjectedVotes)}</td>
+        <td>${formatInt(r.candidateVotes)}</td>
+        <td>${formatInt(r.simpleProjection)}</td>
+        <td>${formatInt(r.ruralProjection)}</td>
       </tr>
     `).join("");
   }
-}
-
-function renderShowdownPanel(nationalStats, proSanchezStats) {
-  const totalSanchezEl = document.getElementById("national-sanchez-total");
-  const totalRlaEl = document.getElementById("national-rla-total");
-  const showdownDateEl = document.getElementById("showdown-data-date");
-  if (!totalSanchezEl || !totalRlaEl || !showdownDateEl) return;
-
-  totalSanchezEl.textContent = formatInt(nationalStats.sanchezProjectedVotes);
-  totalRlaEl.textContent = formatInt(nationalStats.rlaProjectedVotes);
-  showdownDateEl.textContent = `Data del corte: ${proSanchezStats.extractedAtLabel}`;
 }
 
 function updateMainChartButtons() {
@@ -643,17 +648,16 @@ async function loadAndRender() {
   const top5 = top5FromTotals(latest.totals);  // devuelve hasta TOP_N
   const top5Names = top5.map(([name]) => name);
   const currentStats = buildCurrentProcessingStats(latest.totals);
-  const proSanchezStats = buildProSanchezStats(latest.payload);
   const nationalStats = window.ProjectionModes.buildNationalProjectionStats(latest.payload);
   const ruralStats = window.ProjectionModes.buildRuralProjectionStats(latest.payload);
-  const extractedAtLabel = latest.payload?.metadata?.extracted_at_utc
-    ? new Date(latest.payload.metadata.extracted_at_utc).toLocaleString("es-PE", {
-        timeZone: "America/Lima",
-        dateStyle: "full",
-        timeStyle: "short",
-      })
-    : "—";
-  proSanchezStats.extractedAtLabel = extractedAtLabel;
+  const simpleProjectionByRegion = window.ProjectionModes.buildSimpleProjectionByRegion(latest.payload);
+  const ruralProjectionByRegion = window.ProjectionModes.buildRuralProjectionByRegion(latest.payload);
+  const topRegionalLeadersStats = buildTopRegionalLeaderStats(
+    latest.payload,
+    simpleProjectionByRegion,
+    ruralProjectionByRegion,
+    selectedRegionalCandidate
+  );
   mainChartData = {
     actual: currentStats,
     interpolation: {
@@ -671,8 +675,7 @@ async function loadAndRender() {
   // 4. Renderizar
   updateStatusBar(latest.payload);
   renderMainChart();
-  renderProSanchezPanel(proSanchezStats);
-  renderShowdownPanel(nationalStats, proSanchezStats);
+  renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate);
 
   if (trendSnapshots.length >= 2) {
     const trendContainer = document.querySelector("#trend-chart-container");
@@ -695,6 +698,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
   const ruralBtn = document.getElementById("mode-rural");
+  const candidatePicker = document.getElementById("candidate-picker");
   if (actualBtn) {
     actualBtn.addEventListener("click", () => {
       mainChartMode = "actual";
@@ -711,6 +715,13 @@ document.addEventListener("DOMContentLoaded", () => {
     ruralBtn.addEventListener("click", () => {
       mainChartMode = "rural";
       renderMainChart();
+    });
+  }
+  if (candidatePicker) {
+    candidatePicker.value = selectedRegionalCandidate;
+    candidatePicker.addEventListener("change", () => {
+      selectedRegionalCandidate = candidatePicker.value || SANCHEZ_PARTY;
+      loadAndRender();
     });
   }
   loadAndRender();
