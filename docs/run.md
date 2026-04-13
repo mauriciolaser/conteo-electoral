@@ -76,6 +76,40 @@ schtasks /delete /tn "ElectionCounter10m" /f
 
 ---
 
+### Deploy desde GitHub Actions (remoto)
+
+El workflow `.github/workflows/deploy-frontend.yml` hace build + FTP deploy automáticamente.
+
+**Trigger automático:** push a `main` cuando cambian archivos en `frontend/`, `scripts/build_frontend.py` o `election_counter/publish.py`.
+
+**Trigger manual desde terminal:**
+
+```bash
+gh workflow run deploy-frontend.yml --repo mauriciolaser/conteo-electoral
+```
+
+Con seguimiento en tiempo real:
+
+```bash
+gh workflow run deploy-frontend.yml --repo mauriciolaser/conteo-electoral && gh run watch --repo mauriciolaser/conteo-electoral
+```
+
+Requiere [GitHub CLI](https://cli.github.com/). Alternativamente desde la web:
+**Actions → Deploy Frontend → Run workflow → Run workflow**
+
+**Secrets requeridos en GitHub** (`Settings → Secrets and variables → Actions`):
+
+| Secret | Descripción |
+|---|---|
+| `FTP_USER` | Usuario FTP |
+| `FTP_HOST` | Host / IP del servidor FTP |
+| `FTP_PASSWORD` | Contraseña FTP |
+| `DEPLOY_FRONTEND` | Ruta FTP destino (ej. `perulainen.com/conteo`) |
+| `BASE_URL` | URL HTTP del sitio (ej. `https://www.perulainen.com/conteo`) |
+| `GA_ID` | Google Analytics ID (opcional) |
+
+---
+
 ## 4) Variables de entorno (.env)
 
 ```env
