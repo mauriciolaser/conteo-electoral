@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "election-counter"
+version = "0.1.0"
+description = "ONPE election scraper and projection pipeline"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "playwright>=1.45.0",
+  "matplotlib>=3.9.0",
+  "pillow>=10.0.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["election_counter*"]

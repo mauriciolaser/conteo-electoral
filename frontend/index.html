@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Conteo electoral Perú 2026 y proyecciones de resultados." />
+  <meta name="author" content="perulainen" />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="googlebot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="bingbot" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <meta name="theme-color" content="#0a1226" />
+  <meta name="application-name" content="Conteo Electoral Perú 2026" />
+  <meta name="apple-mobile-web-app-title" content="Conteo Electoral Perú 2026" />
+  <meta property="og:locale" content="es_PE" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Conteo Electoral Perú 2026" />
+  <meta property="og:description" content="Conteo electoral Perú 2026 y proyecciones de resultados." />
+  <meta property="og:site_name" content="perulainen" />
+  <meta property="og:url" content="https://perulainen.com/conteo/" />
+  <meta property="og:image" content="https://perulainen.com/conteo/banner.png" />
+  <meta property="og:image:secure_url" content="https://perulainen.com/conteo/banner.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1536" />
+  <meta property="og:image:height" content="1024" />
+  <meta property="og:image:alt" content="Banner de Conteo Electoral Perú 2026" />
+  <meta property="article:author" content="perulainen" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Conteo Electoral Perú 2026" />
+  <meta name="twitter:description" content="Conteo electoral Perú 2026 y proyecciones de resultados." />
+  <meta name="twitter:image" content="https://perulainen.com/conteo/banner.png" />
+  <meta name="twitter:image:alt" content="Banner de Conteo Electoral Perú 2026" />
+  <meta name="twitter:creator" content="perulainen" />
+  <meta name="twitter:site" content="perulainen" />
+  <title>perulainen | Conteo Electoral Perú 2026</title>
+  <link rel="canonical" href="https://perulainen.com/conteo/" />
+  <link rel="image_src" href="https://perulainen.com/conteo/banner.png" />
+  <link rel="stylesheet" href="style.css" />
+  <!-- __GA_SNIPPET__ -->
+</head>
+<body>
+  <header class="site-header">
+    <img class="site-banner" src="./banner.png" alt="Banner de Conteo Electoral Perú 2026" />
+    <h1>Conteo Electoral Perú 2026</h1>
+    <p>Conteo electoral Perú 2026 y proyecciones de resultados.</p>
+  </header>
+
+  <main>
+    <section id="status-bar">
+      <article class="hud-item">
+        <p class="hud-label">Actas procesadas</p>
+        <p id="actas-pct" class="hud-value">—</p>
+      </article>
+      <article class="hud-item">
+        <p class="hud-label">Data obtenida</p>
+        <p id="extracted-at" class="hud-value">—</p>
+      </article>
+    </section>
+
+    <section class="chart-section">
+      <h2>Top 6 Nacional</h2>
+      <div class="mode-switch" id="main-chart-mode-switch">
+        <button
+          id="mode-actual"
+          class="mode-btn"
+          data-tooltip="Muestra solo los votos válidos ya contabilizados en el último corte nacional."
+          type="button"
+        >
+          PROCESAMIENTO ACTUAL
+        </button>
+        <button
+          id="mode-interpolation"
+          class="mode-btn"
+          data-tooltip="Proyecta el total nacional al 100% manteniendo la distribución observada por región."
+          type="button"
+        >
+          INTERPOLACIÓN
+        </button>
+        <button
+          id="mode-rural"
+          class="mode-btn"
+          data-tooltip="Redistribuye el crecimiento pendiente con sesgo rural en regiones donde Sánchez lidera."
+          type="button"
+        >
+          VOTO RURAL
+        </button>
+      </div>
+      <p class="chart-note" id="main-chart-note">Porcentaje de votos válidos del total (Top 6)</p>
+      <div id="main-chart-container">
+        <canvas id="main-chart"></canvas>
+      </div>
+    </section>
+
+    <section class="chart-section">
+      <h2>Tendencia Nacional</h2>
+      <p class="chart-note">Votos contabilizados por snapshot con cortes cada 30 minutos (Top 5)</p>
+      <div id="trend-chart-container">
+        <canvas id="trend-chart"></canvas>
+      </div>
+    </section>
+
+    <section class="chart-section" id="pro-sanchez-section">
+      <h2>Top 5 regiones en las que Sánchez está primero</h2>
+      <div class="table-wrap">
+        <table id="pro-sanchez-table">
+          <thead>
+            <tr>
+              <th>REGIÓN</th>
+              <th>VOTOS DE SÁNCHEZ</th>
+              <th>PORCENTAJE DE CONTEO</th>
+              <th>VOTOS INTERPOLADOS</th>
+            </tr>
+          </thead>
+          <tbody id="pro-sanchez-table-body">
+            <tr>
+              <td colspan="4">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="chart-section" id="showdown-section">
+      <h2>Sánchez vs. López Aliaga</h2>
+      <p id="showdown-data-date" class="showdown-date">Data del corte: —</p>
+      <div class="party-banner">
+        <article class="party-card party-card-jpp">
+          <img src="./assets/jpp-badge.svg" alt="Juntos por el Perú" />
+          <div>
+            <h3>Juntos por el Perú</h3>
+            <p>Roberto Sánchez</p>
+          </div>
+        </article>
+        <article class="party-card party-card-rp">
+          <img src="./assets/rp-badge.svg" alt="Renovación Popular" />
+          <div>
+            <h3>Renovación Popular</h3>
+            <p>Rafael López Aliaga</p>
+          </div>
+        </article>
+      </div>
+      <div class="showdown-group">
+        <p>Interpolación total de votos Pro-Sánchez en todas las regiones: <strong id="national-sanchez-total">—</strong></p>
+        <p>Interpolación total de votos para Rafael López Aliaga (Renovación Popular) en todas las regiones: <strong id="national-rla-total">—</strong></p>
+      </div>
+    </section>
+
+    <div id="error-msg" class="hidden"></div>
+  </main>
+
+  <footer>
+    <p>Datos: ONPE — Actualización automática cada 60 segundos</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="projection-modes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

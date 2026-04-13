@@ -1,0 +1,64 @@
+# /conteo — frontend electoral + datos JSON
+# Instalado en perulainen.com/conteo/ via FTP (DEPLOY_FRONTEND).
+# El .htaccess del padre (AutoSSL + HTTPS force) sigue activo.
+
+# ── Bloquear acceso directo por IP ──────────────────────────────────────────
+# Solo se permite llegar via el hostname correcto.
+# Acceso por IP directa (ej: http://***REMOVED_HOST***/conteo/) devuelve 403.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /conteo/
+
+  # Rechazar si el Host no es perulainen.com (con o sin www)
+  RewriteCond %{HTTP_HOST} !^(www\.)?perulainen\.com$ [NC]
+  RewriteRule ^ - [F,L]
+
+  # Archivos y directorios existentes: servir directo
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Fallback a index.html (para recarga directa en /conteo/)
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# ── Headers ─────────────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  <Files "index.html">
+    Header set X-Robots-Tag "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    Header set Link "<https://perulainen.com/conteo/>; rel=\"canonical\", <https://perulainen.com/conteo/banner.png>; rel=\"image_src\""
+    Header set Content-Language "es-PE"
+  </Files>
+
+  <Files "banner.png">
+    Header set X-Robots-Tag "index, follow, max-image-preview:large"
+    Header set Cache-Control "public, max-age=604800"
+    Header set Content-Disposition "inline"
+  </Files>
+
+  <FilesMatch "^(robots\.txt|sitemap\.xml)$">
+    Header set Cache-Control "public, max-age=3600"
+    Header set X-Content-Type-Options "nosniff"
+  </FilesMatch>
+
+  # CORS restringido: solo el propio dominio puede hacer fetch de los JSON.
+  # Se usa SetEnvIf para reflejar el origen exacto (con o sin www) porque
+  # Apache solo puede enviar un valor en Access-Control-Allow-Origin.
+  <FilesMatch "\.json$">
+    SetEnvIf Origin "^https://(www\.)?perulainen\.com$" CORS_ORIGIN=$0
+    Header set Access-Control-Allow-Origin "%{CORS_ORIGIN}e" env=CORS_ORIGIN
+    Header set Cache-Control "no-store, no-cache, must-revalidate"
+    Header set X-Content-Type-Options "nosniff"
+  </FilesMatch>
+  <FilesMatch "\.(html|js|css)$">
+    Header set Cache-Control "no-store"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+  </FilesMatch>
+  <FilesMatch "\.(png|jpg|jpeg|webp|svg|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+    Header set X-Content-Type-Options "nosniff"
+  </FilesMatch>
+</IfModule>
+
+DirectoryIndex index.html

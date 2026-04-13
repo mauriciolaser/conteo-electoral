@@ -1,0 +1,49 @@
+# Proyección Electoral ONPE
+
+- Fuente: https://resultadoelectoral.onpe.gob.pe/main/presidenciales
+- Extraído (UTC): 2026-04-13T16:29:03.898279+00:00
+- Proyectado (UTC): 2026-04-13T16:29:03.968639+00:00
+- Actas contabilizadas global: 54.179%
+- Margen escenarios: 5.000%
+
+## Totales Estimados
+
+- Nacional: 20,445,899 votos emitidos estimados
+- Extranjero: 416,571 votos emitidos estimados
+- Nacional + Extranjero: 20,862,470 votos emitidos estimados
+
+## Top 10 - Escenario Base (Nacional + Extranjero)
+
+1. FUERZA POPULAR: 2,997,510
+2. VOTOS EN BLANCO: 2,270,987
+3. RENOVACIÓN POPULAR: 2,180,115
+4. PARTIDO DEL BUEN GOBIERNO: 2,039,734
+5. JUNTOS POR EL PERÚ: 1,788,311
+6. PARTIDO CÍVICO OBRAS: 1,771,469
+7. PARTIDO PAÍS PARA TODOS: 1,450,496
+8. AHORA NACIÓN - AN: 1,360,141
+9. VOTOS NULOS: 1,007,082
+10. PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO: 645,405
+
+## Escenarios
+
+### Conservador (margen -5.00%)
+1. FUERZA POPULAR: 2,950,209
+2. VOTOS EN BLANCO: 2,270,987
+3. RENOVACIÓN POPULAR: 2,145,712
+4. PARTIDO DEL BUEN GOBIERNO: 2,007,547
+5. JUNTOS POR EL PERÚ: 1,760,091
+
+### Base (margen +0.00%)
+1. FUERZA POPULAR: 2,997,510
+2. VOTOS EN BLANCO: 2,270,987
+3. RENOVACIÓN POPULAR: 2,180,115
+4. PARTIDO DEL BUEN GOBIERNO: 2,039,734
+5. JUNTOS POR EL PERÚ: 1,788,311
+
+### Optimista (margen +5.00%)
+1. FUERZA POPULAR: 3,041,633
+2. VOTOS EN BLANCO: 2,270,987
+3. RENOVACIÓN POPULAR: 2,212,206
+4. PARTIDO DEL BUEN GOBIERNO: 2,069,758
+5. JUNTOS POR EL PERÚ: 1,814,635
