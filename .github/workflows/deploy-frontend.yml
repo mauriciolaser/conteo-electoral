@@ -1,0 +1,46 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "frontend/**"
+      - "scripts/build_frontend.py"
+      - "election_counter/publish.py"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Build & Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Create .env from secrets
+        run: |
+          cat > .env << 'EOF'
+          FTP_USER=${{ secrets.FTP_USER }}
+          FTP_HOST=${{ secrets.FTP_HOST }}
+          FTP_PASSWORD=${{ secrets.FTP_PASSWORD }}
+          DEPLOY_FRONTEND=${{ secrets.DEPLOY_FRONTEND }}
+          BASE_URL=${{ secrets.BASE_URL }}
+          GA_ID=${{ secrets.GA_ID }}
+          EOF
+
+      - name: Build frontend
+        run: python scripts/build_frontend.py
+
+      - name: Deploy via FTP
+        run: python -m election_counter --mode deploy-frontend
