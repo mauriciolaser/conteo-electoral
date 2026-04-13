@@ -210,11 +210,11 @@ const MAIN_CHART_MODE_META = {
     tooltipSuffix: "votos interpolados",
   },
   rural: {
-    note: "Proyección especulativa con sesgo rural en regiones pro-Sánchez (Top 6)",
+    note: "Sesgo rural: top 10 regiones pro-Sánchez · ×1.45 Sánchez / ×0.72 Aliaga / ×1.10 2.°–3.° / ×0.92 4.°–8.° / ×0.72 resto (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
   },
   ruralFallback: {
-    note: "VOTO RURAL sin regiones elegibles en este corte; se muestra la interpolación base (Top 6)",
+    note: "VOTO RURAL sin regiones elegibles en este corte — se muestra interpolación base (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
   },
 };
@@ -688,8 +688,17 @@ async function loadAndRender() {
 // ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   let headerTicking = false;
+  let headerCompact = false;
+  const COMPACT_ON = 120;
+  const COMPACT_OFF = 60;
   const syncHeaderState = () => {
-    document.body.classList.toggle("header-compact", window.scrollY > 56);
+    if (!headerCompact && window.scrollY > COMPACT_ON) {
+      headerCompact = true;
+      document.body.classList.add("header-compact");
+    } else if (headerCompact && window.scrollY < COMPACT_OFF) {
+      headerCompact = false;
+      document.body.classList.remove("header-compact");
+    }
     headerTicking = false;
   };
   window.addEventListener("scroll", () => {

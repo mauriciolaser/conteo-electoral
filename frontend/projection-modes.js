@@ -2,6 +2,7 @@
   const TOP_N = 6;
   const TOP_RURAL_REGIONS = 10;
   const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
+  const ALIAGA_PARTY = "RENOVACION POPULAR";
 
   const RURAL_MULTIPLIERS = {
     sanchez: 1.45,
@@ -114,6 +115,7 @@
 
   function multiplierForRank(rank, partyNameNormalized) {
     if (partyNameNormalized === SANCHEZ_PARTY) return RURAL_MULTIPLIERS.sanchez;
+    if (partyNameNormalized === ALIAGA_PARTY) return RURAL_MULTIPLIERS.slow;
     if (rank === 2 || rank === 3) return RURAL_MULTIPLIERS.superPotent;
     if (rank >= 4 && rank <= 8) return RURAL_MULTIPLIERS.normal;
     return RURAL_MULTIPLIERS.slow;
