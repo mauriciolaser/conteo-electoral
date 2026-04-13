@@ -1,15 +1,37 @@
 (function attachProjectionModes(global) {
   const TOP_N = 6;
-  const TOP_RURAL_REGIONS = 10;
   const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
-  const ALIAGA_PARTY = "RENOVACION POPULAR";
 
-  const RURAL_MULTIPLIERS = {
-    sanchez: 1.45,
-    superPotent: 1.10,
-    normal: 0.92,
-    slow: 0.72,
+  // Tiers basados en popularidad promedio real en las top 6 regiones pro-Sánchez
+  // (medida sobre votos válidos acumulados en esas regiones, corte 54.5% actas):
+  //   Tier S: Sánchez          ~27%  → ×1.45 (fijo, es el candidato dominante)
+  //   Tier A: ≥10%             Cívico Obras ~15%, Ahora Nación ~12%  → ×1.20
+  //   Tier B: 5–10%            Fuerza Popular ~7%, Buen Gobierno ~6.5%  → ×1.00
+  //   Tier C: 2–5%             Cooperación Popular, Renovación Popular, Frente Esperanza,
+  //                            Sicreo, País para Todos, Venceremos, Primero la Gente  → ×0.80
+  //   Tier D: <2%              resto  → ×0.55
+  const RURAL_TIERS = {
+    S: { multiplier: 1.45, parties: new Set([SANCHEZ_PARTY]) },
+    A: { multiplier: 1.20, parties: new Set([
+      "PARTIDO CIVICO OBRAS",
+      "AHORA NACION - AN",
+    ]) },
+    B: { multiplier: 1.00, parties: new Set([
+      "FUERZA POPULAR",
+      "PARTIDO DEL BUEN GOBIERNO",
+    ]) },
+    C: { multiplier: 0.80, parties: new Set([
+      "PARTIDO POLITICO COOPERACION POPULAR",
+      "RENOVACION POPULAR",
+      "PARTIDO FRENTE DE LA ESPERANZA 2021",
+      "PARTIDO SICREO",
+      "PARTIDO PAIS PARA TODOS",
+      "ALIANZA ELECTORAL VENCEREMOS",
+      "PRIMERO LA GENTE - COMUNIDAD, ECOLOGIA, LIBERTAD Y PROGRESO",
+    ]) },
+    // Tier D (default): ×0.55
   };
+  const RURAL_MULTIPLIER_D = 0.55;
 
   function normalizeName(name) {
     return (name || "")
@@ -102,23 +124,14 @@
   }
 
   function getTopRuralRegions(regions) {
-    return regions
-      .filter(region => getLeadingValidParty(region).name === SANCHEZ_PARTY)
-      .map(region => ({
-        region,
-        sanchezVotes: getCurrentPartyVotes(region, SANCHEZ_PARTY),
-      }))
-      .sort((a, b) => b.sanchezVotes - a.sanchezVotes)
-      .slice(0, TOP_RURAL_REGIONS)
-      .map(item => item.region);
+    return regions.filter(region => getLeadingValidParty(region).name === SANCHEZ_PARTY);
   }
 
-  function multiplierForRank(rank, partyNameNormalized) {
-    if (partyNameNormalized === SANCHEZ_PARTY) return RURAL_MULTIPLIERS.sanchez;
-    if (partyNameNormalized === ALIAGA_PARTY) return RURAL_MULTIPLIERS.slow;
-    if (rank === 2 || rank === 3) return RURAL_MULTIPLIERS.superPotent;
-    if (rank >= 4 && rank <= 8) return RURAL_MULTIPLIERS.normal;
-    return RURAL_MULTIPLIERS.slow;
+  function multiplierForParty(partyNameNormalized) {
+    for (const tier of Object.values(RURAL_TIERS)) {
+      if (tier.parties.has(partyNameNormalized)) return tier.multiplier;
+    }
+    return RURAL_MULTIPLIER_D;
   }
 
   function buildRuralValidProjection(region, baseProjectedByParty) {
@@ -143,12 +156,10 @@
     }
 
     const weightedGrowth = {};
-    for (let index = 0; index < validParties.length; index += 1) {
-      const party = validParties[index];
-      const rank = index + 1;
+    for (const party of validParties) {
       const baseProjectedVotes = baseProjectedByParty[party.name] || 0;
       const growthBase = Math.max(0, baseProjectedVotes - party.currentVotes);
-      weightedGrowth[party.name] = growthBase * multiplierForRank(rank, party.normalizedName);
+      weightedGrowth[party.name] = growthBase * multiplierForParty(party.normalizedName);
     }
 
     const weightedGrowthTotal = Object.values(weightedGrowth).reduce((sum, value) => sum + value, 0);

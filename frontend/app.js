@@ -210,7 +210,7 @@ const MAIN_CHART_MODE_META = {
     tooltipSuffix: "votos interpolados",
   },
   rural: {
-    note: "Sesgo rural: top 10 regiones pro-Sánchez · ×1.45 Sánchez / ×0.72 Aliaga / ×1.10 2.°–3.° / ×0.92 4.°–8.° / ×0.72 resto (Top 6)",
+    note: "Sesgo rural (popularidad real en todas las regiones donde lidera Sánchez): ×1.45 Sánchez · ×1.20 Cívico Obras/Ahora Nación · ×1.00 FP/Buen Gobierno · ×0.80 tier medio · ×0.55 resto (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
   },
   ruralFallback: {
