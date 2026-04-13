@@ -202,15 +202,15 @@ let mainChartMode = "actual";
 let mainChartData = null;
 const MAIN_CHART_MODE_META = {
   actual: {
-    note: "Votos válidos procesados actualmente (Top 6)",
+    note: "Votos válidos procesados actualmente disponibles en la web de ONPE",
     tooltipSuffix: "votos procesados",
   },
   interpolation: {
-    note: "Proyección nacional con el último snapshot (Top 6)",
+    note: "Estiramos la data siguiendo la tendencia del último registro disponible en ONPE.",
     tooltipSuffix: "votos interpolados",
   },
   rural: {
-    note: "Sesgo rural en top 10 regiones donde lidera Sánchez: redistribuye solo voto pendiente con ratio Rural/Urbano del conteo Rápido de Ipsos presentado al mediodía del 12 de abril (y OTROS para listas no explícitas), sin tocar votos ya contados (Top 6)",
+    note: "Aplicamos 'sesgo rural' en top regiones donde lidera Sánchez: redistribuye solo voto pendiente con ratio Rural/Urbano del conteo Rápido de Ipsos presentado al mediodía del 12 de abril (y OTROS para listas no explícitas), sin tocar votos ya contados",
     tooltipSuffix: "votos proyectados modo rural",
   },
   ruralFallback: {
