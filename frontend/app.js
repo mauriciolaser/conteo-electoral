@@ -908,6 +908,8 @@ function updateStatusBar(latestPayload, snapshots) {
 //  Main load
 // ─────────────────────────────────────────────
 let _firstLoad = true;
+// Caché en memoria: map de timestamp → payload ya descargado
+const _snapshotCache = new Map();
 
 async function loadAndRender() {
   hideError();
@@ -948,16 +950,26 @@ async function loadAndRender() {
     return;
   }
 
-  // 2. Cargar todos los snapshots (en paralelo) — o usar caché
+  // 2. Cargar solo los snapshots nuevos (no en caché) — o usar caché de LS
   if (!usingFallback) {
-    const results = await Promise.allSettled(
-      timestamps.map(ts =>
-        fetchJSON(`${BASE_URL}/raw_history/${ts}/raw_region_results.json`)
-      )
-    );
-    rawPayloads = results
-      .filter(r => r.status === "fulfilled")
-      .map(r => r.value);
+    const newTimestamps = timestamps.filter(ts => !_snapshotCache.has(ts));
+    if (newTimestamps.length > 0) {
+      const results = await Promise.allSettled(
+        newTimestamps.map(ts =>
+          fetchJSON(`${BASE_URL}/raw_history/${ts}/raw_region_results.json`)
+            .then(payload => ({ ts, payload }))
+        )
+      );
+      for (const r of results) {
+        if (r.status === "fulfilled") {
+          _snapshotCache.set(r.value.ts, r.value.payload);
+        }
+      }
+    }
+
+    rawPayloads = timestamps
+      .filter(ts => _snapshotCache.has(ts))
+      .map(ts => _snapshotCache.get(ts));
 
     if (rawPayloads.length > 0) {
       saveSnapshotsToLS(rawPayloads);
