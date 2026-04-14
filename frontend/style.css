@@ -742,6 +742,18 @@ footer {
     text-overflow: ellipsis;
   }
 
+  /* Portrait: stack mode buttons vertically so labels are fully readable */
+  @media (orientation: portrait) {
+    .mode-btn {
+      flex: 1 1 100%;
+      text-overflow: unset;
+      overflow: visible;
+      white-space: normal;
+      font-size: 0.7rem;
+      padding: 0.45rem 0.6rem;
+    }
+  }
+
   /* Chart section: no side overflow */
   .chart-section {
     padding: 1rem 0.85rem;
