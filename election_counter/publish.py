@@ -53,10 +53,19 @@ def publish_frontend(project_root: Path, env_path: Path | None = None) -> None:
 
 
 def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
-    """Sube raw_history/ e history_index.json bajo DEPLOY_FRONTEND en el servidor.
+    """Sube raw_history/ e history_bundle.json bajo DEPLOY_FRONTEND en el servidor.
 
-    Ambos quedan en el mismo directorio web que el frontend, por lo que
-    BASE_URL puede servirlos via HTTP.
+    Estructura publicada:
+      <BASE_URL>/raw_history/<timestamp>/raw_region_results.json  ← archivos individuales
+      <BASE_URL>/history_bundle.json                              ← bundle consolidado (nuevo)
+      <BASE_URL>/history_index.json                               ← índice legacy (compatibilidad)
+
+    El cliente usa history_bundle.json como fuente primaria: un único request
+    trae todos los snapshots filtrados (uno por bucket de 30 min), eliminando
+    la tormenta de requests paralelos que causaba errores 429.
+
+    history_index.json se mantiene para compatibilidad con clientes antiguos
+    que puedan estar cacheados en el navegador.
     """
     env = _load_env_file(env_path or Path(".env"))
     local_history_root = output_dir / "raw_history"
@@ -83,22 +92,41 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
             else:
                 skipped += 1
 
-        # history_index.json junto al raw_history/
-        # Solo se publica un snapshot por bucket de 30 minutos (el más reciente
-        # dentro de cada ventana) para reducir el volumen de datos en el cliente.
+        # Calcular timestamps filtrados (un snapshot por bucket de 30 min)
         all_timestamps = sorted(
             d.name
             for d in local_history_root.iterdir()
             if d.is_dir() and (d / "raw_region_results.json").exists()
         )
         timestamps = _filter_half_hour_timestamps(all_timestamps)
+
+        # ── history_bundle.json ───────────────────────────────────────────────
+        # Archivo consolidado: contiene todos los payloads filtrados en un solo
+        # objeto JSON. El cliente hace 1 request en lugar de N.
+        # Estructura: { "snapshots": [ <payload>, ... ] }  (orden cronológico)
+        snapshots_data = []
+        for ts in timestamps:
+            snapshot_file = local_history_root / ts / "raw_region_results.json"
+            try:
+                payload = json.loads(snapshot_file.read_text(encoding="utf-8"))
+                snapshots_data.append(payload)
+            except Exception as exc:
+                print(f"[publish] advertencia: no se pudo leer {snapshot_file}: {exc}")
+        bundle_bytes = json.dumps({"snapshots": snapshots_data}, ensure_ascii=False).encode("utf-8")
+        bundle_remote = f"{base}/history_bundle.json" if base else "history_bundle.json"
+        _ftp_upload_bytes(ftp, bundle_bytes, bundle_remote)
+
+        # ── history_index.json (legacy) ───────────────────────────────────────
+        # Se mantiene para que clientes con versiones anteriores cacheadas en el
+        # navegador no queden rotos. Puede eliminarse en el futuro.
         index_bytes = json.dumps({"timestamps": timestamps}, ensure_ascii=False).encode("utf-8")
         _ftp_upload_bytes(ftp, index_bytes, f"{base}/history_index.json" if base else "history_index.json")
     finally:
         ftp.quit()
 
     print(f"[publish] raw_history OK: {uploaded} subidos, {skipped} sin cambios -> {remote_root}")
-    print(f"[publish] history_index.json: {len(timestamps)}/{len(all_timestamps)} snapshots (filtrado cada 30 min)")
+    print(f"[publish] history_bundle.json: {len(snapshots_data)}/{len(all_timestamps)} snapshots ({len(bundle_bytes):,} bytes)")
+    print(f"[publish] history_index.json: {len(timestamps)}/{len(all_timestamps)} snapshots (legacy)")
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────

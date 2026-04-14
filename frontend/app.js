@@ -1,9 +1,21 @@
 // ─────────────────────────────────────────────
 //  CONFIG — inyectado por el pipeline desde .env (WEB_BASE_URL).
 //  El build script reemplaza __BASE_URL__ con el valor real.
+//
 //  Estructura esperada en el servidor:
+//    <BASE_URL>/history_bundle.json
+//        Archivo principal. Contiene todos los snapshots filtrados
+//        (uno por bucket de 30 min) en { "snapshots": [ ...payloads ] }.
+//        Publicado por publish_raw_history() en publish.py.
+//        El cliente hace 1 solo request en lugar de N requests paralelos.
+//
+//    <BASE_URL>/history_index.json   (legacy — compatibilidad)
+//        Lista de timestamps. Ya no lo usa el cliente activo, se mantiene
+//        para sesiones con versiones anteriores cacheadas en el navegador.
+//
 //    <BASE_URL>/raw_history/<timestamp>/raw_region_results.json
-//    <BASE_URL>/history_index.json   ← generado por el pipeline
+//        Archivos individuales por snapshot. El cliente ya no los descarga
+//        directamente; siguen en el servidor como fuente del bundle.
 // ─────────────────────────────────────────────
 const BASE_URL = __BASE_URL__;
 const PARTIES_CATALOG_URL = "./parties.json";
@@ -955,76 +967,58 @@ async function loadAndRender() {
 
   if (_firstLoad) showLoadingOverlay();
 
-  // 1. Obtener índice de snapshots disponibles
-  let timestamps = [];
-  let usingFallback = false;
+  // ── Carga de datos ─────────────────────────────────────────────────────────
+  // El pipeline publica history_bundle.json: un único archivo JSON con todos
+  // los snapshots filtrados (uno por bucket de 30 min) dentro de { snapshots: [] }.
+  // Esto reemplaza la estrategia anterior de N requests paralelos a archivos
+  // individuales, que causaba errores 429 en el servidor.
+  //
+  // Flujo:
+  //   1. Intentar fetch de history_bundle.json (1 request)
+  //   2. Comparar el snapshot más reciente del bundle contra _snapshotCache:
+  //      si ya lo tenemos, no hay nada nuevo — omitir re-render en refreshes
+  //   3. Poblar _snapshotCache con los payloads del bundle
+  //   4. Guardar en localStorage como fallback offline
+  //   5. Si el fetch falla, usar localStorage como fuente de datos
+  // ──────────────────────────────────────────────────────────────────────────
+
   let rawPayloads = null;
 
   try {
-    const idx = await fetchJSON(`${BASE_URL}/history_index.json`);
-    const all = Array.isArray(idx.timestamps) ? idx.timestamps : [];
-    timestamps = filterHalfHourTimestamps(all);
+    const bundle = await fetchJSON(`${BASE_URL}/history_bundle.json`);
+    const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
+
+    if (incoming.length === 0) {
+      if (_firstLoad) hideLoadingOverlay();
+      showError("No hay snapshots disponibles aún. El pipeline aún no ha subido datos.");
+      _firstLoad = false;
+      return;
+    }
+
+    // Poblar _snapshotCache con todos los payloads del bundle.
+    // Usamos extracted_at_utc como clave para detectar novedades.
+    for (const payload of incoming) {
+      const ts = _tsFromPayload(payload);
+      if (ts) _snapshotCache.set(ts, payload);
+    }
+
+    rawPayloads = incoming;
+    saveSnapshotsToLS(rawPayloads);
   } catch (e) {
+    // El servidor no responde o devuelve error: usar datos guardados localmente.
     const cached = loadSnapshotsFromLS();
     if (cached) {
-      usingFallback = true;
       rawPayloads = cached.data;
       const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
       showError(`Sin conexión al servidor. Mostrando datos guardados hace ${savedAgo} min.`);
     } else {
       if (_firstLoad) hideLoadingOverlay();
       showError(
-        `No se pudo cargar history_index.json desde ${BASE_URL}. ` +
+        `No se pudo cargar history_bundle.json desde ${BASE_URL}. ` +
         `Asegúrate de que el pipeline haya publicado los datos. (${e.message})`
       );
       _firstLoad = false;
       return;
-    }
-  }
-
-  if (!usingFallback && timestamps.length === 0) {
-    if (_firstLoad) hideLoadingOverlay();
-    showError("No hay snapshots disponibles aún. El pipeline aún no ha subido datos.");
-    _firstLoad = false;
-    return;
-  }
-
-  // 2. Cargar solo los snapshots nuevos (no en caché) — o usar caché de LS
-  if (!usingFallback) {
-    const newTimestamps = timestamps.filter(ts => !_snapshotCache.has(ts));
-    if (newTimestamps.length > 0) {
-      const results = await Promise.allSettled(
-        newTimestamps.map(ts =>
-          fetchJSON(`${BASE_URL}/raw_history/${ts}/raw_region_results.json`)
-            .then(payload => ({ ts, payload }))
-        )
-      );
-      for (const r of results) {
-        if (r.status === "fulfilled") {
-          _snapshotCache.set(r.value.ts, r.value.payload);
-        }
-      }
-    }
-
-    rawPayloads = timestamps
-      .filter(ts => _snapshotCache.has(ts))
-      .map(ts => _snapshotCache.get(ts));
-
-    if (rawPayloads.length > 0) {
-      saveSnapshotsToLS(rawPayloads);
-    } else {
-      const cached = loadSnapshotsFromLS();
-      if (cached) {
-        usingFallback = true;
-        rawPayloads = cached.data;
-        const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
-        showError(`No se obtuvieron datos del servidor. Mostrando datos guardados hace ${savedAgo} min.`);
-      } else {
-        if (_firstLoad) hideLoadingOverlay();
-        showError("No se pudieron cargar los snapshots del servidor.");
-        _firstLoad = false;
-        return;
-      }
     }
   }
 
