@@ -54,7 +54,32 @@
         <p class="hud-label">Data obtenida</p>
         <p id="extracted-at" class="hud-value">—</p>
       </article>
+      <article class="hud-item hud-item--info">
+        <button id="que-es-esto-btn" class="que-es-esto-btn" type="button" aria-expanded="false" aria-controls="que-es-esto-panel">
+          <span class="que-es-esto-label">¿Qué es esto?</span>
+          <span class="que-es-esto-icon" aria-hidden="true">▾</span>
+        </button>
+      </article>
     </section>
+
+    <div id="que-es-esto-panel" class="que-es-esto-panel" hidden>
+      <div class="qee-inner">
+        <div class="qee-block">
+          <h3 class="qee-heading">¿Qué es esto?</h3>
+          <p>Usamos data de la ONPE obtenida en tiempo real y mostramos dos proyecciones del resto de votos.</p>
+        </div>
+        <div class="qee-block">
+          <h3 class="qee-heading">¿Por qué?</h3>
+          <p>En estas elecciones se ha observado que se repite el patrón histórico por el cual los votos de Lima favorecen fuertemente a un candidato, en este caso <strong>Rafael López Aliaga</strong>, mientras que los votos de regiones con actas remotas favorecen fuertemente a otro candidato, en este caso <strong>Roberto Sánchez</strong>.</p>
+          <p style="margin-top:0.6rem">Dado que el conteo de actas de ONPE suele reflejar primero las actas de Lima, este servicio permite hacer proyecciones sobre dos escenarios especulativos: <strong>proyección simple</strong>, en la que todo sigue igual y el peso del voto remoto no hace una gran diferencia; y <strong>proyección voto rural</strong>, en la que se asume que los votos pendientes de contabilizar en regiones remotas favorecen a Sánchez.</p>
+        </div>
+        <div class="qee-block">
+          <h3 class="qee-heading">¿Cómo lo hacemos?</h3>
+          <p>En <strong>proyección simple</strong> solo estiramos los datos, es decir, jugamos con un escenario en el que las tendencias de voto son exactamente iguales desde el último conteo de votos (<span id="qee-actas-pct" class="qee-highlight">—% contabilizado</span>).</p>
+          <p style="margin-top:0.6rem">En <strong>proyección voto rural</strong> estiramos los datos tomando en cuenta los ratios de votación que ha presentado IPSOS en su conteo rápido, los cuales demuestran fuertes tendencias de voto a favor de Roberto Sánchez en regiones con voto remoto: <span class="qee-regions">Amazonas, Apurímac, Ayacucho, Cusco, Huancavelica, Huánuco, Loreto, Madre de Dios, Puno, San Martín, Ucayali</span>.</p>
+        </div>
+      </div>
+    </div>
 
     <section class="chart-section">
       <h2>Top 6 Nacional</h2>
@@ -99,6 +124,24 @@
     </section>
 
     <section class="chart-section" id="pro-sanchez-section">
+      <div id="pending-votes-panel" class="pending-votes-panel">
+        <div class="pvp-item pvp-item--lima">
+          <div class="pvp-icon" aria-hidden="true">🏙</div>
+          <div class="pvp-content">
+            <div class="pvp-label">Votos pendientes en Lima y el Extranjero</div>
+            <div class="pvp-value" id="pending-lima">—</div>
+          </div>
+        </div>
+        <div class="pvp-divider" aria-hidden="true"></div>
+        <div class="pvp-item pvp-item--rural">
+          <div class="pvp-icon" aria-hidden="true">🌄</div>
+          <div class="pvp-content">
+            <div class="pvp-label">Votos pendientes en regiones con actas remotas</div>
+            <div class="pvp-value" id="pending-rural">—</div>
+          </div>
+        </div>
+      </div>
+
       <div class="panel-title-row">
         <h2 id="candidate-top-title">Proyecciones de Top 9 regiones en las que Sánchez está primero</h2>
       </div>

@@ -557,6 +557,55 @@ function renderTrendChart(snapshots, top5Names) {
 }
 
 // ─────────────────────────────────────────────
+//  Regiones remotas (las que usa la proyección rural)
+// ─────────────────────────────────────────────
+const REMOTE_REGIONS = new Set([
+  "AMAZONAS", "APURIMAC", "AYACUCHO", "CUSCO", "HUANCAVELICA",
+  "HUANUCO", "LORETO", "MADRE DE DIOS", "PUNO", "SAN MARTIN", "UCAYALI",
+]);
+
+function normalizeRegionKey(name) {
+  return (name || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .trim();
+}
+
+function isLimaOrExtranjero(regionName) {
+  const n = normalizeRegionKey(regionName);
+  return n === "LIMA" || n === "LIMA PROVINCIAS" || n === "LIMA METROPOLITANA" ||
+         n.includes("EXTRANJERO") || n.includes("EXTERIOR") || n === "CALLAO";
+}
+
+function isRemoteRegion(regionName) {
+  return REMOTE_REGIONS.has(normalizeRegionKey(regionName));
+}
+
+function computePendingVotes(latestPayload) {
+  const regions = latestPayload.regions || [];
+  let pendingLima = 0;
+  let pendingRural = 0;
+
+  for (const region of regions) {
+    const actasPct = Number(region.actas_pct) || 0;
+    const emitidos = parseInt(region.emitidos_actual, 10) || 0;
+    const projectedTotal = actasPct > 0
+      ? Math.round((emitidos * 100) / actasPct)
+      : emitidos;
+    const remaining = Math.max(0, projectedTotal - emitidos);
+
+    if (isLimaOrExtranjero(region.region)) {
+      pendingLima += remaining;
+    } else if (isRemoteRegion(region.region)) {
+      pendingRural += remaining;
+    }
+  }
+
+  return { pendingLima, pendingRural };
+}
+
+// ─────────────────────────────────────────────
 //  Status bar
 // ─────────────────────────────────────────────
 function updateStatusBar(latestPayload) {
@@ -576,6 +625,19 @@ function updateStatusBar(latestPayload) {
   const extractedEl = document.getElementById("extracted-at");
   actasEl.textContent = `${actasPct}`;
   extractedEl.textContent = extractedAt;
+
+  // Update "¿Qué es esto?" panel dynamic percentage
+  const qeePct = document.getElementById("qee-actas-pct");
+  if (qeePct && typeof meta.actas_pct_global === "number") {
+    qeePct.textContent = `${meta.actas_pct_global.toFixed(1)}% contabilizado`;
+  }
+
+  // Update pending votes panel
+  const { pendingLima, pendingRural } = computePendingVotes(latestPayload);
+  const pendingLimaEl = document.getElementById("pending-lima");
+  const pendingRuralEl = document.getElementById("pending-rural");
+  if (pendingLimaEl) pendingLimaEl.textContent = formatInt(pendingLima);
+  if (pendingRuralEl) pendingRuralEl.textContent = formatInt(pendingRural);
 
   return extractedAt;
 }
@@ -716,6 +778,18 @@ document.addEventListener("DOMContentLoaded", () => {
       renderMainChart();
     });
   }
+  // ¿Qué es esto? toggle
+  const qeeBtn = document.getElementById("que-es-esto-btn");
+  const qeePanel = document.getElementById("que-es-esto-panel");
+  if (qeeBtn && qeePanel) {
+    qeeBtn.addEventListener("click", () => {
+      const isOpen = !qeePanel.hidden;
+      qeePanel.hidden = isOpen;
+      qeeBtn.setAttribute("aria-expanded", String(!isOpen));
+      qeeBtn.classList.toggle("active", !isOpen);
+    });
+  }
+
   loadAndRender();
   setInterval(loadAndRender, 60_000);
 });
