@@ -741,12 +741,56 @@ footer {
   color: #6ecb88;
 }
 
-/* Hour delta rows */
-.ffe-hour-row {
-  text-align: center;
-  font-size: 0.8rem;
+/* Hour delta block */
+.ffe-hour-block {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.ffe-hour-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.55rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ffe-hour-card--rla {
+  border-color: rgba(0, 87, 184, 0.3);
+  background: rgba(0, 87, 184, 0.08);
+}
+
+.ffe-hour-card--rs {
+  border-color: rgba(45, 198, 83, 0.28);
+  background: rgba(45, 198, 83, 0.07);
+}
+
+.ffe-hour-label {
+  font-size: 0.68rem;
   color: var(--muted);
-  padding: 0.25rem 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.ffe-hour-delta {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.ffe-hour-card--rla .ffe-hour-delta { color: #7fb8f8; }
+.ffe-hour-card--rs  .ffe-hour-delta { color: #6ecb88; }
+
+.ffe-hour-sublabel {
+  font-size: 0.62rem;
+  color: var(--muted);
+  opacity: 0.6;
 }
 
 /* ─────────────────────────────────────────────

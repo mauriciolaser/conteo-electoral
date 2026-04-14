@@ -716,16 +716,21 @@ function renderFrenteAFrente(latestPayload, snapshots) {
     // El snapshot más antiguo dentro de la última hora (o el más antiguo disponible)
     const oldSnap = snapshots.find(s => s.dt.getTime() >= cutoff) || snapshots[0];
 
-    const rlaOld = oldSnap.totals[RLA_PARTY] || 0;
-    const rsOld  = oldSnap.totals[RS_PARTY]  || 0;
-    const rlaNew = latestSnap.totals[RLA_PARTY] || 0;
-    const rsNew  = latestSnap.totals[RS_PARTY]  || 0;
+    const sumByNormalized = (totals, normalizedParty) =>
+      Object.entries(totals)
+        .filter(([k]) => normalizeName(k) === normalizedParty)
+        .reduce((acc, [, v]) => acc + v, 0);
+
+    const rlaOld = sumByNormalized(oldSnap.totals, RLA_PARTY);
+    const rsOld  = sumByNormalized(oldSnap.totals, RS_PARTY);
+    const rlaNew = sumByNormalized(latestSnap.totals, RLA_PARTY);
+    const rsNew  = sumByNormalized(latestSnap.totals, RS_PARTY);
 
     const rlaDelta = Math.max(0, rlaNew - rlaOld);
     const rsDelta  = Math.max(0, rsNew  - rsOld);
 
-    rlaHourEl.textContent = `Votos de López Aliaga en la última hora: ${formatInt(rlaDelta)}`;
-    rsHourEl.textContent  = `Votos de Sánchez en la última hora: ${formatInt(rsDelta)}`;
+    rlaHourEl.textContent = formatInt(rlaDelta);
+    rsHourEl.textContent  = formatInt(rsDelta);
   }
 }
 
