@@ -116,6 +116,10 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
         bundle_remote = f"{base}/history_bundle.json" if base else "history_bundle.json"
         _ftp_upload_bytes(ftp, bundle_bytes, bundle_remote)
 
+        # Guardar copia local en output_dir para inspección
+        local_bundle = output_dir / "history_bundle.json"
+        local_bundle.write_bytes(bundle_bytes)
+
         # ── history_index.json (legacy) ───────────────────────────────────────
         # Se mantiene para que clientes con versiones anteriores cacheadas en el
         # navegador no queden rotos. Puede eliminarse en el futuro.

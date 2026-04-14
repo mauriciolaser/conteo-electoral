@@ -921,9 +921,11 @@ function updateStatusBar(latestPayload, snapshots) {
   const pendingLimaEl  = document.getElementById("pending-lima");
   const pendingRuralEl = document.getElementById("pending-rural");
   const pendingOtherEl = document.getElementById("pending-other");
-  if (pendingLimaEl)  pendingLimaEl.textContent = formatInt(pendingLima);
-  if (pendingRuralEl) pendingRuralEl.textContent = formatInt(pendingRural);
-  if (pendingOtherEl) pendingOtherEl.textContent = formatInt(pendingOther);
+  const pendingTotalEl = document.getElementById("pending-total");
+  if (pendingLimaEl)  pendingLimaEl.textContent  = formatInt(pendingLima);
+  if (pendingRuralEl) pendingRuralEl.textContent  = formatInt(pendingRural);
+  if (pendingOtherEl) pendingOtherEl.textContent  = formatInt(pendingOther);
+  if (pendingTotalEl) pendingTotalEl.textContent  = formatInt(pendingLima + pendingRural + pendingOther);
 
   renderFrenteAFrente(latestPayload, snapshots);
 
