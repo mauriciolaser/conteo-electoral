@@ -677,7 +677,7 @@ function computePendingVotes(latestPayload) {
   return { pendingLima, pendingRural, rlaLima, rsLima, rlaRural, rsRural };
 }
 
-function renderFrenteAFrente(latestPayload) {
+function renderFrenteAFrente(latestPayload, snapshots) {
   const regions = latestPayload.regions || [];
   let rlaTotal = 0, rsTotal = 0;
 
@@ -705,12 +705,34 @@ function renderFrenteAFrente(latestPayload) {
       diffRow.textContent = `+${formatInt(diff)} — ${name}`;
     }
   }
+
+  // Votos en la última hora
+  const rlaHourEl = document.getElementById("ffe-votes-rla-hour");
+  const rsHourEl  = document.getElementById("ffe-votes-rs-hour");
+  if (rlaHourEl && rsHourEl && snapshots && snapshots.length >= 2) {
+    const ONE_HOUR_MS = 60 * 60 * 1000;
+    const latestSnap = snapshots[snapshots.length - 1];
+    const cutoff = latestSnap.dt.getTime() - ONE_HOUR_MS;
+    // El snapshot más antiguo dentro de la última hora (o el más antiguo disponible)
+    const oldSnap = snapshots.find(s => s.dt.getTime() >= cutoff) || snapshots[0];
+
+    const rlaOld = oldSnap.totals[RLA_PARTY] || 0;
+    const rsOld  = oldSnap.totals[RS_PARTY]  || 0;
+    const rlaNew = latestSnap.totals[RLA_PARTY] || 0;
+    const rsNew  = latestSnap.totals[RS_PARTY]  || 0;
+
+    const rlaDelta = Math.max(0, rlaNew - rlaOld);
+    const rsDelta  = Math.max(0, rsNew  - rsOld);
+
+    rlaHourEl.textContent = `Votos de López Aliaga en la última hora: ${formatInt(rlaDelta)}`;
+    rsHourEl.textContent  = `Votos de Sánchez en la última hora: ${formatInt(rsDelta)}`;
+  }
 }
 
 // ─────────────────────────────────────────────
 //  Status bar
 // ─────────────────────────────────────────────
-function updateStatusBar(latestPayload) {
+function updateStatusBar(latestPayload, snapshots) {
   const meta = latestPayload.metadata || {};
   const actasPct = typeof meta.actas_pct_global === "number"
     ? meta.actas_pct_global.toFixed(3)
@@ -741,7 +763,7 @@ function updateStatusBar(latestPayload) {
   if (pendingLimaEl)  pendingLimaEl.textContent = formatInt(pendingLima);
   if (pendingRuralEl) pendingRuralEl.textContent = formatInt(pendingRural);
 
-  renderFrenteAFrente(latestPayload);
+  renderFrenteAFrente(latestPayload, snapshots);
 
   return extractedAt;
 }
@@ -873,7 +895,7 @@ async function loadAndRender() {
   };
 
   // 4. Renderizar
-  updateStatusBar(latest.payload);
+  updateStatusBar(latest.payload, snapshots);
   renderMainChart();
   renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate);
 
