@@ -73,7 +73,7 @@
           data-tooltip="Proyecta el total nacional al 100% manteniendo la distribución observada por región."
           type="button"
         >
-          INTERPOLACIÓN SIMPLE
+          PROYECCION SIMPLE
         </button>
         <button
           id="mode-rural"
@@ -81,7 +81,7 @@
           data-tooltip="SESGO RURAL = solo en las 10 regiones donde Sánchez lidera y más votos tiene, reparte el voto pendiente con ratio Rural/Urbano del cuadro (OTROS para listas no explícitas), sin tocar votos ya contados."
           type="button"
         >
-          VOTO RURAL
+          PROYECCION VOTO RURAL
         </button>
       </div>
       <p class="chart-note" id="main-chart-note">Porcentaje de votos válidos del total (Top 6)</p>
@@ -92,7 +92,7 @@
 
     <section class="chart-section">
       <h2>Tendencia Nacional</h2>
-      <p class="chart-note">Votos contabilizados por snapshot con cortes cada 30 minutos (Top 5)</p>
+      <p class="chart-note">Votos contabilizados por snapshot con cortes cada 30 minutos</p>
       <div id="trend-chart-container">
         <canvas id="trend-chart"></canvas>
       </div>
@@ -100,13 +100,7 @@
 
     <section class="chart-section" id="pro-sanchez-section">
       <div class="panel-title-row">
-        <h2 id="candidate-top-title">Top 9 regiones en las que Sánchez está primero</h2>
-        <label class="candidate-picker-label" for="candidate-picker">Candidato</label>
-        <select id="candidate-picker" class="candidate-picker" aria-label="Seleccionar candidato para tabla regional">
-          <option value="JUNTOS POR EL PERU" selected>Sánchez</option>
-          <option value="RENOVACION POPULAR">López Aliaga</option>
-          <option value="PARTIDO CIVICO OBRAS">Nieto</option>
-        </select>
+        <h2 id="candidate-top-title">Proyecciones de Top 9 regiones en las que Sánchez está primero</h2>
       </div>
       <div class="table-wrap">
         <table id="pro-sanchez-table">

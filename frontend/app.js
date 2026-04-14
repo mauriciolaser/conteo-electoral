@@ -360,8 +360,8 @@ function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY
         <td>${r.region}</td>
         <td>${r.actasPct.toFixed(3)}%</td>
         <td>${formatInt(r.candidateVotes)}</td>
-        <td>${formatInt(r.simpleProjection)}</td>
-        <td>${formatInt(r.ruralProjection)}</td>
+        <td class="col-simple" title="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">${formatInt(r.simpleProjection)}</td>
+        <td class="col-rural" title="Proyección aplicando ajuste rural en regiones elegibles; fuera de esas regiones, coincide con la proyección simple.">${formatInt(r.ruralProjection)}</td>
       </tr>
     `).join("");
   }
@@ -698,7 +698,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
   const ruralBtn = document.getElementById("mode-rural");
-  const candidatePicker = document.getElementById("candidate-picker");
   if (actualBtn) {
     actualBtn.addEventListener("click", () => {
       mainChartMode = "actual";
@@ -715,13 +714,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ruralBtn.addEventListener("click", () => {
       mainChartMode = "rural";
       renderMainChart();
-    });
-  }
-  if (candidatePicker) {
-    candidatePicker.value = selectedRegionalCandidate;
-    candidatePicker.addEventListener("change", () => {
-      selectedRegionalCandidate = candidatePicker.value || SANCHEZ_PARTY;
-      loadAndRender();
     });
   }
   loadAndRender();
