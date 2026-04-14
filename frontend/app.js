@@ -188,8 +188,24 @@ async function fetchJSON(url) {
 // ─────────────────────────────────────────────
 const LS_KEY = "elec_snapshots_cache";
 
+function latestDtFromPayloads(payloads) {
+  let max = 0;
+  for (const p of payloads) {
+    const t = new Date(p?.metadata?.extracted_at_utc).getTime();
+    if (!isNaN(t) && t > max) max = t;
+  }
+  return max;
+}
+
 function saveSnapshotsToLS(snapshotsRaw) {
   try {
+    const existing = loadSnapshotsFromLS();
+    // Solo sobreescribir si los nuevos datos son más recientes
+    if (existing) {
+      const newLatest = latestDtFromPayloads(snapshotsRaw);
+      const oldLatest = latestDtFromPayloads(existing.data);
+      if (newLatest <= oldLatest) return;
+    }
     localStorage.setItem(LS_KEY, JSON.stringify({ savedAt: Date.now(), data: snapshotsRaw }));
   } catch (_) { /* quota exceeded — ignorar */ }
 }
