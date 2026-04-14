@@ -922,8 +922,32 @@ function updateStatusBar(latestPayload, snapshots) {
 //  Main load
 // ─────────────────────────────────────────────
 let _firstLoad = true;
-// Caché en memoria: map de timestamp → payload ya descargado
-const _snapshotCache = new Map();
+// Caché en memoria: map de timestamp → payload ya descargado.
+// Se pre-carga desde localStorage al iniciar para no re-descargar
+// snapshots ya conocidos tras un reload de página.
+function _tsFromPayload(payload) {
+  // Deriva el timestamp de directorio (YYYYMMDD_HHMMSS) desde extracted_at_utc
+  const raw = payload?.metadata?.extracted_at_utc;
+  if (!raw) return null;
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return null;
+  const pad = n => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}_${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}`;
+}
+
+const _snapshotCache = (() => {
+  const m = new Map();
+  try {
+    const cached = loadSnapshotsFromLS();
+    if (cached) {
+      for (const payload of cached.data) {
+        const ts = _tsFromPayload(payload);
+        if (ts) m.set(ts, payload);
+      }
+    }
+  } catch (_) { /* ignorar */ }
+  return m;
+})();
 
 async function loadAndRender() {
   hideError();
