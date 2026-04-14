@@ -1084,7 +1084,7 @@ async function loadAndRender() {
 }
 
 // ─────────────────────────────────────────────
-//  Init + auto-refresh cada 60s
+//  Init + auto-refresh cada 5 min
 // ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("header-compact");
@@ -1123,5 +1123,5 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadAndRender();
-  setInterval(loadAndRender, 60_000);
+  setInterval(loadAndRender, 300_000);
 });
