@@ -253,6 +253,7 @@ let mainChartInstance = null;
 let trendChartInstance = null;
 let mainChartMode = "actual";
 let mainChartData = null;
+let bestLatestPayload = null; // el snapshot más reciente visto en cualquier refresh
 const MAIN_CHART_MODE_META = {
   actual: {
     note: "Votos válidos procesados actualmente disponibles en la web de ONPE",
@@ -996,7 +997,17 @@ async function loadAndRender() {
   const trendSnapshots = getHalfHourSnapshots(snapshots);
 
   // 3. Determinar top 6 del snapshot más reciente
-  const latest = snapshots[snapshots.length - 1];
+  const latestFromServer = snapshots[snapshots.length - 1];
+
+  // Nunca retroceder: conservar el snapshot más reciente visto en cualquier refresh
+  if (
+    !bestLatestPayload ||
+    latestFromServer.dt.getTime() > new Date(bestLatestPayload.payload?.metadata?.extracted_at_utc).getTime()
+  ) {
+    bestLatestPayload = latestFromServer;
+  }
+  const latest = bestLatestPayload;
+
   const top5 = top5FromTotals(latest.totals);  // devuelve hasta TOP_N
   const top5Names = top5.map(([name]) => name);
   const currentStats = buildCurrentProcessingStats(latest.totals);
