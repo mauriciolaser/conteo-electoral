@@ -327,6 +327,20 @@ function buildCurrentProcessingStats(totals) {
   };
 }
 
+// Filtra una lista de timestamps (formato YYYYMMDD_HHMMSS) conservando
+// un único valor por bucket de 30 minutos (el más reciente de cada ventana).
+function filterHalfHourTimestamps(timestamps) {
+  const buckets = new Map();
+  for (const ts of timestamps) {
+    const m = ts.match(/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})$/);
+    if (!m) continue;
+    const dt = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]));
+    const bucket = Math.floor(dt.getTime() / HALF_HOUR_MS);
+    if (!buckets.has(bucket) || ts > buckets.get(bucket)) buckets.set(bucket, ts);
+  }
+  return [...buckets.values()].sort();
+}
+
 function getHalfHourSnapshots(snapshots) {
   const byBucket = new Map();
   for (const s of snapshots) {
@@ -924,7 +938,8 @@ async function loadAndRender() {
 
   try {
     const idx = await fetchJSON(`${BASE_URL}/history_index.json`);
-    timestamps = Array.isArray(idx.timestamps) ? idx.timestamps : [];
+    const all = Array.isArray(idx.timestamps) ? idx.timestamps : [];
+    timestamps = filterHalfHourTimestamps(all);
   } catch (e) {
     const cached = loadSnapshotsFromLS();
     if (cached) {

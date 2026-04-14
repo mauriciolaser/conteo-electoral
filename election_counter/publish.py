@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime
 from ftplib import FTP
 from io import BytesIO
 from pathlib import Path
@@ -83,21 +84,44 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
                 skipped += 1
 
         # history_index.json junto al raw_history/
-        timestamps = sorted(
+        # Solo se publica un snapshot por bucket de 30 minutos (el más reciente
+        # dentro de cada ventana) para reducir el volumen de datos en el cliente.
+        all_timestamps = sorted(
             d.name
             for d in local_history_root.iterdir()
             if d.is_dir() and (d / "raw_region_results.json").exists()
         )
+        timestamps = _filter_half_hour_timestamps(all_timestamps)
         index_bytes = json.dumps({"timestamps": timestamps}, ensure_ascii=False).encode("utf-8")
         _ftp_upload_bytes(ftp, index_bytes, f"{base}/history_index.json" if base else "history_index.json")
     finally:
         ftp.quit()
 
     print(f"[publish] raw_history OK: {uploaded} subidos, {skipped} sin cambios -> {remote_root}")
-    print(f"[publish] history_index.json: {len(timestamps)} snapshots")
+    print(f"[publish] history_index.json: {len(timestamps)}/{len(all_timestamps)} snapshots (filtrado cada 30 min)")
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
+
+def _filter_half_hour_timestamps(timestamps: list[str]) -> list[str]:
+    """Devuelve un snapshot por bucket de 30 minutos (el más reciente de cada ventana).
+
+    Formato esperado: YYYYMMDD_HHMMSS (ej. 20260414_114625).
+    Timestamps que no coincidan con el formato se descartan.
+    """
+    buckets: dict[int, str] = {}
+    for ts in timestamps:
+        try:
+            dt = datetime.strptime(ts, "%Y%m%d_%H%M%S")
+        except ValueError:
+            continue
+        # Bucket = minutos totales desde epoch redondeados a 30
+        bucket = int(dt.timestamp()) // 1800
+        # Conservar el más reciente dentro del bucket
+        if bucket not in buckets or ts > buckets[bucket]:
+            buckets[bucket] = ts
+    return sorted(buckets.values())
+
 
 def _ftp_connect(env: dict[str, str]) -> FTP:
     host = env.get("FTP_HOST", "").strip()
