@@ -283,7 +283,7 @@ main {
   display: none;
 }
 
-#pro-sanchez-section h2 {
+.regional-top-section h2 {
   margin-bottom: 0;
 }
 
@@ -318,32 +318,32 @@ main {
   overflow-x: auto;
 }
 
-#pro-sanchez-table {
+.regional-top-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
   min-width: 680px;
 }
 
-#pro-sanchez-table th,
-#pro-sanchez-table td {
+.regional-top-table th,
+.regional-top-table td {
   padding: 0.65rem 0.75rem;
   border-bottom: 1px solid var(--border);
   text-align: left;
 }
 
-#pro-sanchez-table th {
+.regional-top-table th {
   position: relative;
   color: var(--muted);
   font-size: 0.75rem;
   letter-spacing: 0.03em;
 }
 
-#pro-sanchez-table tbody td {
+.regional-top-table tbody td {
   color: var(--text);
 }
 
-#pro-sanchez-table .th-tooltip::after {
+.regional-top-table .th-tooltip::after {
   content: attr(data-tooltip);
   position: absolute;
   left: 50%;
@@ -365,7 +365,7 @@ main {
   z-index: 20;
 }
 
-#pro-sanchez-table .th-tooltip::before {
+.regional-top-table .th-tooltip::before {
   content: "";
   position: absolute;
   left: 50%;
@@ -380,27 +380,27 @@ main {
   z-index: 20;
 }
 
-#pro-sanchez-table .th-tooltip:hover::after,
-#pro-sanchez-table .th-tooltip:hover::before,
-#pro-sanchez-table .th-tooltip:focus-visible::after,
-#pro-sanchez-table .th-tooltip:focus-visible::before {
+.regional-top-table .th-tooltip:hover::after,
+.regional-top-table .th-tooltip:hover::before,
+.regional-top-table .th-tooltip:focus-visible::after,
+.regional-top-table .th-tooltip:focus-visible::before {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
 /* Columnas proyección — cabeceras con color + icono ⓘ */
-#pro-sanchez-table th.th-proj-simple {
+.regional-top-table th.th-proj-simple {
   color: #6ecb88;
   cursor: help;
 }
 
-#pro-sanchez-table th.th-proj-rural {
+.regional-top-table th.th-proj-rural {
   color: #7fa8e8;
   cursor: help;
 }
 
-#pro-sanchez-table th.th-proj-simple .proj-icon,
-#pro-sanchez-table th.th-proj-rural .proj-icon {
+.regional-top-table th.th-proj-simple .proj-icon,
+.regional-top-table th.th-proj-rural .proj-icon {
   display: inline-block;
   margin-left: 0.3em;
   font-size: 0.7rem;
@@ -411,25 +411,25 @@ main {
 }
 
 /* Columnas proyección — zebra por hue en filas pares/impares */
-#pro-sanchez-table tbody tr:nth-child(odd) td.col-simple {
+.regional-top-table tbody tr:nth-child(odd) td.col-simple {
   background: rgba(45, 143, 71, 0.07);
   border-left: 2px solid rgba(45, 143, 71, 0.3);
   color: #8fe0a8;
 }
 
-#pro-sanchez-table tbody tr:nth-child(even) td.col-simple {
+.regional-top-table tbody tr:nth-child(even) td.col-simple {
   background: rgba(45, 143, 71, 0.13);
   border-left: 2px solid rgba(45, 143, 71, 0.45);
   color: #a5ecbc;
 }
 
-#pro-sanchez-table tbody tr:nth-child(odd) td.col-rural {
+.regional-top-table tbody tr:nth-child(odd) td.col-rural {
   background: rgba(74, 107, 196, 0.08);
   border-left: 2px solid rgba(74, 107, 196, 0.32);
   color: #9bb5f0;
 }
 
-#pro-sanchez-table tbody tr:nth-child(even) td.col-rural {
+.regional-top-table tbody tr:nth-child(even) td.col-rural {
   background: rgba(74, 107, 196, 0.15);
   border-left: 2px solid rgba(74, 107, 196, 0.5);
   color: #b5caf5;
@@ -907,13 +907,13 @@ footer {
     -webkit-overflow-scrolling: touch;
   }
 
-  #pro-sanchez-table {
+  .regional-top-table {
     min-width: 520px;
     font-size: 0.78rem;
   }
 
-  #pro-sanchez-table th,
-  #pro-sanchez-table td {
+  .regional-top-table th,
+  .regional-top-table td {
     padding: 0.5rem 0.55rem;
   }
 
@@ -924,7 +924,7 @@ footer {
 
   /* Tooltip on mobile: avoid going off-screen */
   .mode-btn::after,
-  #pro-sanchez-table .th-tooltip::after {
+  .regional-top-table .th-tooltip::after {
     width: min(220px, 80vw);
     font-size: 0.7rem;
   }

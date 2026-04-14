@@ -287,16 +287,18 @@ const MAIN_CHART_MODE_META = {
 
 const HALF_HOUR_MS = 30 * 60 * 1000;
 const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
+const LOPEZ_ALIAGA_PARTY = "RENOVACION POPULAR";
+const NIETO_PARTY = "PARTIDO CIVICO OBRAS";
 const CANDIDATE_OPTIONS = {
   [SANCHEZ_PARTY]: {
     label: "Sánchez",
     votesHeader: "VOTOS SÁNCHEZ",
   },
-  "RENOVACION POPULAR": {
+  [LOPEZ_ALIAGA_PARTY]: {
     label: "López Aliaga",
     votesHeader: "VOTOS LÓPEZ ALIAGA",
   },
-  "PARTIDO CIVICO OBRAS": {
+  [NIETO_PARTY]: {
     label: "Nieto",
     votesHeader: "VOTOS NIETO",
   },
@@ -389,16 +391,17 @@ function projectedVotesInRegion(projectedByParty, partyNameNormalized) {
 function buildTopRegionalLeaderStats(latestPayload, simpleProjectionByRegion, ruralProjectionByRegion, candidatePartyName = SANCHEZ_PARTY) {
   const regions = latestPayload.regions || [];
   const candidateRegions = [];
+  const candidatePartyNormalized = normalizeName(candidatePartyName);
 
   for (const region of regions) {
     const leader = leadingPartyInRegion(region);
-    if (leader.name !== candidatePartyName) continue;
+    if (leader.name !== candidatePartyNormalized) continue;
 
     const actasPct = Number(region.actas_pct) || 0;
-    const candidateVotes = partyVotesInRegion(region, candidatePartyName);
+    const candidateVotes = partyVotesInRegion(region, candidatePartyNormalized);
     const regionName = region.region || "—";
-    const simpleProjection = projectedVotesInRegion(simpleProjectionByRegion[regionName], candidatePartyName);
-    const ruralProjection = projectedVotesInRegion(ruralProjectionByRegion[regionName], candidatePartyName);
+    const simpleProjection = projectedVotesInRegion(simpleProjectionByRegion[regionName], candidatePartyNormalized);
+    const ruralProjection = projectedVotesInRegion(ruralProjectionByRegion[regionName], candidatePartyNormalized);
 
     candidateRegions.push({
       region: region.region || "—",
@@ -409,12 +412,11 @@ function buildTopRegionalLeaderStats(latestPayload, simpleProjectionByRegion, ru
     });
   }
 
-  const top9Regions = [...candidateRegions]
-    .sort((a, b) => b.candidateVotes - a.candidateVotes)
-    .slice(0, 9);
+  const topRegions = [...candidateRegions]
+    .sort((a, b) => b.candidateVotes - a.candidateVotes);
 
   return {
-    top9Regions,
+    topRegions,
   };
 }
 
@@ -428,14 +430,15 @@ function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY
   const votesHeader = document.getElementById("candidate-votes-header");
   const candidateLabel = CANDIDATE_OPTIONS[candidatePartyName]?.label || candidatePartyName;
   const dynamicVotesHeader = CANDIDATE_OPTIONS[candidatePartyName]?.votesHeader || `VOTOS ${candidateLabel.toUpperCase()}`;
-  if (title) title.textContent = `Top 9 regiones en las que ${candidateLabel} está primero`;
+  const topCount = stats.topRegions.length;
+  if (title) title.textContent = `Top ${topCount} regiones en las que ${candidateLabel} está primero`;
   if (votesHeader) votesHeader.textContent = dynamicVotesHeader;
   if (!tbody) return;
 
-  if (!stats.top9Regions.length) {
+  if (!stats.topRegions.length) {
     tbody.innerHTML = `<tr><td colspan="5">No hay regiones con liderazgo de ${candidateLabel} aún.</td></tr>`;
   } else {
-    tbody.innerHTML = stats.top9Regions.map(r => `
+    tbody.innerHTML = stats.topRegions.map(r => `
       <tr>
         <td>${r.region}</td>
         <td>${r.actasPct.toFixed(3)}%</td>
@@ -445,6 +448,37 @@ function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY
       </tr>
     `).join("");
   }
+}
+
+function renderSimpleRegionalLeadersPanel(stats, candidatePartyName, panelConfig) {
+  const section = document.getElementById(panelConfig.sectionId);
+  const tbody = document.getElementById(panelConfig.bodyId);
+  const title = document.getElementById(panelConfig.titleId);
+  const votesHeader = document.getElementById(panelConfig.votesHeaderId);
+  const candidateLabel = CANDIDATE_OPTIONS[candidatePartyName]?.label || candidatePartyName;
+  const dynamicVotesHeader = CANDIDATE_OPTIONS[candidatePartyName]?.votesHeader || `VOTOS ${candidateLabel.toUpperCase()}`;
+
+  if (!section || !tbody || !title || !votesHeader) return;
+
+  const topCount = stats.topRegions.length;
+  title.textContent = `Top ${topCount} regiones en las que ${candidateLabel} está primero`;
+  votesHeader.textContent = dynamicVotesHeader;
+
+  if (!stats.topRegions.length) {
+    section.classList.add("hidden");
+    tbody.innerHTML = "";
+    return;
+  }
+
+  section.classList.remove("hidden");
+  tbody.innerHTML = stats.topRegions.map(r => `
+    <tr>
+      <td>${r.region}</td>
+      <td>${r.actasPct.toFixed(3)}%</td>
+      <td>${formatInt(r.candidateVotes)}</td>
+      <td class="col-simple" title="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">${formatInt(r.simpleProjection)}</td>
+    </tr>
+  `).join("");
 }
 
 function updateMainChartButtons() {
@@ -1073,6 +1107,18 @@ async function loadAndRender() {
     ruralProjectionByRegion,
     selectedRegionalCandidate
   );
+  const lopezTopRegionalLeadersStats = buildTopRegionalLeaderStats(
+    latest.payload,
+    simpleProjectionByRegion,
+    ruralProjectionByRegion,
+    LOPEZ_ALIAGA_PARTY
+  );
+  const nietoTopRegionalLeadersStats = buildTopRegionalLeaderStats(
+    latest.payload,
+    simpleProjectionByRegion,
+    ruralProjectionByRegion,
+    NIETO_PARTY
+  );
   mainChartData = {
     actual: currentStats,
     interpolation: {
@@ -1091,6 +1137,18 @@ async function loadAndRender() {
   updateStatusBar(latest.payload, snapshots);
   renderMainChart();
   renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate);
+  renderSimpleRegionalLeadersPanel(lopezTopRegionalLeadersStats, LOPEZ_ALIAGA_PARTY, {
+    sectionId: "pro-lopez-section",
+    titleId: "candidate-top-lopez-title",
+    votesHeaderId: "candidate-votes-lopez-header",
+    bodyId: "pro-lopez-table-body",
+  });
+  renderSimpleRegionalLeadersPanel(nietoTopRegionalLeadersStats, NIETO_PARTY, {
+    sectionId: "pro-nieto-section",
+    titleId: "candidate-top-nieto-title",
+    votesHeaderId: "candidate-votes-nieto-header",
+    bodyId: "pro-nieto-table-body",
+  });
 
   if (trendSnapshots.length >= 2) {
     const trendContainer = document.querySelector("#trend-chart-container");

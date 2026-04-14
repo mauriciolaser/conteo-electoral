@@ -1,0 +1,5207 @@
+{
+  "metadata": {
+    "source_url": "https://resultadoelectoral.onpe.gob.pe/main/presidenciales",
+    "extracted_at_utc": "2026-04-14T20:26:11.019402+00:00",
+    "actas_pct_global": 77.918,
+    "mode": "live",
+    "warnings": [],
+    "party_logos": {
+      "FUERZA POPULAR": "/assets/img-reales/partidos/00000008.jpg",
+      "RENOVACIÓN POPULAR": "/assets/img-reales/partidos/00000035.jpg",
+      "PARTIDO DEL BUEN GOBIERNO": "/assets/img-reales/partidos/00000016.jpg",
+      "JUNTOS POR EL PERÚ": "/assets/img-reales/partidos/00000010.jpg",
+      "PARTIDO CÍVICO OBRAS": "/assets/img-reales/partidos/00000014.jpg",
+      "PARTIDO PAÍS PARA TODOS": "/assets/img-reales/partidos/00000023.jpg",
+      "AHORA NACIÓN - AN": "/assets/img-reales/partidos/00000002.jpg",
+      "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO": "/assets/img-reales/partidos/00000033.jpg",
+      "PARTIDO SICREO": "/assets/img-reales/partidos/00000031.jpg",
+      "PARTIDO FRENTE DE LA ESPERANZA 2021": "/assets/img-reales/partidos/00000021.jpg",
+      "PODEMOS PERÚ": "/assets/img-reales/partidos/00000032.jpg",
+      "PARTIDO POLÍTICO COOPERACIÓN POPULAR": "/assets/img-reales/partidos/00000025.jpg",
+      "ALIANZA PARA EL PROGRESO": "/assets/img-reales/partidos/00000001.jpg",
+      "PARTIDO APRISTA PERUANO": "/assets/img-reales/partidos/00000012.jpg",
+      "PARTIDO DEMOCRÁTICO SOMOS PERÚ": "/assets/img-reales/partidos/00000020.jpg",
+      "PARTIDO PATRIÓTICO DEL PERÚ": "/assets/img-reales/partidos/00000024.jpg",
+      "PARTIDO POLÍTICO PERÚ PRIMERO": "/assets/img-reales/partidos/00000029.jpg",
+      "ALIANZA ELECTORAL VENCEREMOS": "/assets/img-reales/partidos/00000003.jpg",
+      "UN CAMINO DIFERENTE": "/assets/img-reales/partidos/00000037.jpg",
+      "PARTIDO DEMÓCRATA UNIDO PERÚ": "/assets/img-reales/partidos/00000017.jpg",
+      "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE": "/assets/img-reales/partidos/00000027.jpg",
+      "PARTIDO MORADO": "/assets/img-reales/partidos/00000022.jpg",
+      "UNIDAD NACIONAL": "/assets/img-reales/partidos/00000038.jpg",
+      "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA": "/assets/img-reales/partidos/00000026.jpg",
+      "PROGRESEMOS": "/assets/img-reales/partidos/00000034.jpg",
+      "PARTIDO DEMÓCRATA VERDE": "/assets/img-reales/partidos/00000018.jpg",
+      "LIBERTAD POPULAR": "/assets/img-reales/partidos/00000011.jpg",
+      "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL": "/assets/img-reales/partidos/00000007.jpg",
+      "PARTIDO POLÍTICO PERÚ ACCIÓN": "/assets/img-reales/partidos/00000028.jpg",
+      "FUERZA Y LIBERTAD": "/assets/img-reales/partidos/00000009.jpg",
+      "FE EN EL PERÚ": "/assets/img-reales/partidos/00000005.jpg",
+      "PARTIDO DEMOCRATICO FEDERAL": "/assets/img-reales/partidos/00000019.jpg",
+      "SALVEMOS AL PERÚ": "/assets/img-reales/partidos/00000036.jpg",
+      "PARTIDO POLÍTICO PRIN": "/assets/img-reales/partidos/00000030.jpg",
+      "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ": "/assets/img-reales/partidos/00000015.jpg",
+      "PERÚ MODERNO": "/assets/img-reales/partidos/00000004.jpg"
+    }
+  },
+  "regions": [
+    {
+      "region": "AMAZONAS",
+      "actas_pct": 55.869,
+      "emitidos_actual": 131212,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 30004,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 21130,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 19994,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 11671,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 9099,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 6931,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 4504,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 4102,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 2862,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 2251,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 2162,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 2039,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 1868,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 1708,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1219,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1126,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 954,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 945,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 907,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 828,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 681,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 541,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 418,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 398,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 333,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 281,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 235,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 212,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 209,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 197,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 167,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 154,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 147,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 146,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 140,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 106,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 60,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 43,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AJUSTE",
+          "votos": 440,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "ÁNCASH",
+      "actas_pct": 78.485,
+      "emitidos_actual": 544668,
+      "partidos": [
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 81574,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 75076,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 64988,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 43081,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 41942,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 38744,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 38372,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 31826,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 25259,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 13304,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 12373,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 12206,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 8270,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 7370,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 5536,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 4777,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 4290,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 4223,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 3712,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 3337,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 3081,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 2972,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 2821,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 2436,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 2155,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 1957,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 1397,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1337,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 1065,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 949,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 913,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 694,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 646,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 638,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 445,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 334,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 311,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 257,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "APURÍMAC",
+      "actas_pct": 82.536,
+      "emitidos_actual": 212419,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 67566,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 32701,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 23567,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 18419,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 12059,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 11464,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 7524,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 6416,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 5494,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 2947,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 2521,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 2475,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 2190,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 1960,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1729,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1655,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1621,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 1611,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 1166,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 827,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 776,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 741,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 722,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 588,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 585,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 515,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 372,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 352,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 312,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 280,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 278,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 215,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 190,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 155,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 148,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 139,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 95,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 44,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "AREQUIPA",
+      "actas_pct": 93.95,
+      "emitidos_actual": 935945,
+      "partidos": [
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 154615,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 90519,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 88503,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 83455,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 77045,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 70268,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 68974,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 60587,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 38398,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 37954,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 36378,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 27165,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 19029,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 8149,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 8028,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 7538,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 7367,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 6763,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 4912,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 4850,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 4616,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 3473,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 3413,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 3278,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 3012,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 2775,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 2584,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 1678,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 1641,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 1528,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1504,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 1388,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 1106,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 899,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 799,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 609,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 602,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 543,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "AYACUCHO",
+      "actas_pct": 76.368,
+      "emitidos_actual": 278878,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 64025,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 39214,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 35276,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 32719,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 18358,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 14479,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 14002,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 6645,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 5652,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 5344,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 5058,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 5036,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 4607,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 3547,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 2997,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 2740,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 2663,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 2336,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 2160,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 1659,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1411,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 1321,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1253,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 943,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 868,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 774,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 488,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 439,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 432,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 397,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 382,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 361,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 352,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 324,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 189,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 155,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 144,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 128,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "CAJAMARCA",
+      "actas_pct": 56.887,
+      "emitidos_actual": 489819,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 157184,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 71367,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 53988,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 43197,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 30583,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 19240,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 18057,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 13367,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 12118,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 8314,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 7214,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 7201,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 6496,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 4136,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 4004,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 3729,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 3324,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 3293,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 2783,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 2696,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 2448,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 1918,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 1797,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1541,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 1443,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1386,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 976,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 948,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 783,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 722,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 664,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 661,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 613,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 513,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 352,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 288,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 258,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 217,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "CALLAO",
+      "actas_pct": 94.099,
+      "emitidos_actual": 631585,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 112555,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 82061,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 82044,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 66036,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 58597,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 44209,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 32422,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 27467,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 25221,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 21983,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 16238,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 7237,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 5654,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 4669,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 4189,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 4136,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 4068,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 3265,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 3087,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 2944,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 2891,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 2719,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 2286,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1918,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 1892,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 1652,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1621,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1486,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1361,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 1163,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 976,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 729,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 500,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 443,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 405,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 385,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 334,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 261,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AJUSTE",
+          "votos": 481,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "CUSCO",
+      "actas_pct": 80.04,
+      "emitidos_actual": 693459,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 114477,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 89273,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 87881,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 77248,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 56795,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 39568,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 36414,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 30426,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 19205,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 18587,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 18303,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 18236,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 15040,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 9925,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 7953,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 6960,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 4996,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 4671,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 4402,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 4121,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 3545,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 3372,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 3194,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 3148,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 2753,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1668,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 1399,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 1340,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 1325,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 1092,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 1003,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 994,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 946,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 911,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 895,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 637,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 435,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 321,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "HUANCAVELICA",
+      "actas_pct": 80.99,
+      "emitidos_actual": 178999,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 60494,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 26133,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 19596,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 13975,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 10100,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 9596,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 4907,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 4897,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 3421,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 2918,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 2640,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 2404,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 2361,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 2126,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1969,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 1612,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1490,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1325,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 1069,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 1060,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 761,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 713,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 349,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 339,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 336,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 331,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 282,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 275,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 251,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 228,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 206,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 176,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 156,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 151,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 115,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 94,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 89,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 54,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "HUÁNUCO",
+      "actas_pct": 78.513,
+      "emitidos_actual": 352874,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 75987,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 56367,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 44071,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 38587,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 19027,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 17664,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 17491,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 16397,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 14097,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 6766,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 5536,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 5366,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 4565,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 3334,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 2956,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 2529,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 2481,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 2362,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 2196,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 1919,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 1577,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 1533,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1415,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 978,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 914,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 912,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 825,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 762,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 707,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 691,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 557,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 467,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 418,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 408,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 375,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 232,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 213,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 192,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "ICA",
+      "actas_pct": 62.628,
+      "emitidos_actual": 367488,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 62107,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 43123,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 36108,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 31721,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 31372,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 30609,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 22683,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 20601,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 17664,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 11901,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 10900,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 7063,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 5711,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 5007,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 3288,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 3257,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 2646,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 2519,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 2410,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 2169,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1857,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 1630,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1521,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 1461,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 1438,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1233,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 1155,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 895,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 758,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 679,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 631,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 532,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 374,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 288,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 264,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 249,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 203,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 165,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "JUNÍN",
+      "actas_pct": 73.151,
+      "emitidos_actual": 593039,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 79793,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 72385,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 58307,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 52925,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 48701,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 43811,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 39388,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 38444,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 30363,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 20457,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 14567,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 13426,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 12557,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 11054,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 6883,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 6428,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 4560,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 4115,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 4042,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 3583,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 3376,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 3055,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 2733,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 2439,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 2416,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 2317,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 1891,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 1429,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 1304,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 1107,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 965,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 791,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 786,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 770,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 680,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 606,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 317,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 268,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "LA LIBERTAD",
+      "actas_pct": 75.745,
+      "emitidos_actual": 897450,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 146780,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 116799,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 76022,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 64545,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 64378,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 60644,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 58492,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 52872,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 49945,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 30357,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 28277,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 24833,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 24742,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 22189,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 15299,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 11317,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 6391,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 5313,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 4212,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 3404,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 3267,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 3164,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 2958,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 2957,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 2473,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 2209,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 2181,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 1953,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 1846,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1447,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 1371,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 1011,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 988,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 811,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 807,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 507,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 391,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 298,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "LAMBAYEQUE",
+      "actas_pct": 80.864,
+      "emitidos_actual": 668186,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 144019,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 76646,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 60958,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 53765,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 51162,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 50436,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 40286,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 39661,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 25367,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 18436,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 17604,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 12068,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 11698,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 8668,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 7627,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 7244,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 5512,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 5296,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 3416,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 3167,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 2931,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 2827,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 2731,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 2693,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 2495,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1780,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 1554,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 1378,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 1297,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1032,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 925,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 788,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 655,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 608,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 489,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 346,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 346,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 275,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "LIMA",
+      "actas_pct": 90.409,
+      "emitidos_actual": 6252545,
+      "partidos": [
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 1109199,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 981049,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 834083,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 503211,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 497764,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 492256,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 379684,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 237222,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 229553,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 218013,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 177722,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 77672,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 52982,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 45809,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 40288,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 35096,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 31038,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 29533,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 28926,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 28165,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 27035,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 26324,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 25634,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 21203,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 19513,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 15805,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 14641,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 13526,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 10521,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 10303,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 8026,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 6795,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 5749,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 5569,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 3801,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 3102,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 2877,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 2856,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "LORETO",
+      "actas_pct": 69.818,
+      "emitidos_actual": 336800,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 73142,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 60523,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 33368,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 20605,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 19120,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 17701,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 17573,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 16447,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 11711,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 11501,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 10294,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 6543,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 6202,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 5089,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 4530,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 2335,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 2165,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1971,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 1750,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1533,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1494,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1478,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 1141,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 991,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 969,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 786,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 739,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 721,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 620,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 599,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 564,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 539,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 493,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 440,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 406,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 313,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 248,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 156,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "MADRE DE DIOS",
+      "actas_pct": 51.677,
+      "emitidos_actual": 56088,
+      "partidos": [
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 9540,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 8480,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 6486,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 6387,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 3559,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 3288,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 2761,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 2407,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 1729,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 1679,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 1474,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 1214,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 876,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 714,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 695,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 585,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 521,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 503,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 463,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 419,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 320,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 310,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 248,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 213,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 200,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 166,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 132,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 131,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 97,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 94,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 74,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 70,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 64,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 46,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 46,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 45,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 32,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 20,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "MOQUEGUA",
+      "actas_pct": 94.983,
+      "emitidos_actual": 124803,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 13912,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 13211,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 11452,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 11335,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 11316,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 7154,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 6804,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 6313,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 5854,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 5547,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 5045,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 4912,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 4672,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 4631,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 1772,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1514,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 1261,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1047,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 958,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 934,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 686,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 579,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 570,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 545,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 393,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 372,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 317,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 301,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 210,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 197,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 170,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 159,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 132,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 120,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 110,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 110,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 102,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 86,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "PASCO",
+      "actas_pct": 76.933,
+      "emitidos_actual": 115628,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 17584,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 15868,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 15373,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 11497,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 9018,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 6437,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 6081,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 4554,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 4251,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 4218,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 4021,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 2813,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 1909,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 1829,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 1555,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 1137,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1116,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 891,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 783,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 734,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 542,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 462,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 417,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 415,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 302,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 253,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 238,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 188,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 167,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 157,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 155,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 151,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 149,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 101,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 86,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 79,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 64,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 33,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "PIURA",
+      "actas_pct": 58.644,
+      "emitidos_actual": 702032,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 154817,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 107846,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 60519,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 52587,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 49432,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 46827,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 43126,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 38917,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 25511,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 20130,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 16031,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 10935,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 9854,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 9105,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 7330,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 7058,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 6022,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 4388,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 3743,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 2874,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 2813,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 2545,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 2470,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 2383,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 2176,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1957,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 1815,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 1784,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 1187,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 1110,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 936,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 707,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 707,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 702,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 663,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 485,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 344,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 196,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "PUNO",
+      "actas_pct": 77.981,
+      "emitidos_actual": 602325,
+      "partidos": [
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 124585,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 89518,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 60562,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 58692,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 57183,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 31402,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 26555,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 23830,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 21487,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 20090,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 16003,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 10257,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 8671,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 8399,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 7927,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 4709,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 4563,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 4177,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 3299,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 2921,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 2689,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 2450,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 1785,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 1607,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 1024,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 922,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 808,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 805,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 746,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 656,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 622,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 617,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 590,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 580,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 547,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 437,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 427,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 183,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "SAN MARTÍN",
+      "actas_pct": 67.048,
+      "emitidos_actual": 361921,
+      "partidos": [
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 68792,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 63074,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 61387,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 30981,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 25360,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 16054,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 13553,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 13161,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 11756,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 5828,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 5761,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 5404,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 4933,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 3198,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 3126,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 3026,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 2884,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 2711,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 2655,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 2337,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 2313,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1946,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 1693,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 1332,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 1240,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 1168,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 979,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 880,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 697,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 695,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 586,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 457,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 455,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 443,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 377,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 365,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 193,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 121,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "TACNA",
+      "actas_pct": 85.879,
+      "emitidos_actual": 215521,
+      "partidos": [
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 27712,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 22500,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 21734,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 18723,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 16081,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 14246,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 13274,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 12971,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 12405,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 9981,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 9489,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 8359,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 7896,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 2307,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 2286,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 1898,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1577,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1454,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 1148,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 1127,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 1102,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 934,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 861,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 768,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 705,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 686,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 615,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 461,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 447,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 411,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 297,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 280,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 247,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 157,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 127,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 107,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 77,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 71,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "TUMBES",
+      "actas_pct": 85.759,
+      "emitidos_actual": 121174,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 32079,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 18332,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 14286,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 7838,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 6405,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 5601,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 5361,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 4724,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 4574,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 4044,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 2707,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 2110,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 1958,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 1555,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 965,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 930,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 877,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 795,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 786,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 664,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 622,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 593,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 533,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 416,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 352,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 349,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 345,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 342,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 191,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 147,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 133,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 130,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 96,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 91,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 77,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 75,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 51,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 40,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "UCAYALI",
+      "actas_pct": 56.074,
+      "emitidos_actual": 175423,
+      "partidos": [
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 41606,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 33049,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 15770,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 11360,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 11105,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 9470,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 7810,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 6796,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 5538,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 4358,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 3491,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 3476,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 2735,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 2485,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 2106,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 1844,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 1605,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 1346,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 1111,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 1098,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 1059,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 964,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 946,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 621,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 558,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 543,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 451,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 380,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 304,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 302,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 300,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 266,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 260,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 179,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 144,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 123,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 121,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 98,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    },
+    {
+      "region": "PERUANOS EN EL EXTRANJERO",
+      "actas_pct": 17.971,
+      "emitidos_actual": 72448,
+      "partidos": [
+        {
+          "nombre": "RENOVACIÓN POPULAR",
+          "votos": 17179,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS EN BLANCO",
+          "votos": 11006,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "FUERZA POPULAR",
+          "votos": 9105,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEL BUEN GOBIERNO",
+          "votos": 6717,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PAÍS PARA TODOS",
+          "votos": 6315,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO CÍVICO OBRAS",
+          "votos": 4923,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AHORA NACIÓN - AN",
+          "votos": 4164,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "VOTOS NULOS",
+          "votos": 2911,
+          "es_blanco_o_nulo": true
+        },
+        {
+          "nombre": "PRIMERO LA GENTE – COMUNIDAD, ECOLOGÍA, LIBERTAD Y PROGRESO",
+          "votos": 2467,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "JUNTOS POR EL PERÚ",
+          "votos": 1218,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO SICREO",
+          "votos": 734,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO APRISTA PERUANO",
+          "votos": 630,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO FRENTE DE LA ESPERANZA 2021",
+          "votos": 618,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UN CAMINO DIFERENTE",
+          "votos": 476,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "UNIDAD NACIONAL",
+          "votos": 402,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA ELECTORAL VENCEREMOS",
+          "votos": 344,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRÁTICO SOMOS PERÚ",
+          "votos": 325,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO COOPERACIÓN POPULAR",
+          "votos": 279,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO MORADO",
+          "votos": 275,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO PATRIÓTICO DEL PERÚ",
+          "votos": 257,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA UNIDO PERÚ",
+          "votos": 223,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO NACIONAL PERÚ LIBRE",
+          "votos": 218,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "ALIANZA PARA EL PROGRESO",
+          "votos": 212,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMÓCRATA VERDE",
+          "votos": 198,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PODEMOS PERÚ",
+          "votos": 182,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO INTEGRIDAD DEMOCRÁTICA",
+          "votos": 171,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "LIBERTAD POPULAR",
+          "votos": 161,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ ACCIÓN",
+          "votos": 113,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PERÚ PRIMERO",
+          "votos": 108,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PROGRESEMOS",
+          "votos": 106,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FUERZA Y LIBERTAD",
+          "votos": 99,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "AVANZA PAÍS - PARTIDO DE INTEGRACIÓN SOCIAL",
+          "votos": 83,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "FE EN EL PERÚ",
+          "votos": 57,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DE LOS TRABAJADORES Y EMPRENDEDORES PTE - PERÚ",
+          "votos": 39,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO POLÍTICO PRIN",
+          "votos": 37,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PERÚ MODERNO",
+          "votos": 37,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "SALVEMOS AL PERÚ",
+          "votos": 32,
+          "es_blanco_o_nulo": false
+        },
+        {
+          "nombre": "PARTIDO DEMOCRATICO FEDERAL",
+          "votos": 27,
+          "es_blanco_o_nulo": false
+        }
+      ],
+      "source": "onpe_live_backend"
+    }
+  ]
+}
