@@ -288,7 +288,7 @@ const MAIN_CHART_MODE_META = {
 const HALF_HOUR_MS = 30 * 60 * 1000;
 const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
 const LOPEZ_ALIAGA_PARTY = "RENOVACION POPULAR";
-const NIETO_PARTY = "PARTIDO CIVICO OBRAS";
+const NIETO_PARTY = "PARTIDO DEL BUEN GOBIERNO";
 const CANDIDATE_OPTIONS = {
   [SANCHEZ_PARTY]: {
     label: "Sánchez",
@@ -365,43 +365,53 @@ function getHalfHourSnapshots(snapshots) {
   return [...byBucket.values()].sort((a, b) => a.dt - b.dt);
 }
 
-function partyVotesInRegion(region, partyNameNormalized) {
-  const party = (region.partidos || []).find(
-    p => normalizeName(p.nombre) === partyNameNormalized
-  );
-  return parseInt(party?.votos) || 0;
+function partyVotesInRegion(region, partyNameCanonical) {
+  return (region.partidos || [])
+    .filter(p => canonicalPartyName(p.nombre) === partyNameCanonical)
+    .reduce((acc, p) => acc + (parseInt(p.votos) || 0), 0);
 }
 
 function leadingPartyInRegion(region) {
-  return (region.partidos || [])
-    .filter(p => !isSpecial(p.nombre || ""))
-    .reduce((best, p) => (parseInt(p.votos) || 0) > best.votes
-      ? { name: normalizeName(p.nombre), votes: parseInt(p.votos) || 0 }
-      : best,
-    { name: "", votes: -1 });
+  const totalsByParty = new Map();
+  for (const p of (region.partidos || [])) {
+    const rawName = p.nombre || "";
+    if (isSpecial(rawName)) continue;
+    const partyName = canonicalPartyName(rawName);
+    totalsByParty.set(partyName, (totalsByParty.get(partyName) || 0) + (parseInt(p.votos) || 0));
+  }
+
+  let bestName = "";
+  let bestVotes = -1;
+  for (const [name, votes] of totalsByParty.entries()) {
+    if (votes > bestVotes) {
+      bestName = name;
+      bestVotes = votes;
+    }
+  }
+  return { name: bestName, votes: bestVotes };
 }
 
-function projectedVotesInRegion(projectedByParty, partyNameNormalized) {
+function projectedVotesInRegion(projectedByParty, partyNameCanonical) {
   if (!projectedByParty) return 0;
   return Object.entries(projectedByParty)
-    .filter(([name]) => normalizeName(name) === partyNameNormalized)
+    .filter(([name]) => canonicalPartyName(name) === partyNameCanonical)
     .reduce((acc, [, votes]) => acc + (Number(votes) || 0), 0);
 }
 
 function buildTopRegionalLeaderStats(latestPayload, simpleProjectionByRegion, ruralProjectionByRegion, candidatePartyName = SANCHEZ_PARTY) {
   const regions = latestPayload.regions || [];
   const candidateRegions = [];
-  const candidatePartyNormalized = normalizeName(candidatePartyName);
+  const candidatePartyCanonical = canonicalPartyName(candidatePartyName);
 
   for (const region of regions) {
     const leader = leadingPartyInRegion(region);
-    if (leader.name !== candidatePartyNormalized) continue;
+    if (leader.name !== candidatePartyCanonical) continue;
 
     const actasPct = Number(region.actas_pct) || 0;
-    const candidateVotes = partyVotesInRegion(region, candidatePartyNormalized);
+    const candidateVotes = partyVotesInRegion(region, candidatePartyCanonical);
     const regionName = region.region || "—";
-    const simpleProjection = projectedVotesInRegion(simpleProjectionByRegion[regionName], candidatePartyNormalized);
-    const ruralProjection = projectedVotesInRegion(ruralProjectionByRegion[regionName], candidatePartyNormalized);
+    const simpleProjection = projectedVotesInRegion(simpleProjectionByRegion[regionName], candidatePartyCanonical);
+    const ruralProjection = projectedVotesInRegion(ruralProjectionByRegion[regionName], candidatePartyCanonical);
 
     candidateRegions.push({
       region: region.region || "—",
