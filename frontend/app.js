@@ -206,7 +206,7 @@ const MAIN_CHART_MODE_META = {
     tooltipSuffix: "votos procesados",
   },
   interpolation: {
-    note: "Estiramos la data siguiendo la tendencia del último registro disponible en ONPE.",
+    note: "Estiramos la data siguiendo la tendencia del último registro disponible en ONPE sin contar los cambios de tendencia que se producen cuando llegan actas remotas.",
     tooltipSuffix: "votos interpolados",
   },
   rural: {
