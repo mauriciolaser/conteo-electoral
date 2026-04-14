@@ -610,6 +610,131 @@ function renderTrendChart(snapshots, top5Names) {
 }
 
 // ─────────────────────────────────────────────
+//  Growth rate chart: delta de votos por snapshot
+// ─────────────────────────────────────────────
+let growthRateChartInstance = null;
+
+function renderGrowthRateChart(snapshots) {
+  const canvas = document.getElementById("growth-rate-chart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (growthRateChartInstance) growthRateChartInstance.destroy();
+
+  const sumByNormalized = (totals, normalizedParty) =>
+    Object.entries(totals)
+      .filter(([k]) => normalizeName(k) === normalizedParty)
+      .reduce((acc, [, v]) => acc + v, 0);
+
+  // Agrupa en buckets horarios, tomando el snapshot más reciente de cada hora
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  const byHour = new Map();
+  for (const s of snapshots) {
+    const bucket = Math.floor(s.dt.getTime() / ONE_HOUR_MS);
+    const existing = byHour.get(bucket);
+    if (!existing || s.dt > existing.dt) byHour.set(bucket, s);
+  }
+  const hourlySnaps = [...byHour.values()].sort((a, b) => a.dt - b.dt);
+
+  if (hourlySnaps.length < 2) {
+    document.getElementById("growth-rate-chart-container").innerHTML =
+      `<p style="color:#7b7f94;padding:1rem 0">Se necesitan al menos 2 cortes horarios para mostrar el ritmo de crecimiento.</p>`;
+    return;
+  }
+
+  // Calcula deltas a partir del segundo snapshot
+  const labels = [];
+  const rlaDeltas = [];
+  const rsDeltas  = [];
+
+  for (let i = 1; i < hourlySnaps.length; i++) {
+    const prev = hourlySnaps[i - 1];
+    const curr = hourlySnaps[i];
+
+    const rlaOld = sumByNormalized(prev.totals, RLA_PARTY);
+    const rsOld  = sumByNormalized(prev.totals, RS_PARTY);
+    const rlaNew = sumByNormalized(curr.totals, RLA_PARTY);
+    const rsNew  = sumByNormalized(curr.totals, RS_PARTY);
+
+    const bucketMs = Math.floor(curr.dt.getTime() / ONE_HOUR_MS) * ONE_HOUR_MS;
+    labels.push(new Date(bucketMs).toLocaleTimeString("es-PE", {
+      hour: "2-digit", minute: "2-digit", timeZone: "America/Lima",
+    }));
+    rlaDeltas.push(Math.max(0, rlaNew - rlaOld));
+    rsDeltas.push(Math.max(0, rsNew  - rsOld));
+  }
+
+  const rlaColor = "#0057b8";
+  const rsColor  = "#32cd32";
+
+  growthRateChartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "López Aliaga",
+          data: rlaDeltas,
+          borderColor: rlaColor,
+          backgroundColor: rlaColor + "33",
+          borderWidth: 2,
+          pointRadius: 5,
+          tension: 0.3,
+          fill: false,
+        },
+        {
+          label: "Sánchez",
+          data: rsDeltas,
+          borderColor: rsColor,
+          backgroundColor: rsColor + "33",
+          borderWidth: 2,
+          pointRadius: 5,
+          tension: 0.3,
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: "#e8eaf0", font: { size: 11 } },
+          position: "bottom",
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: +${ctx.parsed.y.toLocaleString("es-PE")} votos`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: "#7b7f94", font: { size: 10 } },
+          grid: { color: "#2a2d3a" },
+        },
+        y: {
+          ticks: {
+            color: "#7b7f94",
+            callback: v => v >= 1_000_000
+              ? (v / 1_000_000).toFixed(1) + "M"
+              : v >= 1000
+              ? (v / 1000).toFixed(0) + "k"
+              : v,
+          },
+          grid: { color: "#2a2d3a" },
+          title: {
+            display: true,
+            text: "Votos nuevos por hora",
+            color: "#7b7f94",
+            font: { size: 11 },
+          },
+        },
+      },
+    },
+  });
+}
+
+// ─────────────────────────────────────────────
 //  Regiones remotas (las que usa la proyección rural)
 // ─────────────────────────────────────────────
 const REMOTE_REGIONS = new Set([
@@ -913,6 +1038,15 @@ async function loadAndRender() {
   } else {
     document.querySelector("#trend-chart-container").innerHTML =
       `<p style="color:#7b7f94;padding:1rem 0">Se necesitan al menos 2 snapshots de corte (30 min) para mostrar la tendencia.</p>`;
+  }
+
+  // Gráfico de ritmo de crecimiento horario
+  const growthContainer = document.getElementById("growth-rate-chart-container");
+  if (growthContainer) {
+    if (!document.getElementById("growth-rate-chart")) {
+      growthContainer.innerHTML = `<canvas id="growth-rate-chart"></canvas>`;
+    }
+    renderGrowthRateChart(snapshots);
   }
 
   if (_firstLoad) {
