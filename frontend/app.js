@@ -582,10 +582,22 @@ function isRemoteRegion(regionName) {
   return REMOTE_REGIONS.has(normalizeRegionKey(regionName));
 }
 
+const RLA_PARTY  = "RENOVACION POPULAR";
+const RS_PARTY   = "JUNTOS POR EL PERU";
+
+function votesForPartyInRegion(region, partyNormalized) {
+  const entry = (region.partidos || []).find(
+    p => normalizeName(p.nombre) === partyNormalized
+  );
+  return parseInt(entry?.votos, 10) || 0;
+}
+
 function computePendingVotes(latestPayload) {
   const regions = latestPayload.regions || [];
   let pendingLima = 0;
   let pendingRural = 0;
+  let rlaLima = 0, rsLima = 0;
+  let rlaRural = 0, rsRural = 0;
 
   for (const region of regions) {
     const actasPct = Number(region.actas_pct) || 0;
@@ -595,14 +607,51 @@ function computePendingVotes(latestPayload) {
       : emitidos;
     const remaining = Math.max(0, projectedTotal - emitidos);
 
+    const rlaVotes = votesForPartyInRegion(region, RLA_PARTY);
+    const rsVotes  = votesForPartyInRegion(region, RS_PARTY);
+
     if (isLimaOrExtranjero(region.region)) {
       pendingLima += remaining;
+      rlaLima += rlaVotes;
+      rsLima  += rsVotes;
     } else if (isRemoteRegion(region.region)) {
       pendingRural += remaining;
+      rlaRural += rlaVotes;
+      rsRural  += rsVotes;
     }
   }
 
-  return { pendingLima, pendingRural };
+  return { pendingLima, pendingRural, rlaLima, rsLima, rlaRural, rsRural };
+}
+
+function renderFrenteAFrente(latestPayload) {
+  const regions = latestPayload.regions || [];
+  let rlaTotal = 0, rsTotal = 0;
+
+  for (const region of regions) {
+    rlaTotal += votesForPartyInRegion(region, RLA_PARTY);
+    rsTotal  += votesForPartyInRegion(region, RS_PARTY);
+  }
+
+  const rlaEl   = document.getElementById("ffe-votes-rla");
+  const rsEl    = document.getElementById("ffe-votes-rs");
+  const diffRow = document.getElementById("ffe-diff-row");
+
+  if (rlaEl) rlaEl.textContent = formatInt(rlaTotal);
+  if (rsEl)  rsEl.textContent  = formatInt(rsTotal);
+
+  if (diffRow) {
+    if (rlaTotal === 0 && rsTotal === 0) {
+      diffRow.textContent = "—";
+      diffRow.className = "ffe-diff-row";
+    } else {
+      const diff   = Math.abs(rlaTotal - rsTotal);
+      const leader = rlaTotal >= rsTotal ? "rla" : "rs";
+      const name   = leader === "rla" ? "López Aliaga va adelante" : "Sánchez va adelante";
+      diffRow.className = `ffe-diff-row ffe-diff-row--${leader}`;
+      diffRow.textContent = `+${formatInt(diff)} — ${name}`;
+    }
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -634,10 +683,12 @@ function updateStatusBar(latestPayload) {
 
   // Update pending votes panel
   const { pendingLima, pendingRural } = computePendingVotes(latestPayload);
-  const pendingLimaEl = document.getElementById("pending-lima");
+  const pendingLimaEl  = document.getElementById("pending-lima");
   const pendingRuralEl = document.getElementById("pending-rural");
-  if (pendingLimaEl) pendingLimaEl.textContent = formatInt(pendingLima);
+  if (pendingLimaEl)  pendingLimaEl.textContent = formatInt(pendingLima);
   if (pendingRuralEl) pendingRuralEl.textContent = formatInt(pendingRural);
+
+  renderFrenteAFrente(latestPayload);
 
   return extractedAt;
 }

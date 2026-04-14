@@ -123,27 +123,40 @@
       </div>
     </section>
 
-    <section class="chart-section" id="pro-sanchez-section">
-      <div id="pending-votes-panel" class="pending-votes-panel">
-        <div class="pvp-item pvp-item--lima">
-          <div class="pvp-icon" aria-hidden="true">🏙</div>
-          <div class="pvp-content">
-            <div class="pvp-label">Votos pendientes en Lima y el Extranjero</div>
-            <div class="pvp-value" id="pending-lima">—</div>
-          </div>
+    <section class="chart-section" id="pending-votes-section">
+      <h2 class="ffe-title">Frente a Frente</h2>
+
+      <div class="ffe-zones">
+        <div class="ffe-zone">
+          <span class="ffe-zone-icon" aria-hidden="true">🏙</span>
+          <span class="ffe-zone-label">Votos pendientes en Lima, Callao y Extranjero</span>
+          <span class="ffe-zone-value" id="pending-lima">—</span>
         </div>
-        <div class="pvp-divider" aria-hidden="true"></div>
-        <div class="pvp-item pvp-item--rural">
-          <div class="pvp-icon" aria-hidden="true">🌄</div>
-          <div class="pvp-content">
-            <div class="pvp-label">Votos pendientes en regiones con actas remotas</div>
-            <div class="pvp-value" id="pending-rural">—</div>
-          </div>
+        <div class="ffe-zone">
+          <span class="ffe-zone-icon" aria-hidden="true">🌄</span>
+          <span class="ffe-zone-label">Votos pendientes en regiones con actas remotas</span>
+          <span class="ffe-zone-value" id="pending-rural">—</span>
         </div>
       </div>
 
+      <div class="ffe-matchup">
+        <div class="ffe-candidate ffe-candidate--rla">
+          <span class="ffe-candidate-name">Rafael López Aliaga</span>
+          <span class="ffe-candidate-votes" id="ffe-votes-rla">—</span>
+        </div>
+        <div class="ffe-vs" aria-hidden="true">VS</div>
+        <div class="ffe-candidate ffe-candidate--rs">
+          <span class="ffe-candidate-votes" id="ffe-votes-rs">—</span>
+          <span class="ffe-candidate-name">Roberto Sánchez</span>
+        </div>
+      </div>
+
+      <div class="ffe-diff-row" id="ffe-diff-row">—</div>
+    </section>
+
+    <section class="chart-section" id="pro-sanchez-section">
       <div class="panel-title-row">
-        <h2 id="candidate-top-title">Proyecciones de Top 9 regiones en las que Sánchez está primero</h2>
+        <h2 id="candidate-top-title">Top 9 regiones en las que Sánchez está primero</h2>
       </div>
       <div class="table-wrap">
         <table id="pro-sanchez-table">
