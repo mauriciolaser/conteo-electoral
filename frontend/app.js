@@ -183,6 +183,43 @@ async function fetchJSON(url) {
   return r.json();
 }
 
+// ─────────────────────────────────────────────
+//  LocalStorage cache (fallback resiliente)
+// ─────────────────────────────────────────────
+const LS_KEY = "elec_snapshots_cache";
+
+function saveSnapshotsToLS(snapshotsRaw) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ savedAt: Date.now(), data: snapshotsRaw }));
+  } catch (_) { /* quota exceeded — ignorar */ }
+}
+
+function loadSnapshotsFromLS() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed.data) ? parsed : null;
+  } catch (_) { return null; }
+}
+
+// ─────────────────────────────────────────────
+//  Overlay helpers
+// ─────────────────────────────────────────────
+function showLoadingOverlay(subText) {
+  const overlay = document.getElementById("loading-overlay");
+  const sub = document.getElementById("loading-sub");
+  if (overlay) overlay.classList.remove("hidden");
+  if (sub) sub.textContent = subText || "";
+}
+
+function hideLoadingOverlay() {
+  const overlay = document.getElementById("loading-overlay");
+  if (!overlay) return;
+  overlay.classList.add("hidden");
+  overlay.addEventListener("transitionend", () => overlay.remove(), { once: true });
+}
+
 function showError(msg) {
   const el = document.getElementById("error-msg");
   el.textContent = msg;
@@ -672,7 +709,7 @@ function updateStatusBar(latestPayload) {
 
   const actasEl = document.getElementById("actas-pct");
   const extractedEl = document.getElementById("extracted-at");
-  actasEl.textContent = `${actasPct}`;
+  actasEl.textContent = actasPct !== "—" ? `${actasPct}%` : "—";
   extractedEl.textContent = extractedAt;
 
   // Update "¿Qué es esto?" panel dynamic percentage
@@ -696,60 +733,94 @@ function updateStatusBar(latestPayload) {
 // ─────────────────────────────────────────────
 //  Main load
 // ─────────────────────────────────────────────
+let _firstLoad = true;
+
 async function loadAndRender() {
   hideError();
   await ensurePartiesCatalog();
 
+  if (_firstLoad) showLoadingOverlay();
+
   // 1. Obtener índice de snapshots disponibles
   let timestamps = [];
+  let usingFallback = false;
+  let rawPayloads = null;
+
   try {
     const idx = await fetchJSON(`${BASE_URL}/history_index.json`);
     timestamps = Array.isArray(idx.timestamps) ? idx.timestamps : [];
   } catch (e) {
-    showError(
-      `No se pudo cargar history_index.json desde ${BASE_URL}. ` +
-      `Asegúrate de que el pipeline haya publicado los datos. (${e.message})`
-    );
-    return;
-  }
-
-  if (timestamps.length === 0) {
-    showError("No hay snapshots disponibles aún. El pipeline aún no ha subido datos.");
-    return;
-  }
-
-  // 2. Cargar todos los snapshots (en paralelo)
-  const results = await Promise.allSettled(
-    timestamps.map(ts =>
-      fetchJSON(`${BASE_URL}/raw_history/${ts}/raw_region_results.json`)
-    )
-  );
-
-  const snapshots = [];
-  for (let i = 0; i < results.length; i++) {
-    if (results[i].status === "fulfilled") {
-      const payload = results[i].value;
-      const meta = payload.metadata || {};
-      let dt;
-      try {
-        dt = new Date(meta.extracted_at_utc);
-        if (isNaN(dt.getTime())) throw new Error("invalid");
-      } catch {
-        // fallback: parsear desde timestamp label
-        const ts = timestamps[i];
-        const m = ts.match(/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})$/);
-        if (m) {
-          dt = new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`);
-        } else {
-          continue;
-        }
-      }
-      snapshots.push({ dt, totals: aggregateSnapshot(payload), payload });
+    const cached = loadSnapshotsFromLS();
+    if (cached) {
+      usingFallback = true;
+      rawPayloads = cached.data;
+      const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
+      showError(`Sin conexión al servidor. Mostrando datos guardados hace ${savedAgo} min.`);
+    } else {
+      if (_firstLoad) hideLoadingOverlay();
+      showError(
+        `No se pudo cargar history_index.json desde ${BASE_URL}. ` +
+        `Asegúrate de que el pipeline haya publicado los datos. (${e.message})`
+      );
+      _firstLoad = false;
+      return;
     }
   }
 
+  if (!usingFallback && timestamps.length === 0) {
+    if (_firstLoad) hideLoadingOverlay();
+    showError("No hay snapshots disponibles aún. El pipeline aún no ha subido datos.");
+    _firstLoad = false;
+    return;
+  }
+
+  // 2. Cargar todos los snapshots (en paralelo) — o usar caché
+  if (!usingFallback) {
+    const results = await Promise.allSettled(
+      timestamps.map(ts =>
+        fetchJSON(`${BASE_URL}/raw_history/${ts}/raw_region_results.json`)
+      )
+    );
+    rawPayloads = results
+      .filter(r => r.status === "fulfilled")
+      .map(r => r.value);
+
+    if (rawPayloads.length > 0) {
+      saveSnapshotsToLS(rawPayloads);
+    } else {
+      const cached = loadSnapshotsFromLS();
+      if (cached) {
+        usingFallback = true;
+        rawPayloads = cached.data;
+        const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
+        showError(`No se obtuvieron datos del servidor. Mostrando datos guardados hace ${savedAgo} min.`);
+      } else {
+        if (_firstLoad) hideLoadingOverlay();
+        showError("No se pudieron cargar los snapshots del servidor.");
+        _firstLoad = false;
+        return;
+      }
+    }
+  }
+
+  const snapshots = [];
+  for (let i = 0; i < rawPayloads.length; i++) {
+    const payload = rawPayloads[i];
+    const meta = payload.metadata || {};
+    let dt;
+    try {
+      dt = new Date(meta.extracted_at_utc);
+      if (isNaN(dt.getTime())) throw new Error("invalid");
+    } catch {
+      continue;
+    }
+    snapshots.push({ dt, totals: aggregateSnapshot(payload), payload });
+  }
+
   if (snapshots.length === 0) {
+    if (_firstLoad) hideLoadingOverlay();
     showError("No se pudieron cargar los snapshots del servidor.");
+    _firstLoad = false;
     return;
   }
 
@@ -799,6 +870,11 @@ async function loadAndRender() {
   } else {
     document.querySelector("#trend-chart-container").innerHTML =
       `<p style="color:#7b7f94;padding:1rem 0">Se necesitan al menos 2 snapshots de corte (30 min) para mostrar la tendencia.</p>`;
+  }
+
+  if (_firstLoad) {
+    hideLoadingOverlay();
+    _firstLoad = false;
   }
 }
 
