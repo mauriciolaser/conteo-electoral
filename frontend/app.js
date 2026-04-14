@@ -775,6 +775,7 @@ function computePendingVotes(latestPayload) {
   const regions = latestPayload.regions || [];
   let pendingLima = 0;
   let pendingRural = 0;
+  let pendingOther = 0;
   let rlaLima = 0, rsLima = 0;
   let rlaRural = 0, rsRural = 0;
 
@@ -797,10 +798,12 @@ function computePendingVotes(latestPayload) {
       pendingRural += remaining;
       rlaRural += rlaVotes;
       rsRural  += rsVotes;
+    } else {
+      pendingOther += remaining;
     }
   }
 
-  return { pendingLima, pendingRural, rlaLima, rsLima, rlaRural, rsRural };
+  return { pendingLima, pendingRural, pendingOther, rlaLima, rsLima, rlaRural, rsRural };
 }
 
 function renderFrenteAFrente(latestPayload, snapshots) {
@@ -888,11 +891,13 @@ function updateStatusBar(latestPayload, snapshots) {
   }
 
   // Update pending votes panel
-  const { pendingLima, pendingRural } = computePendingVotes(latestPayload);
+  const { pendingLima, pendingRural, pendingOther } = computePendingVotes(latestPayload);
   const pendingLimaEl  = document.getElementById("pending-lima");
   const pendingRuralEl = document.getElementById("pending-rural");
+  const pendingOtherEl = document.getElementById("pending-other");
   if (pendingLimaEl)  pendingLimaEl.textContent = formatInt(pendingLima);
   if (pendingRuralEl) pendingRuralEl.textContent = formatInt(pendingRural);
+  if (pendingOtherEl) pendingOtherEl.textContent = formatInt(pendingOther);
 
   renderFrenteAFrente(latestPayload, snapshots);
 
