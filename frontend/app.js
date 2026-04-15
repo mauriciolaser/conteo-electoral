@@ -555,10 +555,9 @@ function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candida
   panel.classList.remove("hidden");
   titleEl.textContent = overrideTitle || `Potenciales votos en Top ${topCount} regiones en las que ${candidateLabel} está primero`;
 
-  const { avgActasPct, totalCurrentVotes, totalSimple, totalRural } = buildPotentialVotesStats(topRegions);
+  const { totalCurrentVotes, totalSimple, totalRural } = buildPotentialVotesStats(topRegions);
   bodyEl.innerHTML = `
     <tr>
-      <td>${avgActasPct.toFixed(3)}%</td>
       <td>${formatInt(totalCurrentVotes)}</td>
       <td class="col-simple">${formatInt(totalSimple)}</td>
       ${hasRural ? `<td class="col-rural">${formatInt(totalRural)}</td>` : ""}
