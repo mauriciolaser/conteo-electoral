@@ -1248,12 +1248,6 @@ async function loadAndRender() {
     LOPEZ_ALIAGA_PARTY,
     false
   );
-  const nietoTopRegionalLeadersStats = buildTopRegionalLeaderStats(
-    activeLatest.payload,
-    simpleProjectionByRegion,
-    ruralProjectionByRegion,
-    NIETO_PARTY
-  );
   mainChartData = {
     actual: currentStats,
     interpolation: {
@@ -1297,12 +1291,6 @@ async function loadAndRender() {
     false,
     "Interpolación de votos de Rafael López Aliaga (Renovación Popular)"
   );
-  renderSimpleRegionalLeadersPanel(nietoTopRegionalLeadersStats, NIETO_PARTY, {
-    sectionId: "pro-nieto-section",
-    titleId: "candidate-top-nieto-title",
-    votesHeaderId: "candidate-votes-nieto-header",
-    bodyId: "pro-nieto-table-body",
-  });
 
   if (trendSnapshots.length >= 2) {
     const trendContainer = document.querySelector("#trend-chart-container");
