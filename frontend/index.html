@@ -192,35 +192,37 @@
     </section>
 
     <section class="potential-votes-panel" id="potential-sanchez-panel">
-      <h2 id="potential-sanchez-title">Potenciales votos en Top X regiones en las que Sánchez está primero</h2>
+      <h2 id="potential-sanchez-title">Interpolación de votos de Roberto Sánchez (Juntos por el Perú)</h2>
       <div class="table-wrap">
         <table class="regional-top-table">
           <thead>
             <tr>
-              <th class="th-tooltip" data-tooltip="Promedio del porcentaje de actas contabilizadas en las regiones del panel superior.">PORCENTAJE CONTEO</th>
-              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Votos adicionales que recibiría el candidato al 100% de actas, bajo proyección lineal.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
-              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Votos adicionales que recibiría el candidato al 100% de actas, aplicando el ajuste de voto rural.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip" data-tooltip="Promedio del porcentaje de actas contabilizadas en todas las regiones.">PORCENTAJE CONTEO</th>
+              <th class="th-tooltip" tabindex="0" data-tooltip="Suma de votos válidos ya contabilizados del candidato en todas las regiones.">VOTOS ACTUALES<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Estimación de votos totales del candidato si la tendencia actual se mantiene al 100% de actas contabilizadas.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Estimación aplicando ajuste de sesgo rural (ratio Rural/Urbano del conteo rápido Ipsos del 12 de abril) a los votos pendientes en regiones donde lidera Sánchez.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
             </tr>
           </thead>
           <tbody id="potential-sanchez-body">
-            <tr><td colspan="3">Cargando...</td></tr>
+            <tr><td colspan="4">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
     <section class="potential-votes-panel hidden" id="potential-lopez-panel">
-      <h2 id="potential-lopez-title">Potenciales votos en Top X regiones en las que López Aliaga está primero</h2>
+      <h2 id="potential-lopez-title">Interpolación de votos de Rafael López Aliaga (Renovación Popular)</h2>
       <div class="table-wrap">
         <table class="regional-top-table">
           <thead>
             <tr>
-              <th class="th-tooltip" data-tooltip="Promedio del porcentaje de actas contabilizadas en las regiones del panel superior.">PORCENTAJE CONTEO</th>
-              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Votos adicionales que recibiría el candidato al 100% de actas, bajo proyección lineal.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip" data-tooltip="Promedio del porcentaje de actas contabilizadas en todas las regiones.">PORCENTAJE CONTEO</th>
+              <th class="th-tooltip" tabindex="0" data-tooltip="Suma de votos válidos ya contabilizados del candidato en todas las regiones.">VOTOS ACTUALES<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Estimación de votos totales del candidato si la tendencia actual se mantiene al 100% de actas contabilizadas.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
             </tr>
           </thead>
           <tbody id="potential-lopez-body">
-            <tr><td colspan="2">Cargando...</td></tr>
+            <tr><td colspan="3">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -245,8 +247,8 @@
               <th class="th-tooltip" data-tooltip="Departamento o región electoral donde el candidato seleccionado ocupa el primer lugar en votos válidos.">REGIÓN</th>
               <th class="th-tooltip" data-tooltip="Porcentaje de actas contabilizadas para la región en el corte más reciente.">PORCENTAJE CONTEO</th>
               <th class="th-tooltip" id="candidate-votes-header" data-tooltip="Votos válidos contabilizados del candidato seleccionado en la región.">VOTOS SÁNCHEZ</th>
-              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
-              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Proyección aplicando ajuste rural en regiones elegibles; fuera de esas regiones, coincide con la proyección simple.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Estimación de votos totales del candidato en esta región si la tendencia actual se mantiene al 100% de actas.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Estimación aplicando ajuste de sesgo rural (ratio Rural/Urbano del conteo rápido Ipsos del 12 de abril) a los votos pendientes en regiones donde lidera Sánchez. En otras regiones coincide con la proyección simple.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
             </tr>
           </thead>
           <tbody id="pro-sanchez-table-body">
@@ -269,7 +271,7 @@
               <th class="th-tooltip" data-tooltip="Departamento o región electoral donde el candidato ocupa el primer lugar en votos válidos.">REGIÓN</th>
               <th class="th-tooltip" data-tooltip="Porcentaje de actas contabilizadas para la región en el corte más reciente.">PORCENTAJE CONTEO</th>
               <th class="th-tooltip" id="candidate-votes-lopez-header" data-tooltip="Votos válidos contabilizados del candidato en la región.">VOTOS LÓPEZ ALIAGA</th>
-              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Estimación de votos totales del candidato en esta región si la tendencia actual se mantiene al 100% de actas.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
             </tr>
           </thead>
           <tbody id="pro-lopez-table-body">

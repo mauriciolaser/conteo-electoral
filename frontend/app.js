@@ -462,14 +462,14 @@ function projectedVotesInRegion(projectedByParty, partyNameCanonical) {
     .reduce((acc, [, votes]) => acc + (Number(votes) || 0), 0);
 }
 
-function buildTopRegionalLeaderStats(latestPayload, simpleProjectionByRegion, ruralProjectionByRegion, candidatePartyName = SANCHEZ_PARTY) {
+function buildTopRegionalLeaderStats(latestPayload, simpleProjectionByRegion, ruralProjectionByRegion, candidatePartyName = SANCHEZ_PARTY, filterLeading = true) {
   const regions = latestPayload.regions || [];
   const candidateRegions = [];
   const candidatePartyCanonical = canonicalPartyName(candidatePartyName);
 
   for (const region of regions) {
     const leader = leadingPartyInRegion(region);
-    if (leader.name !== candidatePartyCanonical) continue;
+    if (filterLeading && leader.name !== candidatePartyCanonical) continue;
 
     const actasPct = Number(region.actas_pct) || 0;
     const candidateVotes = partyVotesInRegion(region, candidatePartyCanonical);
@@ -498,14 +498,14 @@ function formatInt(n) {
   return Math.round(n || 0).toLocaleString("es-PE");
 }
 
-function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY) {
+function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY, overrideTitle = null) {
   const tbody = document.getElementById("pro-sanchez-table-body");
   const title = document.getElementById("candidate-top-title");
   const votesHeader = document.getElementById("candidate-votes-header");
   const candidateLabel = CANDIDATE_OPTIONS[candidatePartyName]?.label || candidatePartyName;
   const dynamicVotesHeader = CANDIDATE_OPTIONS[candidatePartyName]?.votesHeader || `VOTOS ${candidateLabel.toUpperCase()}`;
   const topCount = stats.topRegions.length;
-  if (title) title.textContent = `Top ${topCount} regiones en las que ${candidateLabel} está primero`;
+  if (title) title.textContent = overrideTitle || `Top ${topCount} regiones en las que ${candidateLabel} está primero`;
   if (votesHeader) votesHeader.textContent = dynamicVotesHeader;
   if (!tbody) return;
 
@@ -526,18 +526,20 @@ function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY
 
 function buildPotentialVotesStats(topRegions) {
   let totalActasPct = 0;
-  let pendingSimple = 0;
-  let pendingRural = 0;
+  let totalCurrentVotes = 0;
+  let totalSimple = 0;
+  let totalRural = 0;
   for (const r of topRegions) {
     totalActasPct += r.actasPct;
-    pendingSimple += Math.max(0, r.simpleProjection - r.candidateVotes);
-    pendingRural  += Math.max(0, r.ruralProjection  - r.candidateVotes);
+    totalCurrentVotes += r.candidateVotes;
+    totalSimple += r.simpleProjection;
+    totalRural  += r.ruralProjection;
   }
   const avgActasPct = topRegions.length > 0 ? totalActasPct / topRegions.length : 0;
-  return { avgActasPct, pendingSimple, pendingRural };
+  return { avgActasPct, totalCurrentVotes, totalSimple, totalRural };
 }
 
-function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candidateLabel, hasRural = true) {
+function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candidateLabel, hasRural = true, overrideTitle = null) {
   const panel = document.getElementById(panelId);
   const titleEl = document.getElementById(titleId);
   const bodyEl = document.getElementById(bodyId);
@@ -551,14 +553,15 @@ function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candida
   }
 
   panel.classList.remove("hidden");
-  if (titleEl) titleEl.textContent = `Potenciales votos en Top ${topCount} regiones en las que ${candidateLabel} está primero`;
+  titleEl.textContent = overrideTitle || `Potenciales votos en Top ${topCount} regiones en las que ${candidateLabel} está primero`;
 
-  const { avgActasPct, pendingSimple, pendingRural } = buildPotentialVotesStats(topRegions);
+  const { avgActasPct, totalCurrentVotes, totalSimple, totalRural } = buildPotentialVotesStats(topRegions);
   bodyEl.innerHTML = `
     <tr>
       <td>${avgActasPct.toFixed(3)}%</td>
-      <td class="col-simple">${formatInt(pendingSimple)}</td>
-      ${hasRural ? `<td class="col-rural">${formatInt(pendingRural)}</td>` : ""}
+      <td>${formatInt(totalCurrentVotes)}</td>
+      <td class="col-simple">${formatInt(totalSimple)}</td>
+      ${hasRural ? `<td class="col-rural">${formatInt(totalRural)}</td>` : ""}
     </tr>
   `;
 }
@@ -574,7 +577,7 @@ function renderSimpleRegionalLeadersPanel(stats, candidatePartyName, panelConfig
   if (!section || !tbody || !title || !votesHeader) return;
 
   const topCount = stats.topRegions.length;
-  title.textContent = `Top ${topCount} regiones en las que ${candidateLabel} está primero`;
+  title.textContent = panelConfig.overrideTitle || `Top ${topCount} regiones en las que ${candidateLabel} está primero`;
   votesHeader.textContent = dynamicVotesHeader;
 
   if (!stats.topRegions.length) {
@@ -1235,13 +1238,15 @@ async function loadAndRender() {
     activeLatest.payload,
     simpleProjectionByRegion,
     ruralProjectionByRegion,
-    selectedRegionalCandidate
+    selectedRegionalCandidate,
+    false
   );
   const lopezTopRegionalLeadersStats = buildTopRegionalLeaderStats(
     activeLatest.payload,
     simpleProjectionByRegion,
     ruralProjectionByRegion,
-    LOPEZ_ALIAGA_PARTY
+    LOPEZ_ALIAGA_PARTY,
+    false
   );
   const nietoTopRegionalLeadersStats = buildTopRegionalLeaderStats(
     activeLatest.payload,
@@ -1266,19 +1271,22 @@ async function loadAndRender() {
   // 4. Renderizar
   updateStatusBar(activeLatest.payload, renderSnapshots);
   renderMainChart();
-  renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate);
+  renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate, "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)");
   renderPotentialVotesPanel(
     topRegionalLeadersStats.topRegions,
     "potential-sanchez-panel",
     "potential-sanchez-title",
     "potential-sanchez-body",
-    CANDIDATE_OPTIONS[selectedRegionalCandidate]?.label || selectedRegionalCandidate
+    CANDIDATE_OPTIONS[selectedRegionalCandidate]?.label || selectedRegionalCandidate,
+    true,
+    "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)"
   );
   renderSimpleRegionalLeadersPanel(lopezTopRegionalLeadersStats, LOPEZ_ALIAGA_PARTY, {
     sectionId: "pro-lopez-section",
     titleId: "candidate-top-lopez-title",
     votesHeaderId: "candidate-votes-lopez-header",
     bodyId: "pro-lopez-table-body",
+    overrideTitle: "Interpolación de votos de Rafael López Aliaga (Renovación Popular)",
   });
   renderPotentialVotesPanel(
     lopezTopRegionalLeadersStats.topRegions,
@@ -1286,7 +1294,8 @@ async function loadAndRender() {
     "potential-lopez-title",
     "potential-lopez-body",
     CANDIDATE_OPTIONS[LOPEZ_ALIAGA_PARTY]?.label || "López Aliaga",
-    false
+    false,
+    "Interpolación de votos de Rafael López Aliaga (Renovación Popular)"
   );
   renderSimpleRegionalLeadersPanel(nietoTopRegionalLeadersStats, NIETO_PARTY, {
     sectionId: "pro-nieto-section",

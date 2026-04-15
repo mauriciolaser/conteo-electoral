@@ -316,6 +316,7 @@ main {
 .table-wrap {
   width: 100%;
   overflow-x: auto;
+  overflow-y: visible;
 }
 
 .regional-top-table {
@@ -337,6 +338,10 @@ main {
   color: var(--muted);
   font-size: 0.75rem;
   letter-spacing: 0.03em;
+}
+
+.regional-top-table th.th-tooltip {
+  cursor: help;
 }
 
 .regional-top-table tbody td {
@@ -900,10 +905,11 @@ footer {
     }
   }
 
-  /* Chart section: no side overflow */
+  /* Chart section: no side overflow, but allow tooltip overflow vertically */
   .chart-section {
     padding: 1rem 0.85rem;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
   }
 
   /* QEE panel */
