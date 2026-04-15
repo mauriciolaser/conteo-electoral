@@ -204,19 +204,8 @@ async function fetchJSON(url) {
 }
 
 // ─────────────────────────────────────────────
-//  LocalStorage cache (fallback resiliente)
+//  Utilidades de snapshot (timestamps, merge)
 // ─────────────────────────────────────────────
-const LS_KEY = "elec_snapshots_cache";
-
-function latestDtFromPayloads(payloads) {
-  let max = 0;
-  for (const p of payloads) {
-    const t = snapshotTimestampFromPayload(p);
-    if (!isNaN(t) && t > max) max = t;
-  }
-  return max;
-}
-
 function snapshotTimestampFromPayload(payload) {
   const raw = payload?.metadata?.extracted_at_utc;
   if (!raw) return NaN;
@@ -251,12 +240,6 @@ function promoteActiveLatestSnapshot(candidate) {
   return activeLatestSnapshot;
 }
 
-function shouldUseCachedPayloads(cachedPayloads) {
-  const cachedLatestTs = latestDtFromPayloads(cachedPayloads);
-  if (!Number.isFinite(cachedLatestTs) || cachedLatestTs <= 0) return false;
-  return !Number.isFinite(activeLatestSnapshotTs) || cachedLatestTs >= activeLatestSnapshotTs;
-}
-
 function mergeActiveSnapshotIntoSeries(snapshots, activeEntry) {
   if (!activeEntry) return snapshots;
   const activeTs = snapshotTimestampFromEntry(activeEntry);
@@ -272,27 +255,6 @@ function mergeActiveSnapshotIntoSeries(snapshots, activeEntry) {
   return out;
 }
 
-function saveSnapshotsToLS(snapshotsRaw) {
-  try {
-    const existing = loadSnapshotsFromLS();
-    // Solo sobreescribir si los nuevos datos son más recientes
-    if (existing) {
-      const newLatest = latestDtFromPayloads(snapshotsRaw);
-      const oldLatest = latestDtFromPayloads(existing.data);
-      if (newLatest <= oldLatest) return;
-    }
-    localStorage.setItem(LS_KEY, JSON.stringify({ savedAt: Date.now(), data: snapshotsRaw }));
-  } catch (_) { /* quota exceeded — ignorar */ }
-}
-
-function loadSnapshotsFromLS() {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed.data) ? parsed : null;
-  } catch (_) { return null; }
-}
 
 // ─────────────────────────────────────────────
 //  Overlay helpers
@@ -1111,19 +1073,8 @@ function _tsFromPayload(payload) {
   return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}_${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}`;
 }
 
-const _snapshotCache = (() => {
-  const m = new Map();
-  try {
-    const cached = loadSnapshotsFromLS();
-    if (cached) {
-      for (const payload of cached.data) {
-        const ts = _tsFromPayload(payload);
-        if (ts) m.set(ts, payload);
-      }
-    }
-  } catch (_) { /* ignorar */ }
-  return m;
-})();
+// Caché en memoria: map de timestamp → payload de la sesión actual.
+const _snapshotCache = new Map();
 
 function setRefreshLinkState(isLoading) {
   const refreshLink = document.getElementById("refresh-link");
@@ -1134,16 +1085,6 @@ function setRefreshLinkState(isLoading) {
 }
 
 function pickFallbackForAttempt() {
-  const cached = loadSnapshotsFromLS();
-  if (cached && shouldUseCachedPayloads(cached.data)) {
-    const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
-    return {
-      rawPayloads: cached.data,
-      usingStaleFallback: false,
-      message: `Sin conexión al servidor. Mostrando datos guardados hace ${savedAgo} min. Usa "Actualizar" para reintentar.`,
-    };
-  }
-
   if (activeLatestSnapshot) {
     return {
       rawPayloads: [activeLatestSnapshot.payload],
@@ -1151,7 +1092,6 @@ function pickFallbackForAttempt() {
       message: "Sin conexión al servidor. Conservando el snapshot más reciente ya visible. Usa \"Actualizar\" para reintentar.",
     };
   }
-
   return null;
 }
 
@@ -1169,16 +1109,12 @@ async function loadAndRender() {
   // ── Carga de datos ─────────────────────────────────────────────────────────
   // El pipeline publica history_bundle.json: un único archivo JSON con todos
   // los snapshots filtrados (uno por bucket de 30 min) dentro de { snapshots: [] }.
-  // Esto reemplaza la estrategia anterior de N requests paralelos a archivos
-  // individuales, que causaba errores 429 en el servidor.
   //
   // Flujo:
-  //   1. Intentar fetch de history_bundle.json (1 request)
-  //   2. Comparar el snapshot más reciente del bundle contra _snapshotCache:
-  //      si ya lo tenemos, no hay nada nuevo — omitir re-render en refreshes
-  //   3. Poblar _snapshotCache con los payloads del bundle
-  //   4. Guardar en localStorage como fallback offline
-  //   5. Si el fetch falla, usar localStorage como fuente de datos
+  //   1. Fetch de history_bundle.json (1 request)
+  //   2. Poblar _snapshotCache con los payloads del bundle
+  //   3. Si el fetch falla y hay snapshot en memoria → mantener vista actual
+  //   4. Si el fetch falla sin datos previos → mostrar error
   // ──────────────────────────────────────────────────────────────────────────
 
     let rawPayloads = null;
@@ -1204,7 +1140,6 @@ async function loadAndRender() {
       }
 
       rawPayloads = incoming;
-      saveSnapshotsToLS(rawPayloads);
     } catch (e) {
       if (!fallbackUsed) {
         const fallback = pickFallbackForAttempt();
@@ -1404,6 +1339,9 @@ document.addEventListener("DOMContentLoaded", () => {
       loadAndRender();
     });
   }
+
+  // Limpiar cache viejo de localStorage (ya no se usa)
+  try { localStorage.removeItem("elec_snapshots_cache"); } catch (_) {}
 
   loadAndRender();
 });
