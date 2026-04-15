@@ -957,3 +957,17 @@ footer {
     font-size: 0.7rem;
   }
 }
+
+.race-section {
+  max-width: 632px;
+  margin: 0 auto 1rem;
+}
+
+.race-iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 632 / 420;
+  border: 0;
+  background: #000;
+}
+

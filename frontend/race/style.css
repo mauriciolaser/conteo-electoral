@@ -1,0 +1,20 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+#race-wrap {
+  width: 100%;
+  max-width: 632px;
+  margin: 0 auto;
+}
+
+#race-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+}

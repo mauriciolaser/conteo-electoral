@@ -17,6 +17,31 @@ import shutil
 from pathlib import Path
 
 
+def generate_race_dummy(root: Path, dist: Path) -> None:
+    raw_history = root / "outputs" / "raw_history"
+    if not raw_history.exists():
+        print("[build] race/dummy.json: outputs/raw_history no existe, omito")
+        return
+    snapshots = sorted(
+        (p for p in raw_history.iterdir() if p.is_dir()),
+        key=lambda p: p.name,
+        reverse=True,
+    )
+    source = next(
+        (s / "raw_region_results.json" for s in snapshots
+         if (s / "raw_region_results.json").exists()),
+        None,
+    )
+    if source is None:
+        print("[build] race/dummy.json: ningún snapshot con raw_region_results.json")
+        return
+    target_dir = dist / "race"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / "dummy.json"
+    shutil.copy2(source, target)
+    print(f"[build] race/dummy.json <- {source.relative_to(root)}")
+
+
 def load_env(env_path: Path) -> dict[str, str]:
     loaded: dict[str, str] = {}
     if env_path.exists():
@@ -120,6 +145,8 @@ def build(project_root: Path | None = None) -> None:
         index_out = index_src.replace("<!-- __GA_SNIPPET__ -->", "")
         print("[build] index.html -> GA_ID no definido (sin analytics)")
     index_dist.write_text(index_out, encoding="utf-8")
+
+    generate_race_dummy(root, dist)
 
     print(f"[build] dist listo en: {dist}")
 
