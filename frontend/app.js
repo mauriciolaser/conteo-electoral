@@ -1097,6 +1097,7 @@ function updateStatusBar(latestPayload, snapshots) {
 //  Main load
 // ─────────────────────────────────────────────
 let _firstLoad = true;
+let _isLoading = false;
 // Caché en memoria: map de timestamp → payload ya descargado.
 // Se pre-carga desde localStorage al iniciar para no re-descargar
 // snapshots ya conocidos tras un reload de página.
@@ -1124,11 +1125,46 @@ const _snapshotCache = (() => {
   return m;
 })();
 
-async function loadAndRender() {
-  hideError();
-  await ensurePartiesCatalog();
+function setRefreshLinkState(isLoading) {
+  const refreshLink = document.getElementById("refresh-link");
+  if (!refreshLink) return;
+  refreshLink.disabled = isLoading;
+  refreshLink.setAttribute("aria-busy", String(isLoading));
+  refreshLink.textContent = isLoading ? "Actualizando..." : "Actualizar";
+}
 
-  if (_firstLoad) showLoadingOverlay();
+function pickFallbackForAttempt() {
+  const cached = loadSnapshotsFromLS();
+  if (cached && shouldUseCachedPayloads(cached.data)) {
+    const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
+    return {
+      rawPayloads: cached.data,
+      usingStaleFallback: false,
+      message: `Sin conexión al servidor. Mostrando datos guardados hace ${savedAgo} min. Usa "Actualizar" para reintentar.`,
+    };
+  }
+
+  if (activeLatestSnapshot) {
+    return {
+      rawPayloads: [activeLatestSnapshot.payload],
+      usingStaleFallback: true,
+      message: "Sin conexión al servidor. Conservando el snapshot más reciente ya visible. Usa \"Actualizar\" para reintentar.",
+    };
+  }
+
+  return null;
+}
+
+async function loadAndRender() {
+  if (_isLoading) return;
+  _isLoading = true;
+  setRefreshLinkState(true);
+
+  hideError();
+  try {
+    await ensurePartiesCatalog();
+
+    if (_firstLoad) showLoadingOverlay();
 
   // ── Carga de datos ─────────────────────────────────────────────────────────
   // El pipeline publica history_bundle.json: un único archivo JSON con todos
@@ -1145,180 +1181,186 @@ async function loadAndRender() {
   //   5. Si el fetch falla, usar localStorage como fuente de datos
   // ──────────────────────────────────────────────────────────────────────────
 
-  let rawPayloads = null;
-  let usingStaleFallback = false;
+    let rawPayloads = null;
+    let usingStaleFallback = false;
+    let fallbackUsed = false;
 
-  try {
-    const bundle = await fetchJSON(`${BASE_URL}/history_bundle.json`);
-    const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
-
-    if (incoming.length === 0) {
-      if (_firstLoad) hideLoadingOverlay();
-      showError("No hay snapshots disponibles aún. El pipeline aún no ha subido datos.");
-      _firstLoad = false;
-      return;
-    }
-
-    // Poblar _snapshotCache con todos los payloads del bundle.
-    // Usamos extracted_at_utc como clave para detectar novedades.
-    for (const payload of incoming) {
-      const ts = _tsFromPayload(payload);
-      if (ts) _snapshotCache.set(ts, payload);
-    }
-
-    rawPayloads = incoming;
-    saveSnapshotsToLS(rawPayloads);
-  } catch (e) {
-    // El servidor no responde o devuelve error: usar datos guardados localmente.
-    const cached = loadSnapshotsFromLS();
-    if (cached && shouldUseCachedPayloads(cached.data)) {
-      rawPayloads = cached.data;
-      const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
-      showError(`Sin conexión al servidor. Mostrando datos guardados hace ${savedAgo} min.`);
-    } else if (activeLatestSnapshot) {
-      usingStaleFallback = true;
-      rawPayloads = [activeLatestSnapshot.payload];
-      showError("Sin conexión al servidor. Conservando el snapshot más reciente ya visible.");
-    } else {
-      if (_firstLoad) hideLoadingOverlay();
-      showError(
-        `No se pudo cargar history_bundle.json desde ${BASE_URL}. ` +
-        `Asegúrate de que el pipeline haya publicado los datos. (${e.message})`
-      );
-      _firstLoad = false;
-      return;
-    }
-  }
-
-  const snapshots = [];
-  for (let i = 0; i < rawPayloads.length; i++) {
-    const payload = rawPayloads[i];
-    const meta = payload.metadata || {};
-    let dt;
     try {
-      dt = new Date(meta.extracted_at_utc);
-      if (isNaN(dt.getTime())) throw new Error("invalid");
-    } catch {
-      continue;
+      const bundle = await fetchJSON(`${BASE_URL}/history_bundle.json`);
+      const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
+
+      if (incoming.length === 0) {
+        if (_firstLoad) hideLoadingOverlay();
+        showError("No hay snapshots disponibles aún. El pipeline aún no ha subido datos.");
+        _firstLoad = false;
+        return;
+      }
+
+      // Poblar _snapshotCache con todos los payloads del bundle.
+      // Usamos extracted_at_utc como clave para detectar novedades.
+      for (const payload of incoming) {
+        const ts = _tsFromPayload(payload);
+        if (ts) _snapshotCache.set(ts, payload);
+      }
+
+      rawPayloads = incoming;
+      saveSnapshotsToLS(rawPayloads);
+    } catch (e) {
+      if (!fallbackUsed) {
+        const fallback = pickFallbackForAttempt();
+        if (fallback) {
+          fallbackUsed = true;
+          rawPayloads = fallback.rawPayloads;
+          usingStaleFallback = fallback.usingStaleFallback;
+          showError(fallback.message);
+        }
+      }
+
+      if (!rawPayloads) {
+        if (_firstLoad) hideLoadingOverlay();
+        showError(
+          `No se pudo cargar history_bundle.json desde ${BASE_URL}. ` +
+          `Asegúrate de que el pipeline haya publicado los datos. (${e.message}). ` +
+          `Usa "Actualizar" para reintentar.`
+        );
+        _firstLoad = false;
+        return;
+      }
     }
-    snapshots.push({ dt, totals: aggregateSnapshot(payload), payload });
-  }
 
-  if (snapshots.length === 0) {
-    if (_firstLoad) hideLoadingOverlay();
-    showError("No se pudieron cargar los snapshots del servidor.");
-    _firstLoad = false;
-    return;
-  }
-
-  snapshots.sort((a, b) => a.dt - b.dt);
-  const latestFromResponse = pickLatestSnapshotEntry(snapshots);
-  const activeLatest = promoteActiveLatestSnapshot(latestFromResponse);
-  if (!activeLatest) {
-    if (_firstLoad) hideLoadingOverlay();
-    showError("No se pudo determinar un snapshot válido para mostrar.");
-    _firstLoad = false;
-    return;
-  }
-
-  const renderSnapshots = usingStaleFallback
-    ? mergeActiveSnapshotIntoSeries([], activeLatest)
-    : mergeActiveSnapshotIntoSeries(snapshots, activeLatest);
-  const trendSnapshots = getHalfHourSnapshots(renderSnapshots);
-
-  const top5 = top5FromTotals(activeLatest.totals);  // devuelve hasta TOP_N
-  const top5Names = top5.map(([name]) => name);
-  const currentStats = buildCurrentProcessingStats(activeLatest.totals);
-  const nationalStats = window.ProjectionModes.buildNationalProjectionStats(activeLatest.payload);
-  const ruralStats = window.ProjectionModes.buildRuralProjectionStats(activeLatest.payload);
-  const simpleProjectionByRegion = window.ProjectionModes.buildSimpleProjectionByRegion(activeLatest.payload);
-  const ruralProjectionByRegion = window.ProjectionModes.buildRuralProjectionByRegion(activeLatest.payload);
-  const topRegionalLeadersStats = buildTopRegionalLeaderStats(
-    activeLatest.payload,
-    simpleProjectionByRegion,
-    ruralProjectionByRegion,
-    selectedRegionalCandidate,
-    false
-  );
-  const lopezTopRegionalLeadersStats = buildTopRegionalLeaderStats(
-    activeLatest.payload,
-    simpleProjectionByRegion,
-    ruralProjectionByRegion,
-    LOPEZ_ALIAGA_PARTY,
-    false
-  );
-  mainChartData = {
-    actual: currentStats,
-    interpolation: {
-      topCandidates: nationalStats.projectedCandidates.slice(0, TOP_N),
-      totalValidVotes: nationalStats.totalValidProjectedVotes,
-    },
-    rural: {
-      topCandidates: ruralStats.projectedCandidates.slice(0, TOP_N),
-      totalValidVotes: ruralStats.totalValidProjectedVotes,
-      isFallback: ruralStats.isFallback,
-      eligibleRegionCount: ruralStats.eligibleRegionCount,
-    },
-  };
-
-  // 4. Renderizar
-  updateStatusBar(activeLatest.payload, renderSnapshots);
-  renderMainChart();
-  renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate, "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)");
-  renderPotentialVotesPanel(
-    topRegionalLeadersStats.topRegions,
-    "potential-sanchez-panel",
-    "potential-sanchez-title",
-    "potential-sanchez-body",
-    CANDIDATE_OPTIONS[selectedRegionalCandidate]?.label || selectedRegionalCandidate,
-    true,
-    "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)"
-  );
-  renderSimpleRegionalLeadersPanel(lopezTopRegionalLeadersStats, LOPEZ_ALIAGA_PARTY, {
-    sectionId: "pro-lopez-section",
-    titleId: "candidate-top-lopez-title",
-    votesHeaderId: "candidate-votes-lopez-header",
-    bodyId: "pro-lopez-table-body",
-    overrideTitle: "Interpolación de votos de Rafael López Aliaga (Renovación Popular)",
-  });
-  renderPotentialVotesPanel(
-    lopezTopRegionalLeadersStats.topRegions,
-    "potential-lopez-panel",
-    "potential-lopez-title",
-    "potential-lopez-body",
-    CANDIDATE_OPTIONS[LOPEZ_ALIAGA_PARTY]?.label || "López Aliaga",
-    false,
-    "Interpolación de votos de Rafael López Aliaga (Renovación Popular)"
-  );
-
-  if (trendSnapshots.length >= 2) {
-    const trendContainer = document.querySelector("#trend-chart-container");
-    if (!document.getElementById("trend-chart")) {
-      trendContainer.innerHTML = `<canvas id="trend-chart"></canvas>`;
+    const snapshots = [];
+    for (let i = 0; i < rawPayloads.length; i++) {
+      const payload = rawPayloads[i];
+      const meta = payload.metadata || {};
+      let dt;
+      try {
+        dt = new Date(meta.extracted_at_utc);
+        if (isNaN(dt.getTime())) throw new Error("invalid");
+      } catch {
+        continue;
+      }
+      snapshots.push({ dt, totals: aggregateSnapshot(payload), payload });
     }
-    renderTrendChart(trendSnapshots, top5Names);
-  } else {
-    document.querySelector("#trend-chart-container").innerHTML =
-      `<p style="color:#7b7f94;padding:1rem 0">Se necesitan al menos 2 snapshots de corte (30 min) para mostrar la tendencia.</p>`;
-  }
 
-  // Gráfico de ritmo de crecimiento horario
-  const growthContainer = document.getElementById("growth-rate-chart-container");
-  if (growthContainer) {
-    if (!document.getElementById("growth-rate-chart")) {
-      growthContainer.innerHTML = `<canvas id="growth-rate-chart"></canvas>`;
+    if (snapshots.length === 0) {
+      if (_firstLoad) hideLoadingOverlay();
+      showError("No se pudieron cargar los snapshots del servidor.");
+      _firstLoad = false;
+      return;
     }
-    renderGrowthRateChart(renderSnapshots);
-  }
 
-  if (_firstLoad) {
-    hideLoadingOverlay();
-    _firstLoad = false;
+    snapshots.sort((a, b) => a.dt - b.dt);
+    const latestFromResponse = pickLatestSnapshotEntry(snapshots);
+    const activeLatest = promoteActiveLatestSnapshot(latestFromResponse);
+    if (!activeLatest) {
+      if (_firstLoad) hideLoadingOverlay();
+      showError("No se pudo determinar un snapshot válido para mostrar.");
+      _firstLoad = false;
+      return;
+    }
+
+    const renderSnapshots = usingStaleFallback
+      ? mergeActiveSnapshotIntoSeries([], activeLatest)
+      : mergeActiveSnapshotIntoSeries(snapshots, activeLatest);
+    const trendSnapshots = getHalfHourSnapshots(renderSnapshots);
+
+    const top5 = top5FromTotals(activeLatest.totals);  // devuelve hasta TOP_N
+    const top5Names = top5.map(([name]) => name);
+    const currentStats = buildCurrentProcessingStats(activeLatest.totals);
+    const nationalStats = window.ProjectionModes.buildNationalProjectionStats(activeLatest.payload);
+    const ruralStats = window.ProjectionModes.buildRuralProjectionStats(activeLatest.payload);
+    const simpleProjectionByRegion = window.ProjectionModes.buildSimpleProjectionByRegion(activeLatest.payload);
+    const ruralProjectionByRegion = window.ProjectionModes.buildRuralProjectionByRegion(activeLatest.payload);
+    const topRegionalLeadersStats = buildTopRegionalLeaderStats(
+      activeLatest.payload,
+      simpleProjectionByRegion,
+      ruralProjectionByRegion,
+      selectedRegionalCandidate,
+      false
+    );
+    const lopezTopRegionalLeadersStats = buildTopRegionalLeaderStats(
+      activeLatest.payload,
+      simpleProjectionByRegion,
+      ruralProjectionByRegion,
+      LOPEZ_ALIAGA_PARTY,
+      false
+    );
+    mainChartData = {
+      actual: currentStats,
+      interpolation: {
+        topCandidates: nationalStats.projectedCandidates.slice(0, TOP_N),
+        totalValidVotes: nationalStats.totalValidProjectedVotes,
+      },
+      rural: {
+        topCandidates: ruralStats.projectedCandidates.slice(0, TOP_N),
+        totalValidVotes: ruralStats.totalValidProjectedVotes,
+        isFallback: ruralStats.isFallback,
+        eligibleRegionCount: ruralStats.eligibleRegionCount,
+      },
+    };
+
+    // 4. Renderizar
+    updateStatusBar(activeLatest.payload, renderSnapshots);
+    renderMainChart();
+    renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate, "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)");
+    renderPotentialVotesPanel(
+      topRegionalLeadersStats.topRegions,
+      "potential-sanchez-panel",
+      "potential-sanchez-title",
+      "potential-sanchez-body",
+      CANDIDATE_OPTIONS[selectedRegionalCandidate]?.label || selectedRegionalCandidate,
+      true,
+      "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)"
+    );
+    renderSimpleRegionalLeadersPanel(lopezTopRegionalLeadersStats, LOPEZ_ALIAGA_PARTY, {
+      sectionId: "pro-lopez-section",
+      titleId: "candidate-top-lopez-title",
+      votesHeaderId: "candidate-votes-lopez-header",
+      bodyId: "pro-lopez-table-body",
+      overrideTitle: "Interpolación de votos de Rafael López Aliaga (Renovación Popular)",
+    });
+    renderPotentialVotesPanel(
+      lopezTopRegionalLeadersStats.topRegions,
+      "potential-lopez-panel",
+      "potential-lopez-title",
+      "potential-lopez-body",
+      CANDIDATE_OPTIONS[LOPEZ_ALIAGA_PARTY]?.label || "López Aliaga",
+      true,
+      "Interpolación de votos de Rafael López Aliaga (Renovación Popular)"
+    );
+
+    if (trendSnapshots.length >= 2) {
+      const trendContainer = document.querySelector("#trend-chart-container");
+      if (!document.getElementById("trend-chart")) {
+        trendContainer.innerHTML = `<canvas id="trend-chart"></canvas>`;
+      }
+      renderTrendChart(trendSnapshots, top5Names);
+    } else {
+      document.querySelector("#trend-chart-container").innerHTML =
+        `<p style="color:#7b7f94;padding:1rem 0">Se necesitan al menos 2 snapshots de corte (30 min) para mostrar la tendencia.</p>`;
+    }
+
+    // Gráfico de ritmo de crecimiento horario
+    const growthContainer = document.getElementById("growth-rate-chart-container");
+    if (growthContainer) {
+      if (!document.getElementById("growth-rate-chart")) {
+        growthContainer.innerHTML = `<canvas id="growth-rate-chart"></canvas>`;
+      }
+      renderGrowthRateChart(renderSnapshots);
+    }
+
+    if (_firstLoad) {
+      hideLoadingOverlay();
+      _firstLoad = false;
+    }
+  } finally {
+    _isLoading = false;
+    setRefreshLinkState(false);
   }
 }
 
 // ─────────────────────────────────────────────
-//  Init + auto-refresh cada 5 min
+//  Init + refresh manual
 // ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("header-compact");
@@ -1356,6 +1398,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const refreshLink = document.getElementById("refresh-link");
+  if (refreshLink) {
+    refreshLink.addEventListener("click", () => {
+      loadAndRender();
+    });
+  }
+
   loadAndRender();
-  setInterval(loadAndRender, 300_000);
 });
