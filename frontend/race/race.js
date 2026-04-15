@@ -144,6 +144,55 @@
     const y = Math.round(canvas.height * SPRITE_BASELINE_Y - drawH);
     const sx = runner.frame * cfg.w;
     ctx.drawImage(img, sx, 0, cfg.w, cfg.h, x, y, drawW, drawH);
+    const isLeader = runner.pct >= Math.max(state.sanchez.pct, state.porky.pct);
+    drawPctChip(cx, y, runner.pct, isLeader);
+  }
+
+  function drawPctChip(cx, spriteTopY, pct, isLeader) {
+    const text = pct.toFixed(2) + "%";
+    const fontPx = Math.max(9, Math.round(canvas.width * 0.0224));
+    ctx.font = `600 ${fontPx}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+
+    const padX = Math.round(fontPx * 0.8);
+    const padY = Math.round(fontPx * 0.38);
+    const textW = ctx.measureText(text).width;
+    const chipW = Math.round(textW + padX * 2);
+    const chipH = Math.round(fontPx + padY * 2);
+    const baseGap = Math.round(fontPx * 0.5);
+    const stackOffset = isLeader ? 0 : Math.round(chipH * 1.25);
+    const chipX = Math.round(cx - chipW / 2);
+    const chipY = Math.round(spriteTopY - baseGap - chipH - stackOffset);
+    const r = Math.round(chipH / 2);
+
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.5)";
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
+    ctx.fillStyle = "rgba(15, 18, 28, 0.88)";
+    roundRect(ctx, chipX, chipY, chipW, chipH, r);
+    ctx.fill();
+    ctx.restore();
+
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255,255,255,0.18)";
+    roundRect(ctx, chipX + 0.5, chipY + 0.5, chipW - 1, chipH - 1, r);
+    ctx.stroke();
+
+    ctx.fillStyle = "#fff";
+    ctx.fillText(text, cx, chipY + chipH / 2 + 1);
+  }
+
+  function roundRect(c, x, y, w, h, r) {
+    const rr = Math.min(r, w / 2, h / 2);
+    c.beginPath();
+    c.moveTo(x + rr, y);
+    c.arcTo(x + w, y,     x + w, y + h, rr);
+    c.arcTo(x + w, y + h, x,     y + h, rr);
+    c.arcTo(x,     y + h, x,     y,     rr);
+    c.arcTo(x,     y,     x + w, y,     rr);
+    c.closePath();
   }
 
   function drawLayer(img, offsetPx) {

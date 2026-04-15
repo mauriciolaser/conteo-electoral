@@ -211,10 +211,65 @@ const LS_KEY = "elec_snapshots_cache";
 function latestDtFromPayloads(payloads) {
   let max = 0;
   for (const p of payloads) {
-    const t = new Date(p?.metadata?.extracted_at_utc).getTime();
+    const t = snapshotTimestampFromPayload(p);
     if (!isNaN(t) && t > max) max = t;
   }
   return max;
+}
+
+function snapshotTimestampFromPayload(payload) {
+  const raw = payload?.metadata?.extracted_at_utc;
+  if (!raw) return NaN;
+  return new Date(raw).getTime();
+}
+
+function snapshotTimestampFromEntry(entry) {
+  if (!entry) return NaN;
+  if (entry.dt instanceof Date) return entry.dt.getTime();
+  return snapshotTimestampFromPayload(entry.payload);
+}
+
+function pickLatestSnapshotEntry(snapshots) {
+  let latest = null;
+  for (const entry of snapshots) {
+    const ts = snapshotTimestampFromEntry(entry);
+    if (!Number.isFinite(ts)) continue;
+    if (!latest || ts > snapshotTimestampFromEntry(latest)) {
+      latest = entry;
+    }
+  }
+  return latest;
+}
+
+function promoteActiveLatestSnapshot(candidate) {
+  const candidateTs = snapshotTimestampFromEntry(candidate);
+  if (!Number.isFinite(candidateTs)) return activeLatestSnapshot;
+  if (!activeLatestSnapshot || candidateTs > activeLatestSnapshotTs) {
+    activeLatestSnapshot = candidate;
+    activeLatestSnapshotTs = candidateTs;
+  }
+  return activeLatestSnapshot;
+}
+
+function shouldUseCachedPayloads(cachedPayloads) {
+  const cachedLatestTs = latestDtFromPayloads(cachedPayloads);
+  if (!Number.isFinite(cachedLatestTs) || cachedLatestTs <= 0) return false;
+  return !Number.isFinite(activeLatestSnapshotTs) || cachedLatestTs >= activeLatestSnapshotTs;
+}
+
+function mergeActiveSnapshotIntoSeries(snapshots, activeEntry) {
+  if (!activeEntry) return snapshots;
+  const activeTs = snapshotTimestampFromEntry(activeEntry);
+  if (!Number.isFinite(activeTs)) return snapshots;
+  const out = [...snapshots];
+  const existingIndex = out.findIndex(entry => snapshotTimestampFromEntry(entry) === activeTs);
+  if (existingIndex >= 0) {
+    out[existingIndex] = activeEntry;
+  } else {
+    out.push(activeEntry);
+    out.sort((a, b) => a.dt - b.dt);
+  }
+  return out;
 }
 
 function saveSnapshotsToLS(snapshotsRaw) {
@@ -273,7 +328,8 @@ let mainChartInstance = null;
 let trendChartInstance = null;
 let mainChartMode = "actual";
 let mainChartData = null;
-let bestLatestPayload = null; // el snapshot más reciente visto en cualquier refresh
+let activeLatestSnapshot = null; // snapshot visible más reciente aceptado por la UI
+let activeLatestSnapshotTs = Number.NEGATIVE_INFINITY;
 const MAIN_CHART_MODE_META = {
   actual: {
     note: "Votos válidos procesados actualmente disponibles en la web de ONPE",
@@ -1088,6 +1144,7 @@ async function loadAndRender() {
   // ──────────────────────────────────────────────────────────────────────────
 
   let rawPayloads = null;
+  let usingStaleFallback = false;
 
   try {
     const bundle = await fetchJSON(`${BASE_URL}/history_bundle.json`);
@@ -1112,10 +1169,14 @@ async function loadAndRender() {
   } catch (e) {
     // El servidor no responde o devuelve error: usar datos guardados localmente.
     const cached = loadSnapshotsFromLS();
-    if (cached) {
+    if (cached && shouldUseCachedPayloads(cached.data)) {
       rawPayloads = cached.data;
       const savedAgo = Math.round((Date.now() - cached.savedAt) / 60000);
       showError(`Sin conexión al servidor. Mostrando datos guardados hace ${savedAgo} min.`);
+    } else if (activeLatestSnapshot) {
+      usingStaleFallback = true;
+      rawPayloads = [activeLatestSnapshot.payload];
+      showError("Sin conexión al servidor. Conservando el snapshot más reciente ya visible.");
     } else {
       if (_firstLoad) hideLoadingOverlay();
       showError(
@@ -1149,41 +1210,41 @@ async function loadAndRender() {
   }
 
   snapshots.sort((a, b) => a.dt - b.dt);
-  const trendSnapshots = getHalfHourSnapshots(snapshots);
-
-  // 3. Determinar top 6 del snapshot más reciente
-  const latestFromServer = snapshots[snapshots.length - 1];
-
-  // Nunca retroceder: conservar el snapshot más reciente visto en cualquier refresh
-  if (
-    !bestLatestPayload ||
-    latestFromServer.dt.getTime() > new Date(bestLatestPayload.payload?.metadata?.extracted_at_utc).getTime()
-  ) {
-    bestLatestPayload = latestFromServer;
+  const latestFromResponse = pickLatestSnapshotEntry(snapshots);
+  const activeLatest = promoteActiveLatestSnapshot(latestFromResponse);
+  if (!activeLatest) {
+    if (_firstLoad) hideLoadingOverlay();
+    showError("No se pudo determinar un snapshot válido para mostrar.");
+    _firstLoad = false;
+    return;
   }
-  const latest = bestLatestPayload;
 
-  const top5 = top5FromTotals(latest.totals);  // devuelve hasta TOP_N
+  const renderSnapshots = usingStaleFallback
+    ? mergeActiveSnapshotIntoSeries([], activeLatest)
+    : mergeActiveSnapshotIntoSeries(snapshots, activeLatest);
+  const trendSnapshots = getHalfHourSnapshots(renderSnapshots);
+
+  const top5 = top5FromTotals(activeLatest.totals);  // devuelve hasta TOP_N
   const top5Names = top5.map(([name]) => name);
-  const currentStats = buildCurrentProcessingStats(latest.totals);
-  const nationalStats = window.ProjectionModes.buildNationalProjectionStats(latest.payload);
-  const ruralStats = window.ProjectionModes.buildRuralProjectionStats(latest.payload);
-  const simpleProjectionByRegion = window.ProjectionModes.buildSimpleProjectionByRegion(latest.payload);
-  const ruralProjectionByRegion = window.ProjectionModes.buildRuralProjectionByRegion(latest.payload);
+  const currentStats = buildCurrentProcessingStats(activeLatest.totals);
+  const nationalStats = window.ProjectionModes.buildNationalProjectionStats(activeLatest.payload);
+  const ruralStats = window.ProjectionModes.buildRuralProjectionStats(activeLatest.payload);
+  const simpleProjectionByRegion = window.ProjectionModes.buildSimpleProjectionByRegion(activeLatest.payload);
+  const ruralProjectionByRegion = window.ProjectionModes.buildRuralProjectionByRegion(activeLatest.payload);
   const topRegionalLeadersStats = buildTopRegionalLeaderStats(
-    latest.payload,
+    activeLatest.payload,
     simpleProjectionByRegion,
     ruralProjectionByRegion,
     selectedRegionalCandidate
   );
   const lopezTopRegionalLeadersStats = buildTopRegionalLeaderStats(
-    latest.payload,
+    activeLatest.payload,
     simpleProjectionByRegion,
     ruralProjectionByRegion,
     LOPEZ_ALIAGA_PARTY
   );
   const nietoTopRegionalLeadersStats = buildTopRegionalLeaderStats(
-    latest.payload,
+    activeLatest.payload,
     simpleProjectionByRegion,
     ruralProjectionByRegion,
     NIETO_PARTY
@@ -1203,7 +1264,7 @@ async function loadAndRender() {
   };
 
   // 4. Renderizar
-  updateStatusBar(latest.payload, snapshots);
+  updateStatusBar(activeLatest.payload, renderSnapshots);
   renderMainChart();
   renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate);
   renderPotentialVotesPanel(
@@ -1251,7 +1312,7 @@ async function loadAndRender() {
     if (!document.getElementById("growth-rate-chart")) {
       growthContainer.innerHTML = `<canvas id="growth-rate-chart"></canvas>`;
     }
-    renderGrowthRateChart(snapshots);
+    renderGrowthRateChart(renderSnapshots);
   }
 
   if (_firstLoad) {
