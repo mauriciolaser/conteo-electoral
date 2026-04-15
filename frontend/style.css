@@ -450,6 +450,34 @@ main {
   color: var(--text);
 }
 
+/* ── Paneles de votos potenciales pendientes ── */
+.potential-votes-panel {
+  background: #0b1525;
+  border: 1px solid var(--border);
+  border-left: 4px solid #4a6bc4;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.potential-votes-panel h2 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.9rem;
+  text-transform: uppercase;
+}
+
+.potential-votes-panel .regional-top-table td {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.potential-votes-panel .regional-top-table th {
+  font-size: 0.72rem;
+}
+
 .subpanel-title {
   margin-top: 1.25rem;
   margin-bottom: 0.4rem;

@@ -481,7 +481,7 @@ function buildPotentialVotesStats(topRegions) {
   return { avgActasPct, pendingSimple, pendingRural };
 }
 
-function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candidateLabel) {
+function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candidateLabel, hasRural = true) {
   const panel = document.getElementById(panelId);
   const titleEl = document.getElementById(titleId);
   const bodyEl = document.getElementById(bodyId);
@@ -502,7 +502,7 @@ function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candida
     <tr>
       <td>${avgActasPct.toFixed(3)}%</td>
       <td class="col-simple">${formatInt(pendingSimple)}</td>
-      <td class="col-rural">${formatInt(pendingRural)}</td>
+      ${hasRural ? `<td class="col-rural">${formatInt(pendingRural)}</td>` : ""}
     </tr>
   `;
 }
@@ -1218,21 +1218,20 @@ async function loadAndRender() {
     titleId: "candidate-top-lopez-title",
     votesHeaderId: "candidate-votes-lopez-header",
     bodyId: "pro-lopez-table-body",
-    hasRural: true,
   });
   renderPotentialVotesPanel(
     lopezTopRegionalLeadersStats.topRegions,
     "potential-lopez-panel",
     "potential-lopez-title",
     "potential-lopez-body",
-    CANDIDATE_OPTIONS[LOPEZ_ALIAGA_PARTY]?.label || "López Aliaga"
+    CANDIDATE_OPTIONS[LOPEZ_ALIAGA_PARTY]?.label || "López Aliaga",
+    false
   );
   renderSimpleRegionalLeadersPanel(nietoTopRegionalLeadersStats, NIETO_PARTY, {
     sectionId: "pro-nieto-section",
     titleId: "candidate-top-nieto-title",
     votesHeaderId: "candidate-votes-nieto-header",
     bodyId: "pro-nieto-table-body",
-    hasRural: true,
   });
 
   if (trendSnapshots.length >= 2) {
