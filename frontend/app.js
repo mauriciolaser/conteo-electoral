@@ -468,6 +468,45 @@ function renderTopRegionalLeadersPanel(stats, candidatePartyName = SANCHEZ_PARTY
   }
 }
 
+function buildPotentialVotesStats(topRegions) {
+  let totalActasPct = 0;
+  let pendingSimple = 0;
+  let pendingRural = 0;
+  for (const r of topRegions) {
+    totalActasPct += r.actasPct;
+    pendingSimple += Math.max(0, r.simpleProjection - r.candidateVotes);
+    pendingRural  += Math.max(0, r.ruralProjection  - r.candidateVotes);
+  }
+  const avgActasPct = topRegions.length > 0 ? totalActasPct / topRegions.length : 0;
+  return { avgActasPct, pendingSimple, pendingRural };
+}
+
+function renderPotentialVotesPanel(topRegions, panelId, titleId, bodyId, candidateLabel) {
+  const panel = document.getElementById(panelId);
+  const titleEl = document.getElementById(titleId);
+  const bodyEl = document.getElementById(bodyId);
+  if (!panel || !titleEl || !bodyEl) return;
+
+  const topCount = topRegions.length;
+  if (!topCount) {
+    panel.classList.add("hidden");
+    bodyEl.innerHTML = "";
+    return;
+  }
+
+  panel.classList.remove("hidden");
+  if (titleEl) titleEl.textContent = `Potenciales votos en Top ${topCount} regiones en las que ${candidateLabel} está primero`;
+
+  const { avgActasPct, pendingSimple, pendingRural } = buildPotentialVotesStats(topRegions);
+  bodyEl.innerHTML = `
+    <tr>
+      <td>${avgActasPct.toFixed(3)}%</td>
+      <td class="col-simple">${formatInt(pendingSimple)}</td>
+      <td class="col-rural">${formatInt(pendingRural)}</td>
+    </tr>
+  `;
+}
+
 function renderSimpleRegionalLeadersPanel(stats, candidatePartyName, panelConfig) {
   const section = document.getElementById(panelConfig.sectionId);
   const tbody = document.getElementById(panelConfig.bodyId);
@@ -489,14 +528,26 @@ function renderSimpleRegionalLeadersPanel(stats, candidatePartyName, panelConfig
   }
 
   section.classList.remove("hidden");
-  tbody.innerHTML = stats.topRegions.map(r => `
-    <tr>
-      <td>${r.region}</td>
-      <td>${r.actasPct.toFixed(3)}%</td>
-      <td>${formatInt(r.candidateVotes)}</td>
-      <td class="col-simple" title="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">${formatInt(r.simpleProjection)}</td>
-    </tr>
-  `).join("");
+  if (panelConfig.hasRural) {
+    tbody.innerHTML = stats.topRegions.map(r => `
+      <tr>
+        <td>${r.region}</td>
+        <td>${r.actasPct.toFixed(3)}%</td>
+        <td>${formatInt(r.candidateVotes)}</td>
+        <td class="col-simple" title="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">${formatInt(r.simpleProjection)}</td>
+        <td class="col-rural" title="Proyección aplicando ajuste rural en regiones elegibles; fuera de esas regiones, coincide con la proyección simple.">${formatInt(r.ruralProjection)}</td>
+      </tr>
+    `).join("");
+  } else {
+    tbody.innerHTML = stats.topRegions.map(r => `
+      <tr>
+        <td>${r.region}</td>
+        <td>${r.actasPct.toFixed(3)}%</td>
+        <td>${formatInt(r.candidateVotes)}</td>
+        <td class="col-simple" title="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">${formatInt(r.simpleProjection)}</td>
+      </tr>
+    `).join("");
+  }
 }
 
 function updateMainChartButtons() {
@@ -1155,17 +1206,33 @@ async function loadAndRender() {
   updateStatusBar(latest.payload, snapshots);
   renderMainChart();
   renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate);
+  renderPotentialVotesPanel(
+    topRegionalLeadersStats.topRegions,
+    "potential-sanchez-panel",
+    "potential-sanchez-title",
+    "potential-sanchez-body",
+    CANDIDATE_OPTIONS[selectedRegionalCandidate]?.label || selectedRegionalCandidate
+  );
   renderSimpleRegionalLeadersPanel(lopezTopRegionalLeadersStats, LOPEZ_ALIAGA_PARTY, {
     sectionId: "pro-lopez-section",
     titleId: "candidate-top-lopez-title",
     votesHeaderId: "candidate-votes-lopez-header",
     bodyId: "pro-lopez-table-body",
+    hasRural: true,
   });
+  renderPotentialVotesPanel(
+    lopezTopRegionalLeadersStats.topRegions,
+    "potential-lopez-panel",
+    "potential-lopez-title",
+    "potential-lopez-body",
+    CANDIDATE_OPTIONS[LOPEZ_ALIAGA_PARTY]?.label || "López Aliaga"
+  );
   renderSimpleRegionalLeadersPanel(nietoTopRegionalLeadersStats, NIETO_PARTY, {
     sectionId: "pro-nieto-section",
     titleId: "candidate-top-nieto-title",
     votesHeaderId: "candidate-votes-nieto-header",
     bodyId: "pro-nieto-table-body",
+    hasRural: true,
   });
 
   if (trendSnapshots.length >= 2) {

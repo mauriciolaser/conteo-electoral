@@ -219,6 +219,24 @@
       </div>
     </section>
 
+    <section class="chart-section" id="potential-sanchez-panel">
+      <h2 id="potential-sanchez-title">Potenciales votos en Top X regiones en las que Sánchez está primero</h2>
+      <div class="table-wrap">
+        <table class="regional-top-table">
+          <thead>
+            <tr>
+              <th class="th-tooltip" data-tooltip="Promedio del porcentaje de actas contabilizadas en las regiones del panel superior.">PORCENTAJE CONTEO</th>
+              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Votos adicionales que recibiría el candidato al 100% de actas, bajo proyección lineal.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Votos adicionales que recibiría el candidato al 100% de actas, aplicando el ajuste de voto rural.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+            </tr>
+          </thead>
+          <tbody id="potential-sanchez-body">
+            <tr><td colspan="3">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="chart-section regional-top-section hidden" id="pro-lopez-section">
       <div class="panel-title-row">
         <h2 id="candidate-top-lopez-title">Top X regiones en las que López Aliaga está primero</h2>
@@ -231,12 +249,31 @@
               <th class="th-tooltip" data-tooltip="Porcentaje de actas contabilizadas para la región en el corte más reciente.">PORCENTAJE CONTEO</th>
               <th class="th-tooltip" id="candidate-votes-lopez-header" data-tooltip="Votos válidos contabilizados del candidato en la región.">VOTOS LÓPEZ ALIAGA</th>
               <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Proyección aplicando ajuste rural en regiones elegibles; fuera de esas regiones, coincide con la proyección simple.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
             </tr>
           </thead>
           <tbody id="pro-lopez-table-body">
             <tr>
-              <td colspan="4">Cargando...</td>
+              <td colspan="5">Cargando...</td>
             </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="chart-section hidden" id="potential-lopez-panel">
+      <h2 id="potential-lopez-title">Potenciales votos en Top X regiones en las que López Aliaga está primero</h2>
+      <div class="table-wrap">
+        <table class="regional-top-table">
+          <thead>
+            <tr>
+              <th class="th-tooltip" data-tooltip="Promedio del porcentaje de actas contabilizadas en las regiones del panel superior.">PORCENTAJE CONTEO</th>
+              <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Votos adicionales que recibiría el candidato al 100% de actas, bajo proyección lineal.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Votos adicionales que recibiría el candidato al 100% de actas, aplicando el ajuste de voto rural.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+            </tr>
+          </thead>
+          <tbody id="potential-lopez-body">
+            <tr><td colspan="3">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -254,11 +291,12 @@
               <th class="th-tooltip" data-tooltip="Porcentaje de actas contabilizadas para la región en el corte más reciente.">PORCENTAJE CONTEO</th>
               <th class="th-tooltip" id="candidate-votes-nieto-header" data-tooltip="Votos válidos contabilizados del candidato en la región.">VOTOS NIETO</th>
               <th class="th-tooltip th-proj-simple" tabindex="0" data-tooltip="Proyección lineal al 100% de actas en la región, manteniendo la misma proporción observada del candidato.">PROYECCIÓN SIMPLE<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
+              <th class="th-tooltip th-proj-rural" tabindex="0" data-tooltip="Proyección aplicando ajuste rural en regiones elegibles; fuera de esas regiones, coincide con la proyección simple.">PROYECCIÓN VOTO RURAL<span class="proj-icon" aria-hidden="true">ⓘ</span></th>
             </tr>
           </thead>
           <tbody id="pro-nieto-table-body">
             <tr>
-              <td colspan="4">Cargando...</td>
+              <td colspan="5">Cargando...</td>
             </tr>
           </tbody>
         </table>
