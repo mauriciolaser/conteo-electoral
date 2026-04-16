@@ -17,7 +17,12 @@
 //        Archivos individuales por snapshot. El cliente ya no los descarga
 //        directamente; siguen en el servidor como fuente del bundle.
 // ─────────────────────────────────────────────
-const BASE_URL = __BASE_URL__;
+const BASE_URL = (
+  typeof __BASE_URL__ !== "undefined" &&
+  typeof __BASE_URL__ === "string" &&
+  __BASE_URL__.trim() &&
+  __BASE_URL__.trim() !== "__BASE_URL__"
+) ? __BASE_URL__.trim().replace(/\/+$/, "") : "";
 const PARTIES_CATALOG_URL = "./parties.json";
 
 // ─────────────────────────────────────────────
@@ -1095,6 +1100,47 @@ function pickFallbackForAttempt() {
   return null;
 }
 
+function buildDummyHistoryPayload(extractedAtUtc, actasPctGlobal, regionalRows) {
+  return {
+    metadata: {
+      extracted_at_utc: extractedAtUtc,
+      actas_pct_global: actasPctGlobal,
+    },
+    regions: regionalRows.map(row => ({
+      region: row.region,
+      actas_pct: row.actasPct,
+      emitidos_actual: row.emitidos,
+      partidos: [
+        { nombre: "RENOVACION POPULAR", votos: String(row.rla) },
+        { nombre: "JUNTOS POR EL PERU", votos: String(row.rs) },
+        { nombre: "FUERZA POPULAR", votos: String(row.fp) },
+      ],
+    })),
+  };
+}
+
+function buildDummyHistoryBundle() {
+  return {
+    snapshots: [
+      buildDummyHistoryPayload("2026-04-16T10:00:00Z", 62.4, [
+        { region: "LIMA", actasPct: 75.1, emitidos: 1500000, rla: 520000, rs: 260000, fp: 180000 },
+        { region: "CUSCO", actasPct: 58.2, emitidos: 380000, rla: 62000, rs: 192000, fp: 54000 },
+        { region: "PIURA", actasPct: 60.8, emitidos: 430000, rla: 142000, rs: 118000, fp: 72000 },
+      ]),
+      buildDummyHistoryPayload("2026-04-16T11:00:00Z", 64.8, [
+        { region: "LIMA", actasPct: 77.0, emitidos: 1560000, rla: 548000, rs: 276000, fp: 186000 },
+        { region: "CUSCO", actasPct: 60.0, emitidos: 395000, rla: 66000, rs: 201000, fp: 56000 },
+        { region: "PIURA", actasPct: 62.7, emitidos: 446000, rla: 149000, rs: 123000, fp: 74000 },
+      ]),
+      buildDummyHistoryPayload("2026-04-16T12:00:00Z", 67.3, [
+        { region: "LIMA", actasPct: 79.5, emitidos: 1645000, rla: 586000, rs: 294000, fp: 194000 },
+        { region: "CUSCO", actasPct: 62.3, emitidos: 412000, rla: 70000, rs: 212000, fp: 58000 },
+        { region: "PIURA", actasPct: 65.1, emitidos: 466000, rla: 158000, rs: 130000, fp: 77000 },
+      ]),
+    ],
+  };
+}
+
 async function loadAndRender() {
   if (_isLoading) return;
   _isLoading = true;
@@ -1122,7 +1168,9 @@ async function loadAndRender() {
     let fallbackUsed = false;
 
     try {
-      const bundle = await fetchJSON(`${BASE_URL}/history_bundle.json`);
+      const bundle = BASE_URL
+        ? await fetchJSON(`${BASE_URL}/history_bundle.json`)
+        : buildDummyHistoryBundle();
       const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
 
       if (incoming.length === 0) {
@@ -1148,6 +1196,14 @@ async function loadAndRender() {
           rawPayloads = fallback.rawPayloads;
           usingStaleFallback = fallback.usingStaleFallback;
           showError(fallback.message);
+        }
+      }
+
+      if (!rawPayloads) {
+        const bundle = buildDummyHistoryBundle();
+        rawPayloads = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
+        if (rawPayloads.length) {
+          showError("Servidor de datos no disponible. Mostrando data dummy para pruebas.");
         }
       }
 
