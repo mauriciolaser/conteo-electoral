@@ -23,7 +23,8 @@
     label: "JUNTOS POR EL PERU",
   };
 
-  const DATA_URL = "../../outputs/history_bundle.json";
+  const API_SERIES_URL = "../api/v1/timelapse/series";
+  const LEGACY_DATA_URL = "../history_bundle.json";
   const FRAME_FPS = 10;
   const PX_PER_HUNDREDTH_PP = 0.5;
   const LOOP_DURATION_MS = 60_000;
@@ -110,20 +111,33 @@
   }
 
   async function fetchSeries() {
-    const response = await fetch(DATA_URL, { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`history bundle HTTP ${response.status}`);
+    let points = [];
+    try {
+      const response = await fetch(API_SERIES_URL, { cache: "no-store" });
+      if (!response.ok) throw new Error(`timelapse API HTTP ${response.status}`);
+      const payload = await response.json();
+      points = (Array.isArray(payload?.points) ? payload.points : [])
+        .map(point => ({
+          atMs: Number(point?.at_ms) || 0,
+          pctSanchez: Number(point?.pct_sanchez) || 0,
+          pctPorky: Number(point?.pct_lopez_aliaga) || 0,
+        }))
+        .filter(point => point.atMs > 0);
+    } catch (_) {
+      const response = await fetch(LEGACY_DATA_URL, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`history bundle HTTP ${response.status}`);
+      }
+      const payload = await response.json();
+      const snapshots = Array.isArray(payload?.snapshots) ? payload.snapshots : [];
+      points = snapshots
+        .map(buildPoint)
+        .filter(Boolean);
     }
-
-    const payload = await response.json();
-    const snapshots = Array.isArray(payload?.snapshots) ? payload.snapshots : [];
-    const points = snapshots
-      .map(buildPoint)
-      .filter(Boolean)
-      .sort((a, b) => a.atMs - b.atMs);
+    points.sort((a, b) => a.atMs - b.atMs);
 
     if (points.length === 0) {
-      throw new Error("history bundle sin snapshots válidos");
+      throw new Error("timelapse sin puntos válidos");
     }
 
     if (points.length === 1) {

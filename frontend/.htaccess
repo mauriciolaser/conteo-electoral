@@ -13,6 +13,9 @@
   RewriteCond %{HTTP_HOST} !^(www\.)?perulainen\.com$ [NC]
   RewriteRule ^ - [F,L]
 
+  # API pública: enrutar /conteo/api/* al proxy PHP.
+  RewriteRule ^api(?:/.*)?$ api/index.php [QSA,L]
+
   # Archivos y directorios existentes: servir directo
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d

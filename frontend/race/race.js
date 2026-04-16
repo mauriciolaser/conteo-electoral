@@ -14,6 +14,9 @@
   const FRAME_FPS = 10;
   const PX_PER_HUNDREDTH_PP = 0.5;
   const RELOAD_MS = 60_000;
+  const API_RACE_LATEST_URL = "../api/v1/race/latest";
+  const API_DASHBOARD_LATEST_URL = "../api/v1/dashboard/latest";
+  const LEGACY_BUNDLE_URL = "../history_bundle.json";
 
   const SPRITE_BASELINE_Y = 0.78;
   const SPRITE_DRAW_SCALE = 0.45;
@@ -114,22 +117,47 @@
 
   async function fetchData() {
     try {
-      const r = await fetch("../history_bundle.json", { cache: "no-store" });
-      if (!r.ok) throw new Error("bundle status " + r.status);
+      const r = await fetch(API_RACE_LATEST_URL, { cache: "no-store" });
+      if (!r.ok) throw new Error("api race status " + r.status);
       const json = await r.json();
-      return pickLatestSnapshot(json);
+      const latest = json?.latest || {};
+      if (Number.isFinite(Number(latest.pct_sanchez)) && Number.isFinite(Number(latest.pct_lopez_aliaga))) {
+        return {
+          pctSanchez: Number(latest.pct_sanchez) || 0,
+          pctPorky: Number(latest.pct_lopez_aliaga) || 0,
+        };
+      }
+      throw new Error("api race payload inválido");
     } catch (_) {
-      const r = await fetch("./dummy.json", { cache: "no-store" });
-      const json = await r.json();
-      return pickLatestSnapshot(json);
+      try {
+        const r = await fetch(API_DASHBOARD_LATEST_URL, { cache: "no-store" });
+        if (!r.ok) throw new Error("api dashboard latest status " + r.status);
+        const json = await r.json();
+        const snap = pickLatestSnapshot(json?.snapshot || json);
+        if (snap) return computePcts(snap);
+      } catch (_) {
+        try {
+          const r = await fetch(LEGACY_BUNDLE_URL, { cache: "no-store" });
+          if (!r.ok) throw new Error("legacy bundle status " + r.status);
+          const json = await r.json();
+          const snap = pickLatestSnapshot(json);
+          if (snap) return computePcts(snap);
+        } catch (_) {
+          const r = await fetch("./dummy.json", { cache: "no-store" });
+          const json = await r.json();
+          const snap = pickLatestSnapshot(json);
+          if (snap) return computePcts(snap);
+        }
+      }
     }
+    return { pctSanchez: 0, pctPorky: 0 };
   }
 
   async function refresh() {
     try {
-      const snap = await fetchData();
-      if (!snap) return;
-      const { pctSanchez, pctPorky } = computePcts(snap);
+      const data = await fetchData();
+      if (!data) return;
+      const { pctSanchez, pctPorky } = data;
       updateTargets(pctSanchez, pctPorky);
     } catch (e) {
       console.warn("[race] refresh failed", e);

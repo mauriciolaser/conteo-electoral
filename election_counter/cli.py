@@ -41,6 +41,7 @@ def main() -> int:
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--no-publish", action="store_true", default=False)
+    parser.add_argument("--env-file", default=None, help="Ruta al archivo .env para deploy/publish")
     args = parser.parse_args()
 
     data_dir = Path(args.data_dir)
@@ -54,10 +55,11 @@ def main() -> int:
     chart_path = output_dir / "base_scenario_chart.png"
     trend_chart_path = output_dir / "national_trend_chart.png"
     history_dir = output_dir / "raw_history"
+    env_path = Path(args.env_file) if args.env_file else None
 
     if args.mode == "deploy-frontend":
         project_root = Path(__file__).resolve().parent.parent
-        publish_frontend(project_root=project_root)
+        publish_frontend(project_root=project_root, env_path=env_path)
         return 0
 
     if args.mode == "vps":
@@ -73,13 +75,14 @@ def main() -> int:
             top_n=args.top_n,
             source_url=args.source_url,
             interval_seconds=1800,
+            env_path=env_path,
         )
         return 0
 
     if args.mode == "publish":
         if not args.no_publish:
             try:
-                publish_raw_history(output_dir=output_dir)
+                publish_raw_history(output_dir=output_dir, env_path=env_path)
             except Exception as exc:  # noqa: BLE001
                 print(f"[publish] error: {exc}")
         return 0
@@ -128,7 +131,7 @@ def main() -> int:
 
     if args.mode == "full" and not args.no_publish:
         try:
-            publish_raw_history(output_dir=output_dir)
+            publish_raw_history(output_dir=output_dir, env_path=env_path)
         except Exception as exc:  # noqa: BLE001
             print(f"[publish] error raw_history: {exc}")
 

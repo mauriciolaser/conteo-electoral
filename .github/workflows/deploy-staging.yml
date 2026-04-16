@@ -1,0 +1,74 @@
+name: Staging Deploy
+run-name: Staging Deploy · ${{ github.event_name }} · ${{ github.ref_name }}
+
+on:
+  push:
+    branches:
+      - staging
+    paths:
+      - "frontend/**"
+      - "scripts/build_frontend.py"
+      - "election_counter/publish.py"
+      - "election_counter/cli.py"
+      - "vps/runner.py"
+      - ".github/workflows/deploy-staging.yml"
+  workflow_dispatch:
+    inputs:
+      deploy_data:
+        description: "Intentar publicar datos (requiere outputs/raw_history disponible)"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  deploy:
+    name: Build & Deploy STAGING
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Create .env.staging from secrets/variables
+        run: |
+          cat > .env.staging << 'EOF'
+          FTP_USER=${{ secrets.STAGING_FTP_USER }}
+          FTP_HOST=${{ secrets.STAGING_FTP_HOST }}
+          FTP_PASSWORD=${{ secrets.STAGING_FTP_PASSWORD }}
+          FTP_PORT=${{ vars.STAGING_FTP_PORT || '21' }}
+          DEPLOY_FRONTEND=${{ vars.STAGING_DEPLOY_FRONTEND || 'staging.perulainen.com/conteo' }}
+          BASE_URL=${{ vars.STAGING_BASE_URL || 'https://staging.perulainen.com/conteo' }}
+          GA_ID=${{ vars.STAGING_GA_ID }}
+          PUBLISH_LEGACY=true
+          PUBLISH_API_SHADOW=true
+          API_DEPLOY_PATH=${{ vars.STAGING_API_DEPLOY_PATH || 'api-elecciones.perulainen.com/staging/conteo/api' }}
+          API_FTP_USER=${{ secrets.STAGING_API_FTP_USER || secrets.STAGING_FTP_USER }}
+          API_FTP_HOST=${{ secrets.STAGING_API_FTP_HOST || secrets.STAGING_FTP_HOST }}
+          API_FTP_PASSWORD=${{ secrets.STAGING_API_FTP_PASSWORD || secrets.STAGING_FTP_PASSWORD }}
+          API_FTP_PORT=${{ vars.STAGING_API_FTP_PORT || vars.STAGING_FTP_PORT || '21' }}
+          CONTEO_API_ORIGIN_BASE=${{ vars.STAGING_CONTEO_API_ORIGIN_BASE || 'https://api-elecciones.perulainen.com/staging/conteo/api' }}
+          CONTEO_API_TIMEOUT_SECONDS=${{ vars.STAGING_CONTEO_API_TIMEOUT_SECONDS || '6' }}
+          EOF
+
+      - name: Build frontend (staging config)
+        run: python scripts/build_frontend.py --env-file .env.staging
+
+      - name: Deploy frontend via FTP (staging)
+        run: python -m election_counter --mode deploy-frontend --env-file .env.staging
+
+      - name: Optional publish data (staging)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_data }}
+        run: |
+          if [ -d outputs/raw_history ]; then
+            python -m election_counter --mode publish --env-file .env.staging
+          else
+            echo "outputs/raw_history no existe en este job; se omite publish de datos."
+          fi

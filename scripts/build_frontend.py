@@ -11,6 +11,7 @@ También inserta el snippet de Google Analytics en index.html si existe GA_ID.
 """
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import shutil
@@ -70,9 +71,10 @@ def build_ga_snippet(ga_id: str) -> str:
     )
 
 
-def build(project_root: Path | None = None) -> None:
+def build(project_root: Path | None = None, env_path: Path | None = None) -> None:
     root = project_root or Path(__file__).resolve().parent.parent
-    env = load_env(root / ".env")
+    resolved_env_path = env_path or (root / ".env")
+    env = load_env(resolved_env_path)
 
     # Acepta WEB_BASE_URL o BASE_URL (fallback)
     base_url = (
@@ -81,7 +83,7 @@ def build(project_root: Path | None = None) -> None:
     ).rstrip("/")
     if not base_url:
         raise ValueError(
-            "BASE_URL (o WEB_BASE_URL) no está definida en .env.\n"
+            f"BASE_URL (o WEB_BASE_URL) no está definida en {resolved_env_path}.\n"
             "Añade una línea como:\n"
             "  BASE_URL=https://perulainen.com/conteo-elecciones"
         )
@@ -166,4 +168,7 @@ def build(project_root: Path | None = None) -> None:
 
 
 if __name__ == "__main__":
-    build()
+    parser = argparse.ArgumentParser(description="Build de frontend/dist con BASE_URL inyectada")
+    parser.add_argument("--env-file", default=".env", help="Ruta al archivo .env a utilizar")
+    args = parser.parse_args()
+    build(env_path=Path(args.env_file))

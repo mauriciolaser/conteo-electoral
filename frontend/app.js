@@ -29,6 +29,10 @@ function resolveBaseUrl(rawValue) {
 
 const BASE_URL = resolveBaseUrl(INJECTED_BASE_URL);
 const PARTIES_CATALOG_URL = "./parties.json";
+const API_BASE_URL = BASE_URL ? `${BASE_URL}/api/v1` : "./api/v1";
+const API_DASHBOARD_SUMMARY_URL = `${API_BASE_URL}/dashboard/summary`;
+const API_DASHBOARD_LATEST_URL = `${API_BASE_URL}/dashboard/latest`;
+const LEGACY_HISTORY_BUNDLE_URL = BASE_URL ? `${BASE_URL}/history_bundle.json` : "";
 
 // ─────────────────────────────────────────────
 //  Paleta de colores por partido (igual a Python)
@@ -1146,6 +1150,82 @@ function buildDummyHistoryBundle() {
   };
 }
 
+function buildSnapshotsFromRawPayloads(rawPayloads) {
+  const snapshots = [];
+  for (let i = 0; i < rawPayloads.length; i++) {
+    const payload = rawPayloads[i];
+    const meta = payload.metadata || {};
+    let dt;
+    try {
+      dt = new Date(meta.extracted_at_utc);
+      if (isNaN(dt.getTime())) throw new Error("invalid");
+    } catch {
+      continue;
+    }
+    snapshots.push({ dt, totals: aggregateSnapshot(payload), payload });
+  }
+  return snapshots;
+}
+
+function parseTotalsMap(rawTotals) {
+  const totals = {};
+  for (const [name, votes] of Object.entries(rawTotals || {})) {
+    const partyName = String(name || "").trim();
+    if (!partyName) continue;
+    totals[partyName] = Number.parseInt(votes, 10) || 0;
+  }
+  return totals;
+}
+
+function buildSnapshotsFromApi(summaryPayload, latestPayload) {
+  const summaryRows = Array.isArray(summaryPayload?.snapshots) ? summaryPayload.snapshots : [];
+  const snapshots = [];
+  for (const row of summaryRows) {
+    const extractedAtUtc = row?.extracted_at_utc;
+    const dt = new Date(extractedAtUtc);
+    if (isNaN(dt.getTime())) continue;
+    snapshots.push({
+      dt,
+      totals: parseTotalsMap(row?.totals_by_party),
+      payload: {
+        metadata: {
+          extracted_at_utc: extractedAtUtc,
+          actas_pct_global: Number(row?.actas_pct_global) || 0,
+        },
+        regions: [],
+      },
+    });
+  }
+
+  if (latestPayload?.metadata?.extracted_at_utc && Array.isArray(latestPayload?.regions)) {
+    const latestTs = snapshotTimestampFromPayload(latestPayload);
+    const fullLatestEntry = {
+      dt: new Date(latestPayload.metadata.extracted_at_utc),
+      totals: aggregateSnapshot(latestPayload),
+      payload: latestPayload,
+    };
+    const index = snapshots.findIndex(s => snapshotTimestampFromEntry(s) === latestTs);
+    if (index >= 0) {
+      snapshots[index] = {
+        ...snapshots[index],
+        payload: latestPayload,
+      };
+    } else if (!isNaN(fullLatestEntry.dt.getTime())) {
+      snapshots.push(fullLatestEntry);
+    }
+  }
+  return snapshots;
+}
+
+async function fetchApiDashboardPayloads() {
+  const [summary, latestWrapper] = await Promise.all([
+    fetchJSON(API_DASHBOARD_SUMMARY_URL),
+    fetchJSON(API_DASHBOARD_LATEST_URL),
+  ]);
+  const latestPayload = latestWrapper?.snapshot || null;
+  return { summary, latestPayload };
+}
+
 async function loadAndRender() {
   if (_isLoading) return;
   _isLoading = true;
@@ -1168,74 +1248,78 @@ async function loadAndRender() {
   //   4. Si el fetch falla sin datos previos → mostrar error
   // ──────────────────────────────────────────────────────────────────────────
 
-    let rawPayloads = null;
+    let snapshots = null;
     let usingStaleFallback = false;
     let fallbackUsed = false;
 
     try {
-      const bundle = BASE_URL
-        ? await fetchJSON(`${BASE_URL}/history_bundle.json`)
-        : buildDummyHistoryBundle();
-      const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
+      if (BASE_URL) {
+        const { summary, latestPayload } = await fetchApiDashboardPayloads();
+        snapshots = buildSnapshotsFromApi(summary, latestPayload);
+        const latestTs = _tsFromPayload(latestPayload);
+        if (latestTs && latestPayload) _snapshotCache.set(latestTs, latestPayload);
+      } else {
+        const bundle = buildDummyHistoryBundle();
+        const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
+        snapshots = buildSnapshotsFromRawPayloads(incoming);
+      }
 
-      if (incoming.length === 0) {
+      if (!snapshots || snapshots.length === 0) {
         if (_firstLoad) hideLoadingOverlay();
         showError("No hay snapshots disponibles aún. El pipeline aún no ha subido datos.");
         _firstLoad = false;
         return;
       }
-
-      // Poblar _snapshotCache con todos los payloads del bundle.
-      // Usamos extracted_at_utc como clave para detectar novedades.
-      for (const payload of incoming) {
-        const ts = _tsFromPayload(payload);
-        if (ts) _snapshotCache.set(ts, payload);
+      if (BASE_URL && !snapshots.some(s => Array.isArray(s?.payload?.regions) && s.payload.regions.length > 0)) {
+        throw new Error("API dashboard/latest sin regiones válidas");
+      }
+    } catch (e) {
+      // Fallback 1: bundle legacy (pipeline antiguo) para pruebas en paralelo.
+      if (BASE_URL) {
+        try {
+          const bundle = await fetchJSON(LEGACY_HISTORY_BUNDLE_URL);
+          const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
+          for (const payload of incoming) {
+            const ts = _tsFromPayload(payload);
+            if (ts) _snapshotCache.set(ts, payload);
+          }
+          snapshots = buildSnapshotsFromRawPayloads(incoming);
+          if (snapshots.length) {
+            showError("API nueva no disponible. Mostrando datos del bundle legacy.");
+          }
+        } catch (_) {
+          // sin-op: continúa a fallback en memoria
+        }
       }
 
-      rawPayloads = incoming;
-    } catch (e) {
       if (!fallbackUsed) {
         const fallback = pickFallbackForAttempt();
         if (fallback) {
           fallbackUsed = true;
-          rawPayloads = fallback.rawPayloads;
+          snapshots = buildSnapshotsFromRawPayloads(fallback.rawPayloads);
           usingStaleFallback = fallback.usingStaleFallback;
           showError(fallback.message);
         }
       }
 
-      if (!rawPayloads) {
+      if (!snapshots || snapshots.length === 0) {
         const bundle = buildDummyHistoryBundle();
-        rawPayloads = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
-        if (rawPayloads.length) {
+        snapshots = buildSnapshotsFromRawPayloads(Array.isArray(bundle.snapshots) ? bundle.snapshots : []);
+        if (snapshots.length) {
           showError("Servidor de datos no disponible. Mostrando data dummy para pruebas.");
         }
       }
 
-      if (!rawPayloads) {
+      if (!snapshots || snapshots.length === 0) {
         if (_firstLoad) hideLoadingOverlay();
         showError(
-          `No se pudo cargar history_bundle.json desde ${BASE_URL}. ` +
-          `Asegúrate de que el pipeline haya publicado los datos. (${e.message}). ` +
+          `No se pudo cargar la API ni el bundle legacy desde ${BASE_URL}. ` +
+          `Asegúrate de que el pipeline haya publicado los datos. (${e.message || e}). ` +
           `Usa "Actualizar" para reintentar.`
         );
         _firstLoad = false;
         return;
       }
-    }
-
-    const snapshots = [];
-    for (let i = 0; i < rawPayloads.length; i++) {
-      const payload = rawPayloads[i];
-      const meta = payload.metadata || {};
-      let dt;
-      try {
-        dt = new Date(meta.extracted_at_utc);
-        if (isNaN(dt.getTime())) throw new Error("invalid");
-      } catch {
-        continue;
-      }
-      snapshots.push({ dt, totals: aggregateSnapshot(payload), payload });
     }
 
     if (snapshots.length === 0) {

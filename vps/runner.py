@@ -31,6 +31,7 @@ def run_vps_loop(
     top_n: int,
     source_url: str,
     interval_seconds: int = 1800,
+    env_path: Path | None = None,
 ) -> None:
     raw_path = output_dir / "raw_region_results.json"
     proj_path = output_dir / "projection.json"
@@ -84,7 +85,7 @@ def run_vps_loop(
                 print(f"[vps] escrito: {trend_chart_path}")
 
             try:
-                publish_raw_history(output_dir=output_dir)
+                publish_raw_history(output_dir=output_dir, env_path=env_path)
             except Exception as exc:  # noqa: BLE001
                 print(f"[vps] error publish raw_history: {exc}")
 
