@@ -70,6 +70,16 @@
     return floors;
   }
 
+  function roundVotesMap(valuesByParty) {
+    const entries = Object.entries(valuesByParty || {});
+    if (!entries.length) return {};
+    const targetTotal = Math.max(
+      0,
+      Math.round(entries.reduce((sum, [, value]) => sum + Math.max(0, Number(value) || 0), 0))
+    );
+    return roundSharesToTotal(valuesByParty, targetTotal);
+  }
+
   function buildRegionProjection(region) {
     const actasPct = Number(region.actas_pct) || 0;
     const emitidos = parseInt(region.emitidos_actual, 10) || 0;
@@ -94,7 +104,7 @@
       const votes = parseInt(party.votos, 10) || 0;
       projectedByParty[name] = votes * factor;
     }
-    return projectedByParty;
+    return roundVotesMap(projectedByParty);
   }
 
   function getLeadingValidParty(region) {

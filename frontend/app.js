@@ -628,7 +628,7 @@ function renderMainChart() {
           callbacks: {
             label: ctx => {
               const pct = ctx.parsed.x.toFixed(2);
-              const votes = values[ctx.dataIndex].toLocaleString("es-PE");
+              const votes = formatInt(values[ctx.dataIndex]);
               return ` ${fullLabels[ctx.dataIndex]}: ${pct}% (${votes} ${modeMeta.tooltipSuffix})`;
             },
           },
