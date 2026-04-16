@@ -52,6 +52,11 @@ def publish_frontend(project_root: Path, env_path: Path | None = None) -> None:
     print(f"[publish] frontend OK: {uploaded} subidos, {skipped} sin cambios -> {base}")
 
 
+def _default_project_env_path() -> Path:
+    """Raíz del repo / .env (mismo criterio que publish_frontend)."""
+    return Path(__file__).resolve().parent.parent / ".env"
+
+
 def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
     """Sube raw_history/ e history_bundle.json bajo DEPLOY_FRONTEND en el servidor.
 
@@ -67,7 +72,7 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
     history_index.json se mantiene para compatibilidad con clientes antiguos
     que puedan estar cacheados en el navegador.
     """
-    env = _load_env_file(env_path or Path(".env"))
+    env = _load_env_file(env_path or _default_project_env_path())
     publish_legacy = _env_bool(env, "PUBLISH_LEGACY", default=True)
     publish_api_shadow = _env_bool(env, "PUBLISH_API_SHADOW", default=False)
 
