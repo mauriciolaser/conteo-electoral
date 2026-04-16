@@ -40,10 +40,22 @@ Y hoy muestra tres modos en `Top 6 Nacional`:
 python -m election_counter --mode deploy-frontend
 ```
 
+`deploy-frontend` ya ejecuta internamente `scripts/build_frontend.py` (regenera `frontend/dist/` antes del FTP). Si prefieres un solo comando explícito desde la raíz del repo:
+
+```bash
+python scripts/deploy_frontend.py --env-file .env
+```
+
 Con archivo de entorno explícito (recomendado para STAGING):
 
 ```bash
 python -m election_counter --mode deploy-frontend --env-file .env.staging
+```
+
+o:
+
+```bash
+python scripts/deploy_frontend.py --env-file .env.staging
 ```
 
 ---
