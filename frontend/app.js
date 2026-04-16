@@ -17,12 +17,17 @@
 //        Archivos individuales por snapshot. El cliente ya no los descarga
 //        directamente; siguen en el servidor como fuente del bundle.
 // ─────────────────────────────────────────────
-const BASE_URL = (
-  typeof __BASE_URL__ !== "undefined" &&
-  typeof __BASE_URL__ === "string" &&
-  __BASE_URL__.trim() &&
-  __BASE_URL__.trim() !== "__BASE_URL__"
-) ? __BASE_URL__.trim().replace(/\/+$/, "") : "";
+const INJECTED_BASE_URL = '__BASE_URL__';
+
+function resolveBaseUrl(rawValue) {
+  const raw = String(rawValue || "").trim();
+  if (!raw || raw === "__BASE_URL__") return "";
+  const unquoted = raw.replace(/^['"]+|['"]+$/g, "").trim();
+  if (!unquoted || unquoted === "__BASE_URL__") return "";
+  return unquoted.replace(/\/+$/, "");
+}
+
+const BASE_URL = resolveBaseUrl(INJECTED_BASE_URL);
 const PARTIES_CATALOG_URL = "./parties.json";
 
 // ─────────────────────────────────────────────

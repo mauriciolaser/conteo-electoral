@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import re
 import shutil
+import json
 from pathlib import Path
 
 
@@ -126,7 +127,20 @@ def build(project_root: Path | None = None) -> None:
 
     print("[build] procesando app.js...")
     app_src = (src / "app.js").read_text(encoding="utf-8")
-    app_out = app_src.replace('__BASE_URL__', f'"{base_url}"')
+    # Reemplazo robusto:
+    # - Si el placeholder está entre comillas ('__BASE_URL__' o "__BASE_URL__"),
+    #   inyectamos un literal JSON válido (comillas y escapes correctos).
+    # - Fallback para placeholder sin comillas.
+    app_out, replaced_count = re.subn(
+        r"""(['"])__BASE_URL__\1""",
+        json.dumps(base_url),
+        app_src,
+        count=1,
+    )
+    if replaced_count == 0:
+        app_out, replaced_count = re.subn(r"__BASE_URL__", base_url, app_src, count=1)
+    if replaced_count == 0:
+        raise ValueError("No se encontró placeholder __BASE_URL__ en frontend/app.js")
     (dist / "app.js").write_text(app_out, encoding="utf-8")
     print(f"[build] app.js -> BASE_URL={base_url}")
 
