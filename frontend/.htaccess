@@ -9,8 +9,9 @@
   RewriteEngine On
   RewriteBase /conteo/
 
-  # Rechazar si el Host no es perulainen.com (con o sin www)
-  RewriteCond %{HTTP_HOST} !^(www\.)?perulainen\.com$ [NC]
+  # Rechazar si el Host no es perulainen.com o staging.perulainen.com
+  # (con o sin www en ambos casos)
+  RewriteCond %{HTTP_HOST} !^((www\.)?perulainen\.com|(www\.)?staging\.perulainen\.com)$ [NC]
   RewriteRule ^ - [F,L]
 
   # API pública: enrutar /conteo/api/* al proxy PHP.
@@ -44,11 +45,12 @@
     Header set X-Content-Type-Options "nosniff"
   </FilesMatch>
 
-  # CORS restringido: solo el propio dominio puede hacer fetch de los JSON.
+  # CORS restringido: solo perulainen.com y staging.perulainen.com pueden
+  # hacer fetch de los JSON.
   # Se usa SetEnvIf para reflejar el origen exacto (con o sin www) porque
   # Apache solo puede enviar un valor en Access-Control-Allow-Origin.
   <FilesMatch "\.json$">
-    SetEnvIf Origin "^https://(www\.)?perulainen\.com$" CORS_ORIGIN=$0
+    SetEnvIf Origin "^https://((www\.)?perulainen\.com|(www\.)?staging\.perulainen\.com)$" CORS_ORIGIN=$0
     Header set Access-Control-Allow-Origin "%{CORS_ORIGIN}e" env=CORS_ORIGIN
     Header set Cache-Control "no-store, no-cache, must-revalidate"
     Header set X-Content-Type-Options "nosniff"

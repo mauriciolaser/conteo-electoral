@@ -171,6 +171,23 @@ Rollback rápido (volver a legacy y apagar API shadow):
 $env:PUBLISH_LEGACY="true"; $env:PUBLISH_API_SHADOW="false"; python -m election_counter --mode publish --env-file .env.staging
 ```
 
+Deploy completo STAGING (primero API, luego frontend):
+
+```powershell
+$env:PUBLISH_LEGACY="false"; $env:PUBLISH_API_SHADOW="true"; python -m election_counter --mode publish --env-file .env.staging; python -m election_counter --mode deploy-frontend --env-file .env.staging
+```
+
+Qué hace cada variante:
+
+- `publish --env-file .env.staging` con `PUBLISH_LEGACY=false` y `PUBLISH_API_SHADOW=true`:
+  - publica solo artefactos API (`/api/v1/*`) al origen de staging;
+  - no despliega frontend ni actualiza `history_bundle` legacy.
+- `deploy-frontend --env-file .env.staging`:
+  - rebuild de `frontend/dist` con `BASE_URL` de staging;
+  - deploy de archivos estáticos del frontend al FTP de staging.
+- comando combinado (`publish; deploy-frontend`):
+  - deja en una sola ejecución la data API y el frontend de staging sincronizados.
+
 ---
 
 ## 4) Variables de entorno (.env)
