@@ -271,6 +271,19 @@ main {
   height: 320px;
 }
 
+#ffe-duel-chart-container {
+  height: 220px;
+  margin-top: 0.35rem;
+}
+
+.chart-section .ffe-duel-heading {
+  margin-top: 1.75rem;
+  margin-bottom: 0.35rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
 .mode-switch {
   display: flex;
   flex-wrap: wrap;

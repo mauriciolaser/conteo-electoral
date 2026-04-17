@@ -10,6 +10,10 @@ from urllib.parse import urljoin
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 from playwright.sync_api import sync_playwright
 
+from election_counter.onpe_region_extras import (
+    enrich_region_onpe_totales,
+    jee_summary_from_totales,
+)
 from election_counter.parsers import parse_regiones
 from election_counter.utils import normalize_name
 
@@ -47,6 +51,7 @@ def scrape_onpe_vps(
             "actas_pct_global": 0.0,
             "mode": "fallback_vps",
             "warnings": warnings,
+            "resumen_jee_nacional": jee_summary_from_totales({}),
         },
         "regions": [],
     }
@@ -65,6 +70,7 @@ def _scrape_live_vps(
     regions: list[dict[str, object]] = []
     actas_pct = 0.0
     party_logos: dict[str, str] = {}
+    jee_nacional: dict[str, object] = jee_summary_from_totales({})
 
     try:
         with sync_playwright() as p:
@@ -103,7 +109,7 @@ def _scrape_live_vps(
 
             try:
                 page.goto(source_url, wait_until="domcontentloaded", timeout=120000)
-                regions, actas_pct = _fetch_regions_from_backend(request_context, data_dir)
+                regions, actas_pct, jee_nacional = _fetch_regions_from_backend(request_context, data_dir)
                 party_logos = _extract_party_logo_map(page)
             finally:
                 if close_ctx:
@@ -123,6 +129,7 @@ def _scrape_live_vps(
             "mode": "live_vps",
             "warnings": warnings,
             "party_logos": party_logos,
+            "resumen_jee_nacional": jee_nacional,
         },
         "regions": regions,
     }
@@ -150,7 +157,9 @@ def _build_context_kwargs() -> dict[str, object]:
     }
 
 
-def _fetch_regions_from_backend(request_context, data_dir: Path) -> tuple[list[dict[str, object]], float]:
+def _fetch_regions_from_backend(
+    request_context, data_dir: Path
+) -> tuple[list[dict[str, object]], float, dict[str, object]]:
     regiones = parse_regiones(data_dir / "regiones.md")
     proceso = _fetch_backend_json(request_context, SOURCE_URL, "/presentacion-backend/proceso/proceso-electoral-activo")
     id_proceso = int((proceso.get("data") or {}).get("idProcesoElectoral") or 2)
@@ -169,7 +178,9 @@ def _fetch_regions_from_backend(request_context, data_dir: Path) -> tuple[list[d
         SOURCE_URL,
         f"/presentacion-backend/resumen-general/totales?idEleccion={id_eleccion}&tipoFiltro=eleccion",
     )
-    actas_global = float((global_tot.get("data") or {}).get("actasContabilizadas") or 0.0)
+    global_data = global_tot.get("data") if isinstance(global_tot.get("data"), dict) else {}
+    actas_global = float(global_data.get("actasContabilizadas") or 0.0)
+    jee_nacional = jee_summary_from_totales(global_data)
 
     out_regions: list[dict[str, object]] = []
     for reg in regiones:
@@ -192,7 +203,7 @@ def _fetch_regions_from_backend(request_context, data_dir: Path) -> tuple[list[d
                 f"?tipoFiltro=ubigeo_nivel_01&idAmbitoGeografico=1&ubigeoNivel1={ubigeo}&idEleccion={id_eleccion}"
             ),
         )
-        out_regions.append(_build_region_from_backend(nombre, tot, parts))
+        out_regions.append(_build_region_from_backend(nombre, tot, parts, ubigeo=ubigeo))
 
     tot_ext = _fetch_backend_json(
         request_context,
@@ -210,9 +221,11 @@ def _fetch_regions_from_backend(request_context, data_dir: Path) -> tuple[list[d
             f"?tipoFiltro=ambito_geografico&idAmbitoGeografico=2&idEleccion={id_eleccion}"
         ),
     )
-    out_regions.append(_build_region_from_backend("PERUANOS EN EL EXTRANJERO", tot_ext, part_ext))
+    out_regions.append(
+        _build_region_from_backend("PERUANOS EN EL EXTRANJERO", tot_ext, part_ext, ubigeo=None)
+    )
 
-    return out_regions, actas_global
+    return out_regions, actas_global, jee_nacional
 
 
 def _fetch_backend_json(request_context, base_url: str, rel_url: str) -> dict[str, object]:
@@ -234,6 +247,8 @@ def _build_region_from_backend(
     region_name: str,
     totales_payload: dict[str, object],
     participantes_payload: dict[str, object],
+    *,
+    ubigeo: str | None,
 ) -> dict[str, object]:
     tot = totales_payload.get("data") or {}
     part_rows = participantes_payload.get("data") or []
@@ -261,13 +276,14 @@ def _build_region_from_backend(
     if diff > 0:
         partidos.append({"nombre": "AJUSTE", "votos": diff, "es_blanco_o_nulo": False})
 
-    return {
+    row = {
         "region": region_name,
         "actas_pct": actas,
         "emitidos_actual": emitidos,
         "partidos": partidos,
         "source": "onpe_live_backend_vps",
     }
+    return enrich_region_onpe_totales(row, totales_payload, ubigeo=ubigeo)
 
 
 def _extract_party_logo_map(page) -> dict[str, str]:

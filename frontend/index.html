@@ -192,6 +192,19 @@
           <span class="ffe-zone-value" id="pending-total">—</span>
         </div>
       </div>
+
+      <h2 class="ffe-duel-heading">Proyección Frente a Frente (Top 2)</h2>
+      <p class="chart-note" id="ffe-duel-chart-note">Solo Rafael López Aliaga (Renovación Popular) y Roberto Sánchez (Juntos por el Perú). Porcentaje sobre la suma de votos válidos de ambos en cada modo.</p>
+      <div class="mode-switch" id="ffe-duel-mode-switch" aria-label="Modo de proyección frente a frente">
+        <button type="button" id="mode-ffe-actual" class="mode-btn" data-tooltip="Votos válidos ya contabilizados para ambos candidatos.">ACTUAL</button>
+        <button type="button" id="mode-ffe-simple" class="mode-btn" data-tooltip="Proyección lineal al 100% de actas por región (igual que proyección simple nacional).">SIMPLE</button>
+        <button type="button" id="mode-ffe-rural" class="mode-btn" data-tooltip="Sesgo rural en regiones donde lidera Sánchez (igual que proyección voto rural).">VOTO RURAL</button>
+        <button type="button" id="mode-ffe-imp-rural" class="mode-btn" data-tooltip="Partiendo del modo voto rural: se descuentan los votos impugnados reportados en regiones donde Sánchez lidera sobre Renovación Popular.">IMPUGN. RURAL</button>
+        <button type="button" id="mode-ffe-imp-lima" class="mode-btn" data-tooltip="Partiendo del modo voto rural: se descuentan los votos impugnados del departamento Lima repartidos entre ambos según su proyección rural en Lima.">IMPUGN. LIMA</button>
+      </div>
+      <div id="ffe-duel-chart-container">
+        <canvas id="ffe-duel-chart"></canvas>
+      </div>
     </section>
 
     <section class="potential-votes-panel" id="potential-sanchez-panel">

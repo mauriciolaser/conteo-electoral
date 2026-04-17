@@ -2,6 +2,7 @@
   const TOP_N = 6;
   const TOP_RURAL_REGIONS = 10;
   const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
+  const RLA_PARTY = "RENOVACION POPULAR";
 
   // Ratios Rural/Urbano del cuadro fuente (data/ratio.png).
   // Cualquier lista no explícita cae a "OTROS".
@@ -336,10 +337,177 @@
     return buildScenarioProjectionStats(latestPayload, multiplierForParty);
   }
 
+  function votesForPartyInMap(projectedByParty, partyNorm) {
+    let sum = 0;
+    for (const [name, raw] of Object.entries(projectedByParty || {})) {
+      if (normalizeName(name) === partyNorm) sum += Number(raw) || 0;
+    }
+    return sum;
+  }
+
+  function sumTwoHorseFromRegionalMaps(projectedByRegion, regions, partyNormA, partyNormB) {
+    let a = 0;
+    let b = 0;
+    for (const region of regions || []) {
+      const name = region.region || "";
+      const map = projectedByRegion[name] || {};
+      a += votesForPartyInMap(map, partyNormA);
+      b += votesForPartyInMap(map, partyNormB);
+    }
+    return { a: Math.round(a), b: Math.round(b) };
+  }
+
+  function currentTwoHorseVotes(latestPayload) {
+    const regions = latestPayload.regions || [];
+    let sanchez = 0;
+    let rla = 0;
+    for (const region of regions) {
+      for (const party of region.partidos || []) {
+        const raw = party.nombre || "";
+        if (isSpecial(raw)) continue;
+        const n = normalizeName(raw);
+        const v = parseInt(party.votos, 10) || 0;
+        if (n === SANCHEZ_PARTY) sanchez += v;
+        else if (n === RLA_PARTY) rla += v;
+      }
+    }
+    return { sanchez, rla };
+  }
+
+  function twoHorseFromProjectedCandidates(projectedCandidates) {
+    let sanchez = 0;
+    let rla = 0;
+    for (const [name, votes] of projectedCandidates || []) {
+      const n = normalizeName(name);
+      if (n === SANCHEZ_PARTY) sanchez += Math.round(Number(votes) || 0);
+      else if (n === RLA_PARTY) rla += Math.round(Number(votes) || 0);
+    }
+    return { sanchez, rla };
+  }
+
+  function regionImpugnadas(region) {
+    const imp = region.impugnadas;
+    if (!imp || typeof imp !== "object") {
+      return {
+        sanchezLidera: false,
+        esLima: false,
+        votosImpugnados: 0,
+      };
+    }
+    return {
+      sanchezLidera: Boolean(imp.sanchez_lidera_sobre_renovacion),
+      esLima: Boolean(imp.es_lima_departamento),
+      votosImpugnados: Math.max(0, parseInt(imp.votos_impugnados, 10) || 0),
+    };
+  }
+
+  function buildHeadToHeadBundle(latestPayload) {
+    const regions = latestPayload.regions || [];
+    const actual = currentTwoHorseVotes(latestPayload);
+    const nationalStats = buildNationalProjectionStats(latestPayload);
+    const ruralStats = buildRuralProjectionStats(latestPayload);
+    const simple = twoHorseFromProjectedCandidates(nationalStats.projectedCandidates);
+    const rural = twoHorseFromProjectedCandidates(ruralStats.projectedCandidates);
+
+    const ruralByRegion = buildRuralProjectionByRegion(latestPayload);
+    const ruralNat = sumTwoHorseFromRegionalMaps(ruralByRegion, regions, SANCHEZ_PARTY, RLA_PARTY);
+
+    let subRuralImp = 0;
+    for (const region of regions) {
+      const imp = regionImpugnadas(region);
+      if (!imp.sanchezLidera || imp.votosImpugnados <= 0) continue;
+      const map = ruralByRegion[region.region || ""] || {};
+      const sReg = votesForPartyInMap(map, SANCHEZ_PARTY);
+      subRuralImp += Math.min(imp.votosImpugnados, Math.round(sReg));
+    }
+    const impugnacionRural = {
+      sanchez: Math.max(0, ruralNat.a - subRuralImp),
+      rla: ruralNat.b,
+      isFallback: ruralStats.isFallback,
+    };
+
+    const limaRegion = regions.find(
+      r =>
+        regionImpugnadas(r).esLima ||
+        String(r.ubigeo || "") === "140000" ||
+        normalizeName(r.region || "") === "LIMA"
+    );
+    let subLimaS = 0;
+    let subLimaR = 0;
+    if (limaRegion) {
+      const vi = regionImpugnadas(limaRegion).votosImpugnados;
+      const limaName = limaRegion.region || "";
+      const map = ruralByRegion[limaName] || {};
+      const sL = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const rL = votesForPartyInMap(map, RLA_PARTY);
+      const pair = sL + rL;
+      if (vi > 0 && pair > 0) {
+        subLimaS = (vi * sL) / pair;
+        subLimaR = (vi * rL) / pair;
+      } else if (vi > 0) {
+        subLimaS = vi / 2;
+        subLimaR = vi / 2;
+      }
+    }
+    const impugnacionLima = {
+      sanchez: Math.max(0, Math.round(ruralNat.a - subLimaS)),
+      rla: Math.max(0, Math.round(ruralNat.b - subLimaR)),
+      isFallback: ruralStats.isFallback,
+    };
+
+    const duoActual = Math.max(1, actual.sanchez + actual.rla);
+    const duoSimple = Math.max(1, simple.sanchez + simple.rla);
+    const duoRural = Math.max(1, rural.sanchez + rural.rla);
+    const duoImpR = Math.max(1, impugnacionRural.sanchez + impugnacionRural.rla);
+    const duoImpL = Math.max(1, impugnacionLima.sanchez + impugnacionLima.rla);
+
+    return {
+      actual: {
+        sanchez: actual.sanchez,
+        rla: actual.rla,
+        totalDuo: duoActual,
+        sanchezPct: (actual.sanchez / duoActual) * 100,
+        rlaPct: (actual.rla / duoActual) * 100,
+      },
+      simple: {
+        sanchez: simple.sanchez,
+        rla: simple.rla,
+        totalDuo: duoSimple,
+        sanchezPct: (simple.sanchez / duoSimple) * 100,
+        rlaPct: (simple.rla / duoSimple) * 100,
+      },
+      rural: {
+        sanchez: rural.sanchez,
+        rla: rural.rla,
+        totalDuo: duoRural,
+        sanchezPct: (rural.sanchez / duoRural) * 100,
+        rlaPct: (rural.rla / duoRural) * 100,
+        isFallback: ruralStats.isFallback,
+      },
+      impugnacionRural: {
+        sanchez: impugnacionRural.sanchez,
+        rla: impugnacionRural.rla,
+        totalDuo: duoImpR,
+        sanchezPct: (impugnacionRural.sanchez / duoImpR) * 100,
+        rlaPct: (impugnacionRural.rla / duoImpR) * 100,
+        isFallback: impugnacionRural.isFallback,
+      },
+      impugnacionLima: {
+        sanchez: impugnacionLima.sanchez,
+        rla: impugnacionLima.rla,
+        totalDuo: duoImpL,
+        sanchezPct: (impugnacionLima.sanchez / duoImpL) * 100,
+        rlaPct: (impugnacionLima.rla / duoImpL) * 100,
+        isFallback: impugnacionLima.isFallback,
+      },
+    };
+  }
+
   global.ProjectionModes = {
     buildNationalProjectionStats,
     buildRuralProjectionStats,
     buildSimpleProjectionByRegion,
     buildRuralProjectionByRegion,
+    buildHeadToHeadBundle,
   };
 })(window);

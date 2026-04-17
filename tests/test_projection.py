@@ -40,6 +40,28 @@ class ProjectionTests(unittest.TestCase):
         self.assertIn("totals", proj)
         self.assertIn("scenarios", proj)
 
+    def test_projection_ignores_extra_region_keys(self) -> None:
+        raw = {
+            "metadata": {"actas_pct_global": 50.0, "warnings": []},
+            "regions": [
+                {
+                    "region": "LIMA",
+                    "ubigeo": "140000",
+                    "actas_pct": 50.0,
+                    "emitidos_actual": 800,
+                    "jee": {"votos_revision_jne": 1},
+                    "impugnadas": {"mesas_impugnadas": 2},
+                    "partidos": [
+                        {"nombre": "PARTIDO A", "votos": 400},
+                        {"nombre": "PARTIDO B", "votos": 400},
+                    ],
+                }
+            ],
+        }
+        proj = build_projection(raw, padron={"LIMA": 2000}, margin=0.05, top_n=2)
+        self.assertEqual(len(proj["regions"]), 1)
+        self.assertIn("partidos", proj["regions"][0])
+
 
 if __name__ == "__main__":
     unittest.main()

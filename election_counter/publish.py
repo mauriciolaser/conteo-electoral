@@ -373,19 +373,27 @@ def _minify_snapshot(payload: dict[str, object] | None) -> dict[str, object]:
                     "es_blanco_o_nulo": bool(party.get("es_blanco_o_nulo", False)),
                 }
             )
-        regions_out.append(
-            {
-                "region": region.get("region", ""),
-                "actas_pct": region.get("actas_pct", 0),
-                "emitidos_actual": region.get("emitidos_actual", 0),
-                "partidos": parties_out,
-            }
-        )
+        row_min: dict[str, object] = {
+            "region": region.get("region", ""),
+            "actas_pct": region.get("actas_pct", 0),
+            "emitidos_actual": region.get("emitidos_actual", 0),
+            "partidos": parties_out,
+        }
+        if "ubigeo" in region:
+            row_min["ubigeo"] = region.get("ubigeo")
+        if "jee" in region:
+            row_min["jee"] = region.get("jee")
+        if "impugnadas" in region:
+            row_min["impugnadas"] = region.get("impugnadas")
+        regions_out.append(row_min)
+    meta_out: dict[str, object] = {
+        "extracted_at_utc": meta.get("extracted_at_utc", ""),
+        "actas_pct_global": meta.get("actas_pct_global", 0),
+    }
+    if "resumen_jee_nacional" in meta:
+        meta_out["resumen_jee_nacional"] = meta.get("resumen_jee_nacional")
     return {
-        "metadata": {
-            "extracted_at_utc": meta.get("extracted_at_utc", ""),
-            "actas_pct_global": meta.get("actas_pct_global", 0),
-        },
+        "metadata": meta_out,
         "regions": regions_out,
     }
 

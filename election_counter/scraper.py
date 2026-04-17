@@ -13,6 +13,12 @@ from election_counter.parsers import (
     parse_partidos_snapshot,
     parse_regiones,
 )
+from election_counter.onpe_region_extras import (
+    empty_impugnadas_block,
+    empty_jee_block,
+    enrich_region_onpe_totales,
+    jee_summary_from_totales,
+)
 from election_counter.utils import normalize_name
 
 SOURCE_URL = "https://resultadoelectoral.onpe.gob.pe/main/presidenciales"
@@ -63,6 +69,7 @@ def _scrape_live(
     assets_failed = False
     regions: list[dict[str, object]] = []
     actas_pct = 0.0
+    jee_nacional: dict[str, object] = jee_summary_from_totales({})
 
     try:
         with sync_playwright() as p:
@@ -104,7 +111,7 @@ def _scrape_live(
                 assets_failed = True
                 warnings.append("ONPE devolvió recursos JS/CSS inválidos en esta ejecución.")
 
-            regions, actas_pct = _fetch_regions_from_backend(page, data_dir)
+            regions, actas_pct, jee_nacional = _fetch_regions_from_backend(page, data_dir)
             party_logos = _extract_party_logo_map(page)
             if close_ctx:
                 context.close()
@@ -115,20 +122,24 @@ def _scrape_live(
     except Exception as exc:  # noqa: BLE001
         warnings.append(f"Error en scraping ONPE: {exc}")
 
+    meta_live: dict[str, object] = {
+        "source_url": source_url,
+        "extracted_at_utc": datetime.now(timezone.utc).isoformat(),
+        "actas_pct_global": actas_pct,
+        "mode": "live",
+        "warnings": warnings,
+        "party_logos": party_logos if "party_logos" in locals() else {},
+    }
+    meta_live["resumen_jee_nacional"] = jee_nacional
     return {
-        "metadata": {
-            "source_url": source_url,
-            "extracted_at_utc": datetime.now(timezone.utc).isoformat(),
-            "actas_pct_global": actas_pct,
-            "mode": "live",
-            "warnings": warnings,
-            "party_logos": party_logos if "party_logos" in locals() else {},
-        },
+        "metadata": meta_live,
         "regions": regions,
     }
 
 
-def _fetch_regions_from_backend(page, data_dir: Path) -> tuple[list[dict[str, object]], float]:
+def _fetch_regions_from_backend(
+    page, data_dir: Path
+) -> tuple[list[dict[str, object]], float, dict[str, object]]:
     regiones = parse_regiones(data_dir / "regiones.md")
 
     proceso = _fetch_backend_json(page, "/presentacion-backend/proceso/proceso-electoral-activo")
@@ -148,7 +159,9 @@ def _fetch_regions_from_backend(page, data_dir: Path) -> tuple[list[dict[str, ob
         page,
         f"/presentacion-backend/resumen-general/totales?idEleccion={id_eleccion}&tipoFiltro=eleccion",
     )
-    actas_global = float((global_tot.get("data") or {}).get("actasContabilizadas") or 0.0)
+    global_data = global_tot.get("data") if isinstance(global_tot.get("data"), dict) else {}
+    actas_global = float(global_data.get("actasContabilizadas") or 0.0)
+    jee_nacional = jee_summary_from_totales(global_data)
 
     out_regions: list[dict[str, object]] = []
     for reg in regiones:
@@ -169,7 +182,7 @@ def _fetch_regions_from_backend(page, data_dir: Path) -> tuple[list[dict[str, ob
                 f"?tipoFiltro=ubigeo_nivel_01&idAmbitoGeografico=1&ubigeoNivel1={ubigeo}&idEleccion={id_eleccion}"
             ),
         )
-        out_regions.append(_build_region_from_backend(nombre, tot, parts))
+        out_regions.append(_build_region_from_backend(nombre, tot, parts, ubigeo=ubigeo))
 
     # Extranjero
     tot_ext = _fetch_backend_json(
@@ -186,9 +199,11 @@ def _fetch_regions_from_backend(page, data_dir: Path) -> tuple[list[dict[str, ob
             f"?tipoFiltro=ambito_geografico&idAmbitoGeografico=2&idEleccion={id_eleccion}"
         ),
     )
-    out_regions.append(_build_region_from_backend("PERUANOS EN EL EXTRANJERO", tot_ext, part_ext))
+    out_regions.append(
+        _build_region_from_backend("PERUANOS EN EL EXTRANJERO", tot_ext, part_ext, ubigeo=None)
+    )
 
-    return out_regions, actas_global
+    return out_regions, actas_global, jee_nacional
 
 
 def _fetch_backend_json(page, rel_url: str) -> dict[str, object]:
@@ -204,6 +219,8 @@ def _build_region_from_backend(
     region_name: str,
     totales_payload: dict[str, object],
     participantes_payload: dict[str, object],
+    *,
+    ubigeo: str | None,
 ) -> dict[str, object]:
     tot = totales_payload.get("data") or {}
     part_rows = participantes_payload.get("data") or []
@@ -232,13 +249,14 @@ def _build_region_from_backend(
     if diff > 0:
         partidos.append({"nombre": "AJUSTE", "votos": diff, "es_blanco_o_nulo": False})
 
-    return {
+    row = {
         "region": region_name,
         "actas_pct": actas,
         "emitidos_actual": emitidos,
         "partidos": partidos,
         "source": "onpe_live_backend",
     }
+    return enrich_region_onpe_totales(row, totales_payload, ubigeo=ubigeo)
 
 
 def _verify_script_assets(page) -> bool:
@@ -574,13 +592,19 @@ def _build_fallback_snapshot(data_dir: Path, source_url: str, warnings: list[str
         part_rows.append({"nombre": "VOTOS EN BLANCO", "votos": blancos, "es_blanco_o_nulo": True})
         part_rows.append({"nombre": "VOTOS NULOS", "votos": nulos, "es_blanco_o_nulo": True})
 
+        ub = r.get("ubigeo")
         out_regions.append(
             {
                 "region": reg,
+                "ubigeo": ub,
                 "actas_pct": actas_pct,
                 "emitidos_actual": emitidos_actual,
                 "partidos": part_rows,
                 "source": "fallback_sintetico",
+                "jee": empty_jee_block(),
+                "impugnadas": empty_impugnadas_block(
+                    region_name=reg, ubigeo=ub, partidos=part_rows
+                ),
             }
         )
 
@@ -606,6 +630,10 @@ def _build_fallback_snapshot(data_dir: Path, source_url: str, warnings: list[str
                 "emitidos_actual": emitidos_actual,
                 "partidos": part_rows,
                 "source": "fallback_sintetico",
+                "jee": empty_jee_block(),
+                "impugnadas": empty_impugnadas_block(
+                    region_name="PERUANOS EN EL EXTRANJERO", ubigeo=None, partidos=part_rows
+                ),
             }
         )
 
@@ -616,6 +644,7 @@ def _build_fallback_snapshot(data_dir: Path, source_url: str, warnings: list[str
             "actas_pct_global": actas_pct,
             "mode": "fallback",
             "warnings": warnings,
+            "resumen_jee_nacional": jee_summary_from_totales({}),
         },
         "regions": out_regions,
     }

@@ -301,9 +301,12 @@ function hideError() {
 //  Chart instances (para poder destruirlos al recargar)
 // ─────────────────────────────────────────────
 let mainChartInstance = null;
+let ffeDuelChartInstance = null;
 let trendChartInstance = null;
 let mainChartMode = "actual";
+let ffeDuelChartMode = "actual";
 let mainChartData = null;
+let ffeDuelChartData = null;
 let activeLatestSnapshot = null; // snapshot visible más reciente aceptado por la UI
 let activeLatestSnapshotTs = Number.NEGATIVE_INFINITY;
 const MAIN_CHART_MODE_META = {
@@ -322,6 +325,33 @@ const MAIN_CHART_MODE_META = {
   ruralFallback: {
     note: "VOTO RURAL sin regiones elegibles en este corte — se muestra interpolación base (Top 6)",
     tooltipSuffix: "votos proyectados modo rural",
+  },
+};
+
+const FFE_DUEL_MODE_META = {
+  actual: {
+    note: "Votos válidos ya contabilizados (ONPE) para los dos candidatos. Barras: % sobre la suma de ambos.",
+    tooltipSuffix: "votos contados",
+  },
+  simple: {
+    note: "Proyección simple al 100% de actas por región, agregada a nivel nacional para los dos candidatos.",
+    tooltipSuffix: "votos proyectados simple",
+  },
+  rural: {
+    note: "Proyección con sesgo rural en regiones donde lidera Sánchez (misma lógica que el Top 6 en modo voto rural).",
+    tooltipSuffix: "votos proyectados voto rural",
+  },
+  ruralFallback: {
+    note: "Voto rural sin regiones elegibles en este corte; coincide con la proyección simple agregada para el duelo.",
+    tooltipSuffix: "votos proyectados",
+  },
+  impugnacionRural: {
+    note: "Desde voto rural: se restan los votos impugnados (ONPE) en regiones donde Sánchez lidera sobre López Aliaga, sin bajar el total regional de Sánchez por debajo de cero.",
+    tooltipSuffix: "votos (simulación impugnación rural)",
+  },
+  impugnacionLima: {
+    note: "Desde voto rural: se restan los votos impugnados del departamento Lima entre ambos, en proporción a su proyección rural en Lima.",
+    tooltipSuffix: "votos (simulación impugnación Lima)",
   },
 };
 
@@ -732,6 +762,100 @@ function renderMainChart() {
             font: { size: 11 },
             padding: isMobileViewport() ? 22 : 8,
           },
+          grid: { display: false },
+        },
+      },
+    },
+  });
+}
+
+function updateFfeDuelChartButtons() {
+  const pairs = [
+    ["actual", "mode-ffe-actual"],
+    ["simple", "mode-ffe-simple"],
+    ["rural", "mode-ffe-rural"],
+    ["impugnacionRural", "mode-ffe-imp-rural"],
+    ["impugnacionLima", "mode-ffe-imp-lima"],
+  ];
+  for (const [mode, id] of pairs) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle("active", ffeDuelChartMode === mode);
+  }
+}
+
+function renderFfeDuelChart() {
+  const canvas = document.getElementById("ffe-duel-chart");
+  const noteEl = document.getElementById("ffe-duel-chart-note");
+  if (!canvas || !ffeDuelChartData || typeof Chart === "undefined") return;
+  const ctx = canvas.getContext("2d");
+  if (ffeDuelChartInstance) ffeDuelChartInstance.destroy();
+
+  const keyByMode = {
+    actual: "actual",
+    simple: "simple",
+    rural: "rural",
+    impugnacionRural: "impugnacionRural",
+    impugnacionLima: "impugnacionLima",
+  };
+  const dataKey = keyByMode[ffeDuelChartMode] || "actual";
+  const source = ffeDuelChartData[dataKey] || ffeDuelChartData.actual;
+
+  const useRuralFallback =
+    (ffeDuelChartMode === "rural" ||
+      ffeDuelChartMode === "impugnacionRural" ||
+      ffeDuelChartMode === "impugnacionLima") &&
+    Boolean(source.isFallback);
+
+  const modeMeta = useRuralFallback
+    ? FFE_DUEL_MODE_META.ruralFallback
+    : (FFE_DUEL_MODE_META[ffeDuelChartMode] || FFE_DUEL_MODE_META.actual);
+  if (noteEl) noteEl.textContent = modeMeta.note;
+
+  updateFfeDuelChartButtons();
+
+  const labels = ["López Aliaga (RP)", "Sánchez (JPP)"];
+  const values = [source.rlaPct, source.sanchezPct];
+  const votes = [source.rla, source.sanchez];
+  const colors = [partyColor("RENOVACION POPULAR", 0), partyColor("JUNTOS POR EL PERU", 1)];
+
+  ffeDuelChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderColor: colors.map(c => c + "cc"),
+        borderWidth: 1,
+        borderRadius: 4,
+      }],
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const i = ctx.dataIndex;
+              return ` ${labels[i]}: ${values[i].toFixed(2)}% (${formatInt(votes[i])} ${modeMeta.tooltipSuffix})`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          max: 100,
+          ticks: {
+            color: "#7b7f94",
+            callback: v => `${v}%`,
+          },
+          grid: { color: "#2a2d3a" },
+        },
+        y: {
+          ticks: { color: "#e8eaf0", font: { size: 11 } },
           grid: { display: false },
         },
       },
@@ -1443,6 +1567,12 @@ async function loadAndRender() {
       },
     };
 
+    if (typeof window.ProjectionModes.buildHeadToHeadBundle === "function") {
+      ffeDuelChartData = window.ProjectionModes.buildHeadToHeadBundle(activeLatest.payload);
+    } else {
+      ffeDuelChartData = null;
+    }
+
     // #region agent log
     (() => {
       const fresh = aggregateSnapshot(activeLatest.payload);
@@ -1476,6 +1606,7 @@ async function loadAndRender() {
     // 4. Renderizar
     updateStatusBar(activeLatest.payload, renderSnapshots);
     renderMainChart();
+    renderFfeDuelChart();
     renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate, "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)");
     renderPotentialVotesPanel(
       topRegionalLeadersStats.topRegions,
@@ -1560,6 +1691,24 @@ document.addEventListener("DOMContentLoaded", () => {
       renderMainChart();
     });
   }
+
+  const ffeModeBindings = [
+    ["mode-ffe-actual", "actual"],
+    ["mode-ffe-simple", "simple"],
+    ["mode-ffe-rural", "rural"],
+    ["mode-ffe-imp-rural", "impugnacionRural"],
+    ["mode-ffe-imp-lima", "impugnacionLima"],
+  ];
+  for (const [id, mode] of ffeModeBindings) {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener("click", () => {
+        ffeDuelChartMode = mode;
+        renderFfeDuelChart();
+      });
+    }
+  }
+
   // ¿Qué es esto? toggle
   const qeeBtn = document.getElementById("que-es-esto-btn");
   const qeePanel = document.getElementById("que-es-esto-panel");
