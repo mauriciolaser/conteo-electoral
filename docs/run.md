@@ -64,6 +64,21 @@ python -m election_counter --mode full --headed --browser-channel msedge --env-f
 python -m election_counter --mode deploy-frontend --env-file .env
 ```
 
+### Deploy frontend vía GitHub Actions (manual)
+
+```powershell
+gh workflow run deploy-frontend.yml --repo mauriciolaser/conteo-electoral; Start-Sleep -Seconds 2; $id = gh run list --repo mauriciolaser/conteo-electoral --workflow "Frontend Deploy" --event workflow_dispatch --limit 1 --json databaseId --jq '.[0].databaseId'; gh run watch $id --repo mauriciolaser/conteo-electoral --exit-status
+```
+
+Este comando:
+
+1. Dispara manualmente el workflow `deploy-frontend.yml` en GitHub Actions.
+2. Espera 2 segundos para que el run quede registrado.
+3. Obtiene el `databaseId` del último run del workflow `Frontend Deploy` con evento `workflow_dispatch`.
+4. Espera a que termine y devuelve estado de éxito/error (`--exit-status`).
+
+Nota: no pegues `python ...` en la misma línea sin `;` después de `--exit-status`.
+
 ## Variables `.env`
 
 ```env
