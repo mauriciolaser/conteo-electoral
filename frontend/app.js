@@ -786,7 +786,14 @@ function updateFfeDuelChartButtons() {
 function renderFfeDuelChart() {
   const canvas = document.getElementById("ffe-duel-chart");
   const noteEl = document.getElementById("ffe-duel-chart-note");
-  if (!canvas || !ffeDuelChartData || typeof Chart === "undefined") return;
+  const badgeClear = document.getElementById("ffe-duel-leader-badge");
+  if (!canvas || !ffeDuelChartData || typeof Chart === "undefined") {
+    if (badgeClear) {
+      badgeClear.textContent = "";
+      badgeClear.classList.remove("ffe-duel-leader-badge--tie");
+    }
+    return;
+  }
   const ctx = canvas.getContext("2d");
   if (ffeDuelChartInstance) ffeDuelChartInstance.destroy();
 
@@ -813,10 +820,57 @@ function renderFfeDuelChart() {
 
   updateFfeDuelChartButtons();
 
-  const labels = ["López Aliaga (RP)", "Sánchez (JPP)"];
-  const values = [source.rlaPct, source.sanchezPct];
-  const votes = [source.rla, source.sanchez];
-  const colors = [partyColor("RENOVACION POPULAR", 0), partyColor("JUNTOS POR EL PERU", 1)];
+  const rlaVotes = Number(source.rla) || 0;
+  const sanchezVotes = Number(source.sanchez) || 0;
+  const rlaPct = Number(source.rlaPct) || 0;
+  const sanchezPct = Number(source.sanchezPct) || 0;
+
+  const rows = [
+    {
+      key: "rla",
+      label: "López Aliaga (RP)",
+      shortLabel: "López Aliaga",
+      votes: rlaVotes,
+      pct: rlaPct,
+      color: partyColor("RENOVACION POPULAR", 0),
+    },
+    {
+      key: "sanchez",
+      label: "Sánchez (JPP)",
+      shortLabel: "Sánchez",
+      votes: sanchezVotes,
+      pct: sanchezPct,
+      color: partyColor("JUNTOS POR EL PERU", 1),
+    },
+  ];
+  rows.sort((a, b) => {
+    if (b.votes !== a.votes) return b.votes - a.votes;
+    return String(a.key).localeCompare(String(b.key));
+  });
+
+  const isTie = rows.length >= 2 && rows[0].votes === rows[1].votes;
+  const labels = rows.map(r => r.label);
+  const values = rows.map(r => r.pct);
+  const votes = rows.map(r => r.votes);
+  const colors = rows.map(r => r.color);
+  const borderWidths = rows.map((r, i) => (!isTie && i === 0 ? 3 : 1));
+  const borderColors = rows.map((r, i) => {
+    if (!isTie && i === 0) return "rgba(255, 255, 255, 0.92)";
+    return `${r.color}cc`;
+  });
+
+  const badgeEl = document.getElementById("ffe-duel-leader-badge");
+  if (badgeEl) {
+    badgeEl.classList.toggle("ffe-duel-leader-badge--tie", isTie);
+    if (isTie) {
+      badgeEl.innerHTML = "<span>Empate en votos válidos (este modo).</span>";
+    } else {
+      const w = rows[0];
+      badgeEl.innerHTML =
+        `<span class="ffe-duel-crown" aria-hidden="true">👑</span>` +
+        `<span>Va ganando: <strong>${w.shortLabel}</strong> (${formatInt(w.votes)} votos)</span>`;
+    }
+  }
 
   ffeDuelChartInstance = new Chart(ctx, {
     type: "bar",
@@ -825,8 +879,8 @@ function renderFfeDuelChart() {
       datasets: [{
         data: values,
         backgroundColor: colors,
-        borderColor: colors.map(c => c + "cc"),
-        borderWidth: 1,
+        borderColor: borderColors,
+        borderWidth: borderWidths,
         borderRadius: 4,
       }],
     },
@@ -840,7 +894,8 @@ function renderFfeDuelChart() {
           callbacks: {
             label: ctx => {
               const i = ctx.dataIndex;
-              return ` ${labels[i]}: ${values[i].toFixed(2)}% (${formatInt(votes[i])} ${modeMeta.tooltipSuffix})`;
+              const lead = !isTie && i === 0 ? " · 1.er lugar" : "";
+              return ` ${labels[i]}: ${values[i].toFixed(2)}% (${formatInt(votes[i])} ${modeMeta.tooltipSuffix})${lead}`;
             },
           },
         },
@@ -855,6 +910,7 @@ function renderFfeDuelChart() {
           grid: { color: "#2a2d3a" },
         },
         y: {
+          reverse: true,
           ticks: { color: "#e8eaf0", font: { size: 11 } },
           grid: { display: false },
         },

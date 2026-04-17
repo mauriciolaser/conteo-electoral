@@ -284,6 +284,37 @@ main {
   color: var(--text);
 }
 
+.ffe-duel-leader-badge {
+  min-height: 1.75rem;
+  margin: 0.35rem 0 0.5rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: #f0d878;
+  background: rgba(240, 216, 120, 0.12);
+  border: 1px solid rgba(240, 216, 120, 0.35);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.ffe-duel-leader-badge:empty {
+  display: none;
+}
+
+.ffe-duel-leader-badge.ffe-duel-leader-badge--tie {
+  color: var(--muted);
+  background: rgba(174, 185, 216, 0.1);
+  border-color: rgba(174, 185, 216, 0.25);
+}
+
+.ffe-duel-leader-badge .ffe-duel-crown {
+  font-size: 1rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(240, 216, 120, 0.55));
+}
+
 .mode-switch {
   display: flex;
   flex-wrap: wrap;
