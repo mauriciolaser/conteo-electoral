@@ -404,6 +404,7 @@ const HALF_HOUR_MS = 30 * 60 * 1000;
 const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
 const LOPEZ_ALIAGA_PARTY = "RENOVACION POPULAR";
 const NIETO_PARTY = "PARTIDO DEL BUEN GOBIERNO";
+const COZY_STORAGE_KEY = "ui.cozyMode";
 const CANDIDATE_OPTIONS = {
   [SANCHEZ_PARTY]: {
     label: "Sánchez",
@@ -673,6 +674,47 @@ function renderSimpleRegionalLeadersPanel(stats, candidatePartyName, panelConfig
   }
 }
 
+function getMainChartSourceForCurrentMode() {
+  if (!mainChartData) return null;
+  if (mainChartMode === "rural" && mainChartData.rural?.isFallback) {
+    return mainChartData.interpolation || mainChartData.actual || null;
+  }
+  return mainChartData[mainChartMode] || mainChartData.actual || null;
+}
+
+function renderTop3Panel() {
+  const container = document.getElementById("top3-cards");
+  if (!container) return;
+  const source = getMainChartSourceForCurrentMode();
+  if (!source || !Array.isArray(source.topCandidates) || source.topCandidates.length === 0) {
+    container.innerHTML = `<p class="top3-empty">Sin datos disponibles para Top 3.</p>`;
+    return;
+  }
+  const total = Number(source.totalValidVotes) || 0;
+  const rows = source.topCandidates.slice(0, 3).map(([name, votes], index) => {
+    const rawVotes = Number(votes) || 0;
+    const pct = total > 0 ? (rawVotes / total) * 100 : 0;
+    const display = getPartyDisplayMeta(name);
+    const bgColor = partyColor(name, index);
+    const logoMarkup = display.imageSrc
+      ? `<img class="top3-logo" src="${display.imageSrc}" alt="Logo ${display.fullLabel}" loading="lazy" />`
+      : `<span class="top3-logo-fallback" style="background:${bgColor}">${display.shortLabel}</span>`;
+    const tooltip = `${display.fullLabel} - ${formatInt(rawVotes)} votos`;
+    return `
+      <article class="top3-card" tabindex="0" title="${tooltip}" aria-label="${tooltip}">
+        <span class="top3-rank">#${index + 1}</span>
+        <span class="top3-logo-wrap">
+          ${logoMarkup}
+        </span>
+        <span class="top3-pct">${pct.toFixed(3)}%</span>
+        <span class="top3-votes">${formatInt(rawVotes)} votos</span>
+        <span class="top3-name">${display.fullLabel}</span>
+      </article>
+    `;
+  });
+  container.innerHTML = rows.join("");
+}
+
 function updateMainChartButtons() {
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
@@ -687,22 +729,25 @@ function renderMainChart() {
   ensureMobilePartyIconPlugin();
   const canvas = document.getElementById("main-chart");
   const noteEl = document.getElementById("main-chart-note");
-  if (!canvas || !mainChartData) return;
+  if (!canvas || !mainChartData) {
+    renderTop3Panel();
+    return;
+  }
   const ctx = canvas.getContext("2d");
   if (mainChartInstance) mainChartInstance.destroy();
 
-  const source = mainChartData[mainChartMode] || mainChartData.actual;
+  const source = getMainChartSourceForCurrentMode();
+  if (!source) return;
   const displayItems = source.topCandidates.map(([name]) => getPartyDisplayMeta(name));
   const labels = displayItems.map(item => isMobileViewport() ? item.shortLabel : item.fullLabel);
   const fullLabels = displayItems.map(item => item.fullLabel);
   const values = source.topCandidates.map(([, votes]) => votes);
   const pcts = values.map(v => source.totalValidVotes > 0 ? (v / source.totalValidVotes * 100) : 0);
   const colors = fullLabels.map((name, i) => partyColor(name, i));
-  const fallbackMetaByMode = {
-    rural: MAIN_CHART_MODE_META.ruralFallback,
-  };
-  const modeMeta = source.isFallback
-    ? (fallbackMetaByMode[mainChartMode] || MAIN_CHART_MODE_META[mainChartMode] || MAIN_CHART_MODE_META.actual)
+  const selectedModeSource = mainChartData[mainChartMode] || mainChartData.actual;
+  const hasRuralFallback = mainChartMode === "rural" && Boolean(selectedModeSource?.isFallback);
+  const modeMeta = hasRuralFallback
+    ? MAIN_CHART_MODE_META.ruralFallback
     : (MAIN_CHART_MODE_META[mainChartMode] || MAIN_CHART_MODE_META.actual);
   if (noteEl) {
     noteEl.textContent = modeMeta.note;
@@ -765,6 +810,7 @@ function renderMainChart() {
       },
     },
   });
+  renderTop3Panel();
 }
 
 function renderFfeDuelChart() {
@@ -1265,9 +1311,30 @@ function updateStatusBar(latestPayload, snapshots) {
     : "—";
 
   const actasEl = document.getElementById("actas-pct");
+  const actasJeePctEl = document.getElementById("actas-jee-pct");
+  const jeeActasEl = document.getElementById("hud-jee-actas");
+  const pendingReviewEl = document.getElementById("hud-pending-review");
   const extractedEl = document.getElementById("extracted-at");
-  actasEl.textContent = actasPct !== "—" ? `${actasPct}%` : "—";
-  extractedEl.textContent = extractedAt;
+  if (actasEl) actasEl.textContent = actasPct !== "—" ? `${actasPct}%` : "—";
+  if (extractedEl) extractedEl.textContent = extractedAt;
+
+  const impRes = meta.impugnadas_resumen && typeof meta.impugnadas_resumen === "object"
+    ? meta.impugnadas_resumen
+    : null;
+  const totalVotes = Object.values(activeLatestSnapshot?.totals || {}).reduce((acc, value) => acc + (Number(value) || 0), 0);
+  const votosImpugnados = Number(impRes?.votos_impugnados_total) || 0;
+  const votosPendientes = Number(impRes?.votos_pendientes_contar_total) || 0;
+  const jeePct = totalVotes > 0 ? (votosImpugnados / totalVotes) * 100 : 0;
+  if (actasJeePctEl) {
+    actasJeePctEl.hidden = false;
+    actasJeePctEl.textContent = `(${jeePct.toFixed(3)}% en JEE)`;
+  }
+  if (jeeActasEl) {
+    jeeActasEl.textContent = formatInt(votosImpugnados);
+  }
+  if (pendingReviewEl) {
+    pendingReviewEl.textContent = formatInt(votosPendientes);
+  }
 
   // Update "¿Qué es esto?" panel dynamic percentage
   const qeePct = document.getElementById("qee-actas-pct");
@@ -1318,6 +1385,32 @@ function setRefreshLinkState(isLoading) {
   refreshLink.disabled = isLoading;
   refreshLink.setAttribute("aria-busy", String(isLoading));
   refreshLink.textContent = isLoading ? "Actualizando..." : "Actualizar";
+}
+
+function setCozyMode(enabled) {
+  document.body.classList.toggle("cozy-mode", Boolean(enabled));
+  const cozyToggle = document.getElementById("cozy-toggle");
+  if (cozyToggle) {
+    cozyToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+  }
+  try {
+    localStorage.setItem(COZY_STORAGE_KEY, enabled ? "1" : "0");
+  } catch (_) {}
+}
+
+function initCozyModeToggle() {
+  const cozyToggle = document.getElementById("cozy-toggle");
+  if (!cozyToggle) return;
+  let enabled = false;
+  try {
+    enabled = localStorage.getItem(COZY_STORAGE_KEY) === "1";
+  } catch (_) {
+    enabled = false;
+  }
+  setCozyMode(enabled);
+  cozyToggle.addEventListener("click", () => {
+    setCozyMode(!document.body.classList.contains("cozy-mode"));
+  });
 }
 
 function pickFallbackForAttempt() {
@@ -1404,6 +1497,7 @@ function parseTotalsMap(rawTotals) {
 function buildSnapshotsFromApi(summaryPayload, latestPayload) {
   const summaryRows = Array.isArray(summaryPayload?.snapshots) ? summaryPayload.snapshots : [];
   const snapshots = [];
+  const impugnadasByTs = new Map();
   for (const row of summaryRows) {
     const extractedAtUtc = row?.extracted_at_utc;
     const dt = new Date(extractedAtUtc);
@@ -1414,6 +1508,8 @@ function buildSnapshotsFromApi(summaryPayload, latestPayload) {
     };
     if (row?.impugnadas_resumen && typeof row.impugnadas_resumen === "object") {
       meta.impugnadas_resumen = row.impugnadas_resumen;
+      const ts = new Date(extractedAtUtc).getTime();
+      if (Number.isFinite(ts)) impugnadasByTs.set(ts, row.impugnadas_resumen);
     }
     snapshots.push({
       dt,
@@ -1427,17 +1523,35 @@ function buildSnapshotsFromApi(summaryPayload, latestPayload) {
 
   if (latestPayload?.metadata?.extracted_at_utc && Array.isArray(latestPayload?.regions)) {
     const latestTs = snapshotTimestampFromPayload(latestPayload);
+    const latestMeta = {
+      ...(latestPayload.metadata || {}),
+    };
+    const impFromSummary = impugnadasByTs.get(latestTs);
+    if (impFromSummary && !latestMeta.impugnadas_resumen) {
+      latestMeta.impugnadas_resumen = impFromSummary;
+    }
     const fullLatestEntry = {
       dt: new Date(latestPayload.metadata.extracted_at_utc),
       totals: aggregateSnapshot(latestPayload),
-      payload: latestPayload,
+      payload: {
+        ...latestPayload,
+        metadata: latestMeta,
+      },
     };
     const index = snapshots.findIndex(s => snapshotTimestampFromEntry(s) === latestTs);
     if (index >= 0) {
+      const existingImpugnadas = snapshots[index]?.payload?.metadata?.impugnadas_resumen;
       snapshots[index] = {
         ...snapshots[index],
         totals: aggregateSnapshot(latestPayload),
-        payload: latestPayload,
+        payload: {
+          ...latestPayload,
+          metadata: {
+            ...(latestPayload.metadata || {}),
+            ...(existingImpugnadas && !latestMeta.impugnadas_resumen ? { impugnadas_resumen: existingImpugnadas } : {}),
+            ...(latestMeta.impugnadas_resumen ? { impugnadas_resumen: latestMeta.impugnadas_resumen } : {}),
+          },
+        },
       };
     } else if (!isNaN(fullLatestEntry.dt.getTime())) {
       snapshots.push(fullLatestEntry);
@@ -1593,15 +1707,6 @@ async function loadAndRender() {
     renderMainChart();
     renderFfeDuelChart();
     renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate, "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)");
-    renderPotentialVotesPanel(
-      topRegionalLeadersStats.topRegions,
-      "potential-sanchez-panel",
-      "potential-sanchez-title",
-      "potential-sanchez-body",
-      CANDIDATE_OPTIONS[selectedRegionalCandidate]?.label || selectedRegionalCandidate,
-      true,
-      "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)"
-    );
     renderSimpleRegionalLeadersPanel(lopezTopRegionalLeadersStats, LOPEZ_ALIAGA_PARTY, {
       sectionId: "pro-lopez-section",
       titleId: "candidate-top-lopez-title",
@@ -1609,15 +1714,6 @@ async function loadAndRender() {
       bodyId: "pro-lopez-table-body",
       overrideTitle: "Interpolación de votos de Rafael López Aliaga (Renovación Popular)",
     });
-    renderPotentialVotesPanel(
-      lopezTopRegionalLeadersStats.topRegions,
-      "potential-lopez-panel",
-      "potential-lopez-title",
-      "potential-lopez-body",
-      CANDIDATE_OPTIONS[LOPEZ_ALIAGA_PARTY]?.label || "López Aliaga",
-      true,
-      "Interpolación de votos de Rafael López Aliaga (Renovación Popular)"
-    );
 
     if (trendSnapshots.length >= 2) {
       const trendContainer = document.querySelector("#trend-chart-container");
@@ -1654,6 +1750,7 @@ async function loadAndRender() {
 // ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("header-compact");
+  initCozyModeToggle();
 
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");

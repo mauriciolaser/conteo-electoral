@@ -52,20 +52,39 @@
     <img class="site-banner" src="./banner.png" alt="Banner de Conteo Electoral Perú 2026" />
     <h1>Conteo Electoral Perú 2026</h1>
     <p>Conteo electoral Perú 2026 y proyecciones de resultados.</p>
+    <div class="header-actions">
+      <button
+        id="cozy-toggle"
+        class="cozy-toggle"
+        type="button"
+        aria-pressed="false"
+        aria-label="Activar modo cozy"
+      >
+        <span class="cozy-toggle-icon" aria-hidden="true">🦄</span>
+        <span class="cozy-toggle-text">Modo Cozy</span>
+      </button>
+    </div>
   </header>
 
   <main>
     <section id="status-bar">
-      <article class="hud-item">
-        <p class="hud-label">Actas procesadas</p>
-        <p id="actas-pct" class="hud-value">—</p>
-        <button id="refresh-link" class="hud-refresh-link" type="button" aria-label="Actualizar datos electorales">
-          Actualizar
-        </button>
+      <article class="hud-item hud-item--advance">
+        <p class="hud-label">Avance</p>
+        <div class="hud-advance-row">
+          <p id="actas-pct" class="hud-value hud-value--advance">—</p>
+          <span id="actas-jee-pct" class="hud-jee-inline" hidden>(0.000% en JEE)</span>
+        </div>
       </article>
-      <article class="hud-item">
-        <p class="hud-label">Data obtenida</p>
-        <p id="extracted-at" class="hud-value">—</p>
+      <article class="hud-item hud-item--pending">
+        <p class="hud-label">Actas pendientes</p>
+        <p class="hud-pending-line">
+          <span class="hud-pending-k">En JEE</span>
+          <span id="hud-jee-actas" class="hud-pending-v">—</span>
+        </p>
+        <p class="hud-pending-line">
+          <span class="hud-pending-k">Por revisar</span>
+          <span id="hud-pending-review" class="hud-pending-v">—</span>
+        </p>
       </article>
       <article class="hud-item hud-item--info">
         <button id="que-es-esto-btn" class="que-es-esto-btn" type="button" aria-expanded="false" aria-controls="que-es-esto-panel">
@@ -74,6 +93,13 @@
         </button>
       </article>
     </section>
+    <div class="hud-meta-row">
+      <span class="hud-meta-label">Data obtenida</span>
+      <span id="extracted-at" class="hud-meta-value">—</span>
+      <button id="refresh-link" class="hud-refresh-link" type="button" aria-label="Actualizar datos electorales">
+        Actualizar
+      </button>
+    </div>
 
     <div id="que-es-esto-panel" class="que-es-esto-panel" hidden>
       <div class="qee-inner">
@@ -93,6 +119,14 @@
         </div>
       </div>
     </div>
+
+    <section class="chart-section top3-section" id="top3-section">
+      <h2>Top 3 Nacional</h2>
+      <p class="chart-note">Liderazgo actual de votos válidos (Top 3)</p>
+      <div class="top3-cards" id="top3-cards" aria-live="polite">
+        <p class="top3-empty">Cargando...</p>
+      </div>
+    </section>
 
     <section class="chart-section">
       <h2>Top 6 Nacional</h2>
@@ -245,7 +279,7 @@
       </div>
     </section>
 
-    <section class="potential-votes-panel" id="potential-sanchez-panel">
+    <section class="potential-votes-panel hidden" id="potential-sanchez-panel">
       <h2 id="potential-sanchez-title">Interpolación de votos de Roberto Sánchez (Juntos por el Perú)</h2>
       <div class="table-wrap">
         <table class="regional-top-table">
