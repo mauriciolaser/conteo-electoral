@@ -438,13 +438,22 @@
     );
   }
 
+  function isForeignRegion(region) {
+    const name = normalizeName(region && region.region);
+    return name.includes("EXTRANJERO");
+  }
+
   function buildHeadToHeadBundle(latestPayload, options = {}) {
     const regions = latestPayload.regions || [];
     const projectionType = options.projectionType === "rural" ? "rural" : "simple";
     const impugnacionRuralPct = normalizeImpugnacionPct(options.impugnacionRuralPct, 100);
     const impugnacionLimaPct = normalizeImpugnacionPct(options.impugnacionLimaPct, 100);
+    const impugnacionExtranjeroPct = normalizeImpugnacionPct(options.impugnacionExtranjeroPct, 100);
+    const impugnacionRestoPct = normalizeImpugnacionPct(options.impugnacionRestoPct, 100);
     const impugnacionRuralFactor = impugnacionRuralPct / 100;
     const impugnacionLimaFactor = impugnacionLimaPct / 100;
+    const impugnacionExtranjeroFactor = impugnacionExtranjeroPct / 100;
+    const impugnacionRestoFactor = impugnacionRestoPct / 100;
     const actual = currentTwoHorseVotes(latestPayload);
     const nationalStats = buildNationalProjectionStats(latestPayload);
     const ruralStats = buildRuralProjectionStats(latestPayload);
@@ -464,7 +473,7 @@
       const map = ruralByRegion[region.region || ""] || {};
       const sRural = votesForPartyInMap(map, SANCHEZ_PARTY);
       const rRural = votesForPartyInMap(map, RLA_PARTY);
-      const applies = imp.sanchezLidera && !isLimaDepartmentRegion(region);
+      const applies = imp.sanchezLidera && !isLimaDepartmentRegion(region) && !isForeignRegion(region);
       if (!applies) {
         impRuralSanchez += sRural;
         impRuralRla += rRural;
@@ -500,6 +509,7 @@
         String(r.ubigeo || "") === "140000" ||
         normalizeName(r.region || "") === "LIMA"
     );
+    const extranjeroRegion = regions.find(r => isForeignRegion(r));
     let impLimaS = simpleNat.a;
     let impLimaR = simpleNat.b;
     if (limaRegion) {
@@ -521,6 +531,7 @@
         impLimaR = Math.max(0, Math.round(simpleNat.b - dR));
       }
     }
+
     const impugnacionLima = {
       sanchez: Math.max(0, impLimaS),
       rla: Math.max(0, impLimaR),
@@ -548,10 +559,13 @@
     let combinedS = Number(baseNat.a) || 0;
     let combinedR = Number(baseNat.b) || 0;
     let totalDiscount = 0;
+    const isRuralGroupRegion = region =>
+      regionImpugnadas(region).sanchezLidera &&
+      !isLimaDepartmentRegion(region) &&
+      !isForeignRegion(region);
 
     for (const region of regions) {
-      const imp = regionImpugnadas(region);
-      if (!imp.sanchezLidera || isLimaDepartmentRegion(region)) continue;
+      if (!isRuralGroupRegion(region)) continue;
       const map = baseByRegion[region.region || ""] || {};
       const s = votesForPartyInMap(map, SANCHEZ_PARTY);
       const r = votesForPartyInMap(map, RLA_PARTY);
@@ -574,6 +588,41 @@
       const pair = s + r;
       if (pair > 0) {
         const disputa = regionVotosEnDisputa(limaRegion) * impugnacionLimaFactor;
+        if (disputa > 0) {
+          const descuento = Math.min(disputa, pair);
+          const dS = (descuento * s) / pair;
+          const dR = (descuento * r) / pair;
+          combinedS = Math.max(0, combinedS - dS);
+          combinedR = Math.max(0, combinedR - dR);
+          totalDiscount += descuento;
+        }
+      }
+    }
+
+    for (const region of regions) {
+      if (isLimaDepartmentRegion(region) || isForeignRegion(region) || isRuralGroupRegion(region)) continue;
+      const map = baseByRegion[region.region || ""] || {};
+      const s = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const r = votesForPartyInMap(map, RLA_PARTY);
+      const pair = s + r;
+      if (pair <= 0) continue;
+      const disputa = regionVotosEnDisputa(region) * impugnacionRestoFactor;
+      if (disputa <= 0) continue;
+      const descuento = Math.min(disputa, pair);
+      const dS = (descuento * s) / pair;
+      const dR = (descuento * r) / pair;
+      combinedS = Math.max(0, combinedS - dS);
+      combinedR = Math.max(0, combinedR - dR);
+      totalDiscount += descuento;
+    }
+
+    if (extranjeroRegion) {
+      const map = baseByRegion[extranjeroRegion.region || ""] || {};
+      const s = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const r = votesForPartyInMap(map, RLA_PARTY);
+      const pair = s + r;
+      if (pair > 0) {
+        const disputa = regionVotosEnDisputa(extranjeroRegion) * impugnacionExtranjeroFactor;
         if (disputa > 0) {
           const descuento = Math.min(disputa, pair);
           const dS = (descuento * s) / pair;
@@ -645,6 +694,8 @@
         rlaPct: (combinedRInt / combinedTotalValid) * 100,
         impugnacionRuralPct,
         impugnacionLimaPct,
+        impugnacionExtranjeroPct,
+        impugnacionRestoPct,
         isFallback: projectionType === "rural" ? Boolean(ruralStats.isFallback) : false,
       },
     };

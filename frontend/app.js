@@ -302,6 +302,8 @@ let ffeDuelChartData = null;
 const ffeImpugnacionPct = {
   rural: 0,
   lima: 0,
+  extranjero: 0,
+  resto: 0,
 };
 let activeLatestSnapshot = null; // snapshot visible más reciente aceptado por la UI
 let activeLatestSnapshotTs = Number.NEGATIVE_INFINITY;
@@ -326,11 +328,11 @@ const MAIN_CHART_MODE_META = {
 
 const FFE_PROJECTION_META = {
   simple: {
-    note: "Base SIMPLE: proyección lineal al 100% de actas por región. Luego se aplican impugnación rural y Lima como eliminación de votantes en disputa sobre esta base.",
+    note: "Base SIMPLE: proyección lineal al 100% de actas por región. Luego se aplican impugnación rural, Lima, Extranjero y Resto como eliminación de votantes en disputa sobre esta base.",
     tooltipSuffix: "votos proyectados (simple + impugnaciones)",
   },
   rural: {
-    note: "Base VOTO RURAL: proyección con sesgo rural. Luego se aplican impugnación rural y Lima como eliminación de votantes en disputa sobre esta base.",
+    note: "Base VOTO RURAL: proyección con sesgo rural. Luego se aplican impugnación rural, Lima, Extranjero y Resto como eliminación de votantes en disputa sobre esta base.",
     tooltipSuffix: "votos proyectados (rural + impugnaciones)",
   },
 };
@@ -367,6 +369,8 @@ function rebuildFfeDuelChartDataFromActiveSnapshot() {
     projectionType: ffeProjectionType,
     impugnacionRuralPct: ffeImpugnacionPct.rural,
     impugnacionLimaPct: ffeImpugnacionPct.lima,
+    impugnacionExtranjeroPct: ffeImpugnacionPct.extranjero,
+    impugnacionRestoPct: ffeImpugnacionPct.resto,
   });
 }
 
@@ -380,11 +384,19 @@ function updateFfeProjectionTypeButtons() {
 function updateFfeImpugnacionControls() {
   const ruralInput = document.getElementById("ffe-imp-rural-input");
   const limaInput = document.getElementById("ffe-imp-lima-input");
+  const extranjeroInput = document.getElementById("ffe-imp-extranjero-input");
+  const restoInput = document.getElementById("ffe-imp-resto-input");
   if (ruralInput && document.activeElement !== ruralInput) {
     ruralInput.value = String(clampImpugnacionPct(ffeImpugnacionPct.rural));
   }
   if (limaInput && document.activeElement !== limaInput) {
     limaInput.value = String(clampImpugnacionPct(ffeImpugnacionPct.lima));
+  }
+  if (extranjeroInput && document.activeElement !== extranjeroInput) {
+    extranjeroInput.value = String(clampImpugnacionPct(ffeImpugnacionPct.extranjero));
+  }
+  if (restoInput && document.activeElement !== restoInput) {
+    restoInput.value = String(clampImpugnacionPct(ffeImpugnacionPct.resto));
   }
 }
 
@@ -777,7 +789,9 @@ function renderFfeDuelChart() {
   if (noteEl) {
     const impR = clampImpugnacionPct(source.impugnacionRuralPct);
     const impL = clampImpugnacionPct(source.impugnacionLimaPct);
-    noteEl.textContent = `${modeMeta.note} Impugnación Rural: ${impR}% · Impugnación Lima: ${impL}%.`;
+    const impE = clampImpugnacionPct(source.impugnacionExtranjeroPct);
+    const impO = clampImpugnacionPct(source.impugnacionRestoPct);
+    noteEl.textContent = `${modeMeta.note} Impugnación Rural: ${impR}% · Impugnación Lima: ${impL}% · Impugnación Extranjero: ${impE}% · Impugnación Resto: ${impO}%.`;
   }
 
   const rlaVotes = Number(source.rla) || 0;
@@ -1708,6 +1722,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
   bindImpInput("ffe-imp-rural-input", "rural");
   bindImpInput("ffe-imp-lima-input", "lima");
+  bindImpInput("ffe-imp-extranjero-input", "extranjero");
+  bindImpInput("ffe-imp-resto-input", "resto");
 
   // ¿Qué es esto? toggle
   const qeeBtn = document.getElementById("que-es-esto-btn");

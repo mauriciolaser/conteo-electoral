@@ -194,7 +194,7 @@
       </div>
 
       <h2 class="ffe-duel-heading">Proyección e Impugnaciones</h2>
-      <p class="chart-note" id="ffe-duel-chart-note">Solo Rafael López Aliaga (Renovación Popular) y Roberto Sánchez (Juntos por el Perú). El resultado combina tipo de proyección + impugnación rural + impugnación Lima.</p>
+      <p class="chart-note" id="ffe-duel-chart-note">Solo Rafael López Aliaga (Renovación Popular) y Roberto Sánchez (Juntos por el Perú). El resultado combina tipo de proyección + impugnación rural + impugnación Lima + impugnación Extranjero + impugnación Resto.</p>
       <div class="mode-switch" id="ffe-projection-type-switch" aria-label="Tipo de proyección frente a frente">
         <button type="button" id="ffe-proj-simple" class="mode-btn active" data-tooltip="Base SIMPLE: proyección lineal al 100% de actas por región.">SIMPLE</button>
         <button type="button" id="ffe-proj-rural" class="mode-btn" data-tooltip="Base VOTO RURAL: proyección con sesgo rural en regiones elegibles.">VOTO RURAL</button>
@@ -216,6 +216,26 @@
         </div>
         <div class="ffe-imp-entry">
           <input id="ffe-imp-lima-input" class="ffe-imp-input" type="text" inputmode="numeric" pattern="[0-9]*" value="0" />
+          <span class="ffe-imp-unit">%</span>
+        </div>
+      </div>
+      <div id="ffe-imp-extranjero-controls" class="ffe-imp-controls" aria-live="polite">
+        <div class="ffe-imp-meta">
+          <label class="ffe-imp-label" for="ffe-imp-extranjero-input">Impugnación Extranjero (%)</label>
+          <span class="ffe-imp-subtitle">Elimina votantes en disputa de Peruanos en el Extranjero, según la base elegida.</span>
+        </div>
+        <div class="ffe-imp-entry">
+          <input id="ffe-imp-extranjero-input" class="ffe-imp-input" type="text" inputmode="numeric" pattern="[0-9]*" value="0" />
+          <span class="ffe-imp-unit">%</span>
+        </div>
+      </div>
+      <div id="ffe-imp-resto-controls" class="ffe-imp-controls" aria-live="polite">
+        <div class="ffe-imp-meta">
+          <label class="ffe-imp-label" for="ffe-imp-resto-input">Impugnación Resto (%)</label>
+          <span class="ffe-imp-subtitle">Elimina votantes en disputa de regiones que no son Lima, Extranjero ni bloque rural.</span>
+        </div>
+        <div class="ffe-imp-entry">
+          <input id="ffe-imp-resto-input" class="ffe-imp-input" type="text" inputmode="numeric" pattern="[0-9]*" value="0" />
           <span class="ffe-imp-unit">%</span>
         </div>
       </div>
@@ -339,10 +359,12 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <script src="projection-modes.js?v=20260417f"></script>
-  <script src="app.js?v=20260417f"></script>
+  <script src="projection-modes.js?v=20260418b"></script>
+  <script src="app.js?v=20260418b"></script>
 </body>
 </html>
+
+
 
 
 
