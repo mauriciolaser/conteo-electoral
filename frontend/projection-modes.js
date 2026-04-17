@@ -401,6 +401,15 @@
     };
   }
 
+  function isLimaDepartmentRegion(region) {
+    const imp = regionImpugnadas(region);
+    return (
+      imp.esLima ||
+      String(region.ubigeo || "") === "140000" ||
+      normalizeName(region.region || "") === "LIMA"
+    );
+  }
+
   function buildHeadToHeadBundle(latestPayload) {
     const regions = latestPayload.regions || [];
     const actual = currentTwoHorseVotes(latestPayload);
@@ -412,18 +421,32 @@
     const simpleByRegion = buildSimpleProjectionByRegion(latestPayload);
     const simpleNat = sumTwoHorseFromRegionalMaps(simpleByRegion, regions, SANCHEZ_PARTY, RLA_PARTY);
 
+    const ruralByRegion = buildRuralProjectionByRegion(latestPayload);
+    const ruralNat = sumTwoHorseFromRegionalMaps(ruralByRegion, regions, SANCHEZ_PARTY, RLA_PARTY);
+
     let subImpRuralSanchez = 0;
+    let subImpRuralRla = 0;
     for (const region of regions) {
       const imp = regionImpugnadas(region);
       if (!imp.sanchezLidera || imp.votosImpugnados <= 0) continue;
+      if (isLimaDepartmentRegion(region)) continue;
       const map = simpleByRegion[region.region || ""] || {};
-      const sReg = votesForPartyInMap(map, SANCHEZ_PARTY);
-      subImpRuralSanchez += Math.min(imp.votosImpugnados, Math.round(sReg));
+      const sR = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const rR = votesForPartyInMap(map, RLA_PARTY);
+      const pair = sR + rR;
+      const vi = imp.votosImpugnados;
+      if (pair > 0) {
+        subImpRuralSanchez += (vi * sR) / pair;
+        subImpRuralRla += (vi * rR) / pair;
+      } else if (vi > 0) {
+        subImpRuralSanchez += vi / 2;
+        subImpRuralRla += vi / 2;
+      }
     }
     const impugnacionRural = {
-      sanchez: Math.max(0, Math.round(simpleNat.a - subImpRuralSanchez)),
-      rla: Math.round(simpleNat.b),
-      isFallback: false,
+      sanchez: Math.max(0, Math.round(ruralNat.a - subImpRuralSanchez)),
+      rla: Math.max(0, Math.round(ruralNat.b - subImpRuralRla)),
+      isFallback: ruralStats.isFallback,
     };
 
     const limaRegion = regions.find(

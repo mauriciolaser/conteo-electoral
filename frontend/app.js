@@ -346,11 +346,11 @@ const FFE_DUEL_MODE_META = {
     tooltipSuffix: "votos proyectados",
   },
   impugnacionRural: {
-    note: "Proyección simple (nacional + extranjero) sin contar los votos impugnados que ONPE reporta en departamentos donde Sánchez va delante de López Aliaga: se descuentan del total proyectado de Sánchez, acotado al voto simple de Sánchez en cada una de esas regiones.",
+    note: "Proyección voto rural (nacional + extranjero) sin los impugnados ONPE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga: en cada una de esas regiones el cupo se descuenta de ambos en la proporción de la proyección simple en esa región (el rótulo «rural» solo nombra ese conjunto de zonas). Lima se trata aparte en «Impugnación Lima».",
     tooltipSuffix: "votos (simulación impugnación rural)",
   },
   impugnacionLima: {
-    note: "Proyección simple (nacional + extranjero) sin contar los votos impugnados que ONPE reporta en el departamento Lima: ese cupo se reparte entre ambos en la misma proporción que su proyección simple solo en Lima.",
+    note: "Proyección simple (nacional + extranjero) sin los impugnados ONPE solo del departamento Lima: ese total se descuenta de Sánchez y de López Aliaga a nivel país en la proporción de su proyección simple dentro de Lima.",
     tooltipSuffix: "votos (simulación impugnación Lima)",
   },
 };
@@ -807,7 +807,9 @@ function renderFfeDuelChart() {
   const dataKey = keyByMode[ffeDuelChartMode] || "actual";
   const source = ffeDuelChartData[dataKey] || ffeDuelChartData.actual;
 
-  const useRuralFallback = ffeDuelChartMode === "rural" && Boolean(source.isFallback);
+  const useRuralFallback =
+    (ffeDuelChartMode === "rural" || ffeDuelChartMode === "impugnacionRural") &&
+    Boolean(source.isFallback);
 
   const modeMeta = useRuralFallback
     ? FFE_DUEL_MODE_META.ruralFallback
@@ -844,14 +846,14 @@ function renderFfeDuelChart() {
   const voteDiff = rows.length >= 2 ? Math.abs(rows[0].votes - rows[1].votes) : 0;
   const winnerRow = !isTie ? rows.reduce((best, r) => (r.votes > best.votes ? r : best), rows[0]) : null;
 
-  // Chart.js horizontal (indexAxis y): primera categoría abajo, última arriba.
-  // Orden ascendente por votos → el que va ganando queda arriba.
+  // Chart.js horizontal (indexAxis y): la primera categoría del array se pinta arriba.
+  // Orden descendente por votos → el ganador va primero y queda arriba.
   rows.sort((a, b) => {
-    if (a.votes !== b.votes) return a.votes - b.votes;
+    if (b.votes !== a.votes) return b.votes - a.votes;
     return String(a.key).localeCompare(String(b.key));
   });
 
-  const winnerIndex = !isTie ? rows.length - 1 : -1;
+  const winnerIndex = !isTie ? 0 : -1;
   const labels = rows.map(r => r.label);
   const values = rows.map(r => r.pct);
   const votes = rows.map(r => r.votes);
