@@ -352,6 +352,100 @@ main {
   display: none;
 }
 
+.ffe-imp-controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem 0.7rem;
+  margin: -0.15rem 0 0.7rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 12px;
+  background: linear-gradient(160deg, rgba(28, 36, 64, 0.72), rgba(18, 24, 44, 0.88));
+  border: 1px solid rgba(119, 139, 197, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.ffe-imp-meta {
+  min-width: 0;
+}
+
+.ffe-imp-subtitle {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.71rem;
+  color: #9faac8;
+  line-height: 1.35;
+}
+
+.ffe-imp-label {
+  font-size: 0.75rem;
+  color: #e6ebff;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.ffe-imp-entry {
+  display: inline-flex;
+  align-items: center;
+  justify-self: end;
+  gap: 0.4rem;
+}
+
+.ffe-imp-input {
+  width: 82px;
+  height: 38px;
+  border: 1px solid rgba(143, 162, 214, 0.4);
+  border-radius: 10px;
+  background: rgba(11, 18, 36, 0.9);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: right;
+  padding: 0.35rem 0.55rem;
+  outline: none;
+}
+
+.ffe-imp-input:focus {
+  border-color: #5d88ff;
+  box-shadow: 0 0 0 2px rgba(93, 136, 255, 0.25);
+}
+
+.ffe-imp-unit {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: #d7ddf3;
+}
+
+.ffe-imp-presets {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.ffe-imp-preset {
+  border: 1px solid rgba(150, 168, 216, 0.32);
+  background: rgba(255, 255, 255, 0.03);
+  color: #c7d1ed;
+  border-radius: 999px;
+  padding: 0.28rem 0.52rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.ffe-imp-preset:hover {
+  background: rgba(95, 134, 230, 0.2);
+  border-color: rgba(95, 134, 230, 0.55);
+  color: #f2f5ff;
+}
+
+.ffe-imp-preset.active {
+  background: rgba(61, 117, 249, 0.28);
+  border-color: rgba(104, 153, 255, 0.8);
+  color: #ffffff;
+}
+
 .regional-top-section h2 {
   margin-bottom: 0;
 }
@@ -1012,6 +1106,33 @@ canvas {
     text-overflow: ellipsis;
   }
 
+  .ffe-imp-controls {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+    padding: 0.52rem;
+  }
+
+  .ffe-imp-entry {
+    justify-self: start;
+  }
+
+  .ffe-imp-input {
+    width: 88px;
+    height: 40px;
+    font-size: 0.95rem;
+  }
+
+  .ffe-imp-presets {
+    gap: 0.3rem;
+  }
+
+  .ffe-imp-preset {
+    min-height: 32px;
+    min-width: 52px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+  }
+
   /* Portrait: stack mode buttons vertically so labels are fully readable */
   @media (orientation: portrait) {
     .mode-btn {
@@ -1021,6 +1142,12 @@ canvas {
       white-space: normal;
       font-size: 0.7rem;
       padding: 0.45rem 0.6rem;
+    }
+
+    #ffe-duel-mode-switch .mode-btn {
+      flex: 1 1 calc(50% - 0.35rem);
+      text-align: center;
+      min-height: 38px;
     }
   }
 

@@ -422,6 +422,13 @@
     return imp.votosImpugnados;
   }
 
+  function normalizeImpugnacionPct(value, fallback = 100) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return fallback;
+    const rounded = Math.round(n);
+    return Math.max(0, Math.min(100, rounded));
+  }
+
   function isLimaDepartmentRegion(region) {
     const imp = regionImpugnadas(region);
     return (
@@ -431,8 +438,12 @@
     );
   }
 
-  function buildHeadToHeadBundle(latestPayload) {
+  function buildHeadToHeadBundle(latestPayload, options = {}) {
     const regions = latestPayload.regions || [];
+    const impugnacionRuralPct = normalizeImpugnacionPct(options.impugnacionRuralPct, 100);
+    const impugnacionLimaPct = normalizeImpugnacionPct(options.impugnacionLimaPct, 100);
+    const impugnacionRuralFactor = impugnacionRuralPct / 100;
+    const impugnacionLimaFactor = impugnacionLimaPct / 100;
     const actual = currentTwoHorseVotes(latestPayload);
     const nationalStats = buildNationalProjectionStats(latestPayload);
     const ruralStats = buildRuralProjectionStats(latestPayload);
@@ -458,7 +469,7 @@
         impRuralRla += rSimple;
         continue;
       }
-      const disputa = regionVotosEnDisputa(region);
+      const disputa = regionVotosEnDisputa(region) * impugnacionRuralFactor;
       if (disputa <= 0) {
         impRuralSanchez += sSimple;
         impRuralRla += rSimple;
@@ -495,7 +506,7 @@
     let impLimaS = simpleNat.a;
     let impLimaR = simpleNat.b;
     if (limaRegion) {
-      const vi = regionVotosEnDisputa(limaRegion);
+      const vi = regionVotosEnDisputa(limaRegion) * impugnacionLimaFactor;
       const limaName = limaRegion.region || "";
       const map = simpleByRegion[limaName] || {};
       const sL = votesForPartyInMap(map, SANCHEZ_PARTY);
@@ -565,6 +576,7 @@
         totalDuo: duoImpR,
         sanchezPct: (impugnacionRural.sanchez / totalValidImpR) * 100,
         rlaPct: (impugnacionRural.rla / totalValidImpR) * 100,
+        appliedPct: impugnacionRuralPct,
         isFallback: impugnacionRural.isFallback,
       },
       impugnacionLima: {
@@ -574,6 +586,7 @@
         totalDuo: duoImpL,
         sanchezPct: (impugnacionLima.sanchez / totalValidImpL) * 100,
         rlaPct: (impugnacionLima.rla / totalValidImpL) * 100,
+        appliedPct: impugnacionLimaPct,
         isFallback: impugnacionLima.isFallback,
       },
     };

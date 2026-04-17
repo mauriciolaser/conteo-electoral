@@ -193,7 +193,7 @@
         </div>
       </div>
 
-      <h2 class="ffe-duel-heading">Proyección Frente a Frente (Top 2)</h2>
+      <h2 class="ffe-duel-heading">Proyección e Impugnaciones</h2>
       <p class="chart-note" id="ffe-duel-chart-note">Solo Rafael López Aliaga (Renovación Popular) y Roberto Sánchez (Juntos por el Perú). Porcentaje sobre el total nacional de votos válidos de cada modo.</p>
       <div class="mode-switch" id="ffe-duel-mode-switch" aria-label="Modo de proyección frente a frente">
         <button type="button" id="mode-ffe-actual" class="mode-btn" data-tooltip="Votos válidos ya contabilizados para ambos candidatos. En barras: porcentaje del total nacional válido del modo.">ACTUAL</button>
@@ -201,6 +201,23 @@
         <button type="button" id="mode-ffe-rural" class="mode-btn" data-tooltip="Sesgo rural en regiones donde lidera Sánchez (igual que proyección voto rural). En barras: porcentaje del total nacional válido del modo.">VOTO RURAL</button>
         <button type="button" id="mode-ffe-imp-rural" class="mode-btn" data-tooltip="Proyección simple nacional; en departamentos fuera de Lima donde Sánchez va primero, solo se descuenta del tramo en disputa JEE/JNE y únicamente sobre la parte proyectada (no sobre votos ya contados). «Rural» solo nombra ese conjunto de zonas. En barras: porcentaje del total nacional válido del modo.">IMPUGN. RURAL</button>
         <button type="button" id="mode-ffe-imp-lima" class="mode-btn" data-tooltip="Proyección simple nacional; en Lima solo se descuenta del tramo en disputa JEE/JNE y únicamente sobre la parte proyectada (no sobre votos ya contados). En barras: porcentaje del total nacional válido del modo.">IMPUGN. LIMA</button>
+      </div>
+      <div id="ffe-imp-controls" class="ffe-imp-controls hidden" aria-live="polite">
+        <div class="ffe-imp-meta">
+          <label id="ffe-imp-percent-label" class="ffe-imp-label" for="ffe-imp-percent-input">Impugnación aplicada (%)</label>
+          <span id="ffe-imp-subtitle" class="ffe-imp-subtitle">Ajusta qué porcentaje del bloque en disputa se descuenta.</span>
+        </div>
+        <div class="ffe-imp-entry">
+          <input id="ffe-imp-percent-input" class="ffe-imp-input" type="text" inputmode="numeric" pattern="[0-9]*" value="100" />
+          <span class="ffe-imp-unit">%</span>
+        </div>
+        <div class="ffe-imp-presets" id="ffe-imp-presets" aria-label="Presets de impugnación">
+          <button type="button" class="ffe-imp-preset" data-pct="0">0%</button>
+          <button type="button" class="ffe-imp-preset" data-pct="25">25%</button>
+          <button type="button" class="ffe-imp-preset" data-pct="50">50%</button>
+          <button type="button" class="ffe-imp-preset" data-pct="75">75%</button>
+          <button type="button" class="ffe-imp-preset" data-pct="100">100%</button>
+        </div>
       </div>
       <p id="ffe-duel-leader-badge" class="ffe-duel-leader-badge" aria-live="polite"></p>
       <div id="ffe-duel-chart-container">
@@ -322,8 +339,10 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <script src="projection-modes.js?v=20260417b"></script>
-  <script src="app.js?v=20260417b"></script>
+  <script src="projection-modes.js?v=20260417d"></script>
+  <script src="app.js?v=20260417d"></script>
 </body>
 </html>
+
+
 

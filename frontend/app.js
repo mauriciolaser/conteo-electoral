@@ -299,6 +299,10 @@ let mainChartMode = "actual";
 let ffeDuelChartMode = "actual";
 let mainChartData = null;
 let ffeDuelChartData = null;
+const ffeImpugnacionPctByMode = {
+  impugnacionRural: 100,
+  impugnacionLima: 100,
+};
 let activeLatestSnapshot = null; // snapshot visible más reciente aceptado por la UI
 let activeLatestSnapshotTs = Number.NEGATIVE_INFINITY;
 const MAIN_CHART_MODE_META = {
@@ -357,6 +361,71 @@ function computePercentAxisMax(values) {
   else if (raw <= 50) step = 2;
   else step = 5;
   return Math.ceil(raw / step) * step;
+}
+
+function clampImpugnacionPct(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 100;
+  return Math.max(0, Math.min(100, Math.round(n)));
+}
+
+function getActiveImpugnacionMode() {
+  if (ffeDuelChartMode === "impugnacionRural") return "impugnacionRural";
+  if (ffeDuelChartMode === "impugnacionLima") return "impugnacionLima";
+  return null;
+}
+
+function rebuildFfeDuelChartDataFromActiveSnapshot() {
+  if (typeof window.ProjectionModes.buildHeadToHeadBundle !== "function") {
+    ffeDuelChartData = null;
+    return;
+  }
+  const payload = activeLatestSnapshot?.payload;
+  if (!payload) {
+    ffeDuelChartData = null;
+    return;
+  }
+  ffeDuelChartData = window.ProjectionModes.buildHeadToHeadBundle(payload, {
+    impugnacionRuralPct: ffeImpugnacionPctByMode.impugnacionRural,
+    impugnacionLimaPct: ffeImpugnacionPctByMode.impugnacionLima,
+  });
+}
+
+function updateFfeImpPresetButtons(selectedPct) {
+  const buttons = document.querySelectorAll("#ffe-imp-presets .ffe-imp-preset");
+  for (const btn of buttons) {
+    const pct = clampImpugnacionPct(parseInt(btn.dataset.pct || "", 10));
+    const isActive = pct === selectedPct;
+    btn.classList.toggle("active", isActive);
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+  }
+}
+
+function updateFfeImpugnacionControls() {
+  const wrap = document.getElementById("ffe-imp-controls");
+  const input = document.getElementById("ffe-imp-percent-input");
+  const label = document.getElementById("ffe-imp-percent-label");
+  const subtitle = document.getElementById("ffe-imp-subtitle");
+  if (!wrap || !input || !label) return;
+  const mode = getActiveImpugnacionMode();
+  if (!mode) {
+    wrap.classList.add("hidden");
+    return;
+  }
+  wrap.classList.remove("hidden");
+  if (mode === "impugnacionRural") {
+    label.textContent = "Impugnación Rural aplicada (%)";
+    if (subtitle) subtitle.textContent = "Descuento aplicado al bloque en disputa fuera de Lima.";
+  } else {
+    label.textContent = "Impugnación Lima aplicada (%)";
+    if (subtitle) subtitle.textContent = "Descuento aplicado al bloque en disputa del departamento Lima.";
+  }
+  const currentPct = clampImpugnacionPct(ffeImpugnacionPctByMode[mode] ?? 100);
+  const nextValue = String(currentPct);
+  if (document.activeElement !== input) {
+    input.value = nextValue;
+  }
+  updateFfeImpPresetButtons(currentPct);
 }
 
 const HALF_HOUR_MS = 30 * 60 * 1000;
@@ -744,6 +813,7 @@ function renderFfeDuelChart() {
   const canvas = document.getElementById("ffe-duel-chart");
   const noteEl = document.getElementById("ffe-duel-chart-note");
   const badgeClear = document.getElementById("ffe-duel-leader-badge");
+  updateFfeImpugnacionControls();
   if (!canvas || !ffeDuelChartData || typeof Chart === "undefined") {
     if (badgeClear) {
       badgeClear.textContent = "";
@@ -770,7 +840,15 @@ function renderFfeDuelChart() {
   const modeMeta = useRuralFallback
     ? FFE_DUEL_MODE_META.ruralFallback
     : (FFE_DUEL_MODE_META[ffeDuelChartMode] || FFE_DUEL_MODE_META.actual);
-  if (noteEl) noteEl.textContent = modeMeta.note;
+  if (noteEl) {
+    const mode = getActiveImpugnacionMode();
+    const appliedPct = Number(source.appliedPct);
+    if (mode && Number.isFinite(appliedPct)) {
+      noteEl.textContent = `${modeMeta.note} Ajuste actual: ${Math.round(appliedPct)}%.`;
+    } else {
+      noteEl.textContent = modeMeta.note;
+    }
+  }
 
   updateFfeDuelChartButtons();
 
@@ -1566,11 +1644,7 @@ async function loadAndRender() {
       },
     };
 
-    if (typeof window.ProjectionModes.buildHeadToHeadBundle === "function") {
-      ffeDuelChartData = window.ProjectionModes.buildHeadToHeadBundle(activeLatest.payload);
-    } else {
-      ffeDuelChartData = null;
-    }
+    rebuildFfeDuelChartDataFromActiveSnapshot();
 
     // 4. Renderizar
     updateStatusBar(activeLatest.payload, renderSnapshots);
@@ -1676,6 +1750,43 @@ document.addEventListener("DOMContentLoaded", () => {
         renderFfeDuelChart();
       });
     }
+  }
+
+  const ffeImpInput = document.getElementById("ffe-imp-percent-input");
+  const applyFfeImpPct = rawValue => {
+    const mode = getActiveImpugnacionMode();
+    if (!mode) return;
+    const cleaned = String(rawValue ?? "").replace(/[^\d]/g, "");
+    const pct = cleaned ? clampImpugnacionPct(parseInt(cleaned, 10)) : (ffeImpugnacionPctByMode[mode] ?? 100);
+    ffeImpugnacionPctByMode[mode] = pct;
+    if (ffeImpInput) ffeImpInput.value = String(pct);
+    rebuildFfeDuelChartDataFromActiveSnapshot();
+    renderFfeDuelChart();
+  };
+  if (ffeImpInput) {
+    ffeImpInput.addEventListener("input", () => {
+      const cleaned = String(ffeImpInput.value || "").replace(/[^\d]/g, "");
+      if (cleaned !== ffeImpInput.value) ffeImpInput.value = cleaned;
+      if (!cleaned) return;
+      applyFfeImpPct(cleaned);
+    });
+    ffeImpInput.addEventListener("blur", () => {
+      applyFfeImpPct(ffeImpInput.value || "");
+    });
+    ffeImpInput.addEventListener("keydown", ev => {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        applyFfeImpPct(ffeImpInput.value || "");
+        ffeImpInput.blur();
+      }
+    });
+  }
+
+  const ffeImpPresetBtns = document.querySelectorAll("#ffe-imp-presets .ffe-imp-preset");
+  for (const btn of ffeImpPresetBtns) {
+    btn.addEventListener("click", () => {
+      applyFfeImpPct(btn.dataset.pct || "100");
+    });
   }
 
   // ¿Qué es esto? toggle
