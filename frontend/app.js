@@ -338,11 +338,11 @@ const FFE_DUEL_MODE_META = {
     tooltipSuffix: "votos proyectados",
   },
   impugnacionRural: {
-    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los votos impugnados ONPE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga: en cada región el cupo se descuenta de ambos candidatos en la proporción de la proyección simple en esa región (como si esos votos desaparecieran). «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima». Barras: % sobre el total nacional válido del modo.",
+    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se descuenta solo del tramo en disputa JEE/JNE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga. El ajuste se aplica únicamente sobre la parte proyectada (no sobre votos ya contados). «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima». Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos (simulación impugnación rural)",
   },
   impugnacionLima: {
-    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los impugnados ONPE solo del departamento Lima entre ambos candidatos en la proporción de la proyección simple dentro de Lima (como si esos votos desaparecieran). Barras: % sobre el total nacional válido del modo.",
+    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se descuenta solo del tramo en disputa JEE/JNE del departamento Lima entre ambos candidatos. El ajuste se aplica únicamente sobre la parte proyectada (no sobre votos ya contados). Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos (simulación impugnación Lima)",
   },
 };

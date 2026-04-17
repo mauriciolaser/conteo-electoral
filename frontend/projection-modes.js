@@ -414,6 +414,14 @@
     };
   }
 
+  function regionVotosEnDisputa(region) {
+    const imp = regionImpugnadas(region);
+    const jee = region && typeof region.jee === "object" ? region.jee : null;
+    const jeeRevision = Math.max(0, parseInt(jee && jee.votos_revision_jne, 10) || 0);
+    if (jeeRevision > 0) return jeeRevision;
+    return imp.votosImpugnados;
+  }
+
   function isLimaDepartmentRegion(region) {
     const imp = regionImpugnadas(region);
     return (
@@ -437,28 +445,44 @@
     const ruralByRegion = buildRuralProjectionByRegion(latestPayload);
     const ruralNat = sumTwoHorseFromRegionalMaps(ruralByRegion, regions, SANCHEZ_PARTY, RLA_PARTY);
 
-    let subImpRuralSanchez = 0;
-    let subImpRuralRla = 0;
+    let impRuralSanchez = 0;
+    let impRuralRla = 0;
     for (const region of regions) {
       const imp = regionImpugnadas(region);
-      if (!imp.sanchezLidera || imp.votosImpugnados <= 0) continue;
-      if (isLimaDepartmentRegion(region)) continue;
       const map = simpleByRegion[region.region || ""] || {};
-      const sR = votesForPartyInMap(map, SANCHEZ_PARTY);
-      const rR = votesForPartyInMap(map, RLA_PARTY);
-      const pair = sR + rR;
-      const vi = imp.votosImpugnados;
-      if (pair > 0) {
-        subImpRuralSanchez += (vi * sR) / pair;
-        subImpRuralRla += (vi * rR) / pair;
-      } else if (vi > 0) {
-        subImpRuralSanchez += vi / 2;
-        subImpRuralRla += vi / 2;
+      const sSimple = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const rSimple = votesForPartyInMap(map, RLA_PARTY);
+      const applies = imp.sanchezLidera && !isLimaDepartmentRegion(region);
+      if (!applies) {
+        impRuralSanchez += sSimple;
+        impRuralRla += rSimple;
+        continue;
       }
+      const disputa = regionVotosEnDisputa(region);
+      if (disputa <= 0) {
+        impRuralSanchez += sSimple;
+        impRuralRla += rSimple;
+        continue;
+      }
+      const sActual = getCurrentPartyVotes(region, SANCHEZ_PARTY);
+      const rActual = getCurrentPartyVotes(region, RLA_PARTY);
+      const gS = Math.max(0, sSimple - sActual);
+      const gR = Math.max(0, rSimple - rActual);
+      const gPair = gS + gR;
+      if (gPair <= 0) {
+        impRuralSanchez += sSimple;
+        impRuralRla += rSimple;
+        continue;
+      }
+      const descuento = Math.min(disputa, gPair);
+      const dS = (descuento * gS) / gPair;
+      const dR = (descuento * gR) / gPair;
+      impRuralSanchez += Math.max(sActual, sSimple - dS);
+      impRuralRla += Math.max(rActual, rSimple - dR);
     }
     const impugnacionRural = {
-      sanchez: Math.max(0, Math.round(simpleNat.a - subImpRuralSanchez)),
-      rla: Math.max(0, Math.round(simpleNat.b - subImpRuralRla)),
+      sanchez: Math.max(0, Math.round(impRuralSanchez)),
+      rla: Math.max(0, Math.round(impRuralRla)),
       isFallback: false,
     };
 
@@ -468,26 +492,30 @@
         String(r.ubigeo || "") === "140000" ||
         normalizeName(r.region || "") === "LIMA"
     );
-    let subLimaS = 0;
-    let subLimaR = 0;
+    let impLimaS = simpleNat.a;
+    let impLimaR = simpleNat.b;
     if (limaRegion) {
-      const vi = regionImpugnadas(limaRegion).votosImpugnados;
+      const vi = regionVotosEnDisputa(limaRegion);
       const limaName = limaRegion.region || "";
       const map = simpleByRegion[limaName] || {};
       const sL = votesForPartyInMap(map, SANCHEZ_PARTY);
       const rL = votesForPartyInMap(map, RLA_PARTY);
-      const pair = sL + rL;
-      if (vi > 0 && pair > 0) {
-        subLimaS = (vi * sL) / pair;
-        subLimaR = (vi * rL) / pair;
-      } else if (vi > 0) {
-        subLimaS = vi / 2;
-        subLimaR = vi / 2;
+      const sActual = getCurrentPartyVotes(limaRegion, SANCHEZ_PARTY);
+      const rActual = getCurrentPartyVotes(limaRegion, RLA_PARTY);
+      const gS = Math.max(0, sL - sActual);
+      const gR = Math.max(0, rL - rActual);
+      const gPair = gS + gR;
+      if (vi > 0 && gPair > 0) {
+        const descuento = Math.min(vi, gPair);
+        const dS = (descuento * gS) / gPair;
+        const dR = (descuento * gR) / gPair;
+        impLimaS = Math.max(0, Math.round(simpleNat.a - dS));
+        impLimaR = Math.max(0, Math.round(simpleNat.b - dR));
       }
     }
     const impugnacionLima = {
-      sanchez: Math.max(0, Math.round(simpleNat.a - subLimaS)),
-      rla: Math.max(0, Math.round(simpleNat.b - subLimaR)),
+      sanchez: Math.max(0, impLimaS),
+      rla: Math.max(0, impLimaR),
       isFallback: false,
     };
 
