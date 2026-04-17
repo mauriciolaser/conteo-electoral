@@ -258,13 +258,15 @@ def _build_api_artifacts(
         pct_sanchez = _party_pct(totals_by_party, "JUNTOS POR EL PERU", total_valid_votes)
         pct_lopez = _party_pct(totals_by_party, "RENOVACION POPULAR", total_valid_votes)
 
-        summary_rows.append(
-            {
-                "extracted_at_utc": str(meta.get("extracted_at_utc", "")),
-                "actas_pct_global": float(meta.get("actas_pct_global", 0) or 0),
-                "totals_by_party": totals_by_party,
-            }
-        )
+        row_out: dict[str, object] = {
+            "extracted_at_utc": str(meta.get("extracted_at_utc", "")),
+            "actas_pct_global": float(meta.get("actas_pct_global", 0) or 0),
+            "totals_by_party": totals_by_party,
+        }
+        imp_res = _impugnadas_resumen_from_payload(payload)
+        if imp_res is not None:
+            row_out["impugnadas_resumen"] = imp_res
+        summary_rows.append(row_out)
         timelapse_points.append(
             {
                 "at_ms": int(ts),
@@ -395,6 +397,52 @@ def _minify_snapshot(payload: dict[str, object] | None) -> dict[str, object]:
     return {
         "metadata": meta_out,
         "regions": regions_out,
+    }
+
+
+def _impugnadas_resumen_from_payload(payload: dict[str, object]) -> dict[str, object] | None:
+    """Agrega bloques `impugnadas` por región para filas compactas de summary.json."""
+    regions_in = payload.get("regions") or []
+    if not isinstance(regions_in, list) or not regions_in:
+        return None
+    tot_v = tot_m = 0
+    lima_v = lima_m = 0
+    fuentes: set[str] = set()
+    seen_any = False
+    for region in regions_in:
+        if not isinstance(region, dict):
+            continue
+        imp = region.get("impugnadas")
+        if not isinstance(imp, dict):
+            continue
+        seen_any = True
+        v = int(imp.get("votos_impugnados") or 0)
+        m = int(imp.get("mesas_impugnadas") or 0)
+        tot_v += v
+        tot_m += m
+        fuente = str(imp.get("fuente_agregado") or "").strip()
+        if fuente:
+            fuentes.add(fuente)
+        ub = str(region.get("ubigeo") or imp.get("ubigeo_departamento") or "").strip()
+        if bool(imp.get("es_lima_departamento")) or ub == "140000":
+            lima_v += v
+            lima_m += m
+    if not seen_any:
+        return None
+    if len(fuentes) == 1:
+        fuente_out = next(iter(fuentes))
+    elif len(fuentes) > 1:
+        fuente_out = "mixto"
+    else:
+        fuente_out = "desconocido"
+    return {
+        "votos_impugnados_total": tot_v,
+        "mesas_impugnadas_total": tot_m,
+        "votos_impugnados_lima_depto": lima_v,
+        "mesas_impugnadas_lima_depto": lima_m,
+        "votos_impugnados_no_lima": tot_v - lima_v,
+        "mesas_impugnadas_no_lima": tot_m - lima_m,
+        "fuente_agregado": fuente_out,
     }
 
 

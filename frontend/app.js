@@ -1429,14 +1429,18 @@ function buildSnapshotsFromApi(summaryPayload, latestPayload) {
     const extractedAtUtc = row?.extracted_at_utc;
     const dt = new Date(extractedAtUtc);
     if (isNaN(dt.getTime())) continue;
+    const meta = {
+      extracted_at_utc: extractedAtUtc,
+      actas_pct_global: Number(row?.actas_pct_global) || 0,
+    };
+    if (row?.impugnadas_resumen && typeof row.impugnadas_resumen === "object") {
+      meta.impugnadas_resumen = row.impugnadas_resumen;
+    }
     snapshots.push({
       dt,
       totals: parseTotalsMap(row?.totals_by_party),
       payload: {
-        metadata: {
-          extracted_at_utc: extractedAtUtc,
-          actas_pct_global: Number(row?.actas_pct_global) || 0,
-        },
+        metadata: meta,
         regions: [],
       },
     });
