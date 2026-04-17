@@ -1,8 +1,8 @@
 # Proyección Electoral ONPE
 
 - Fuente: https://resultadoelectoral.onpe.gob.pe/main/presidenciales
-- Extraído (UTC): 2026-04-17T21:13:50.907412+00:00
-- Proyectado (UTC): 2026-04-17T21:13:50.932411+00:00
+- Extraído (UTC): 2026-04-17T21:19:29.561993+00:00
+- Proyectado (UTC): 2026-04-17T21:19:29.587026+00:00
 - Actas contabilizadas global: 93.359%
 - Margen escenarios: 5.000%
 
