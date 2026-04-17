@@ -1672,20 +1672,6 @@ async function loadAndRender() {
     const ruralStats = window.ProjectionModes.buildRuralProjectionStats(activeLatest.payload);
     const simpleProjectionByRegion = window.ProjectionModes.buildSimpleProjectionByRegion(activeLatest.payload);
     const ruralProjectionByRegion = window.ProjectionModes.buildRuralProjectionByRegion(activeLatest.payload);
-    const topRegionalLeadersStats = buildTopRegionalLeaderStats(
-      activeLatest.payload,
-      simpleProjectionByRegion,
-      ruralProjectionByRegion,
-      selectedRegionalCandidate,
-      false
-    );
-    const lopezTopRegionalLeadersStats = buildTopRegionalLeaderStats(
-      activeLatest.payload,
-      simpleProjectionByRegion,
-      ruralProjectionByRegion,
-      LOPEZ_ALIAGA_PARTY,
-      false
-    );
     mainChartData = {
       actual: currentStats,
       interpolation: {
@@ -1706,14 +1692,6 @@ async function loadAndRender() {
     updateStatusBar(activeLatest.payload, renderSnapshots);
     renderMainChart();
     renderFfeDuelChart();
-    renderTopRegionalLeadersPanel(topRegionalLeadersStats, selectedRegionalCandidate, "Interpolación de votos de Roberto Sánchez (Juntos por el Perú)");
-    renderSimpleRegionalLeadersPanel(lopezTopRegionalLeadersStats, LOPEZ_ALIAGA_PARTY, {
-      sectionId: "pro-lopez-section",
-      titleId: "candidate-top-lopez-title",
-      votesHeaderId: "candidate-votes-lopez-header",
-      bodyId: "pro-lopez-table-body",
-      overrideTitle: "Interpolación de votos de Rafael López Aliaga (Renovación Popular)",
-    });
 
     if (trendSnapshots.length >= 2) {
       const trendContainer = document.querySelector("#trend-chart-container");
