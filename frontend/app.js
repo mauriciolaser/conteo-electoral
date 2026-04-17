@@ -346,11 +346,11 @@ const FFE_DUEL_MODE_META = {
     tooltipSuffix: "votos proyectados",
   },
   impugnacionRural: {
-    note: "Proyección voto rural (nacional + extranjero) sin los impugnados ONPE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga: en cada una de esas regiones el cupo se descuenta de ambos en la proporción de la proyección simple en esa región (el rótulo «rural» solo nombra ese conjunto de zonas). Lima se trata aparte en «Impugnación Lima».",
+    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los votos impugnados ONPE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga: en cada región el cupo se descuenta de ambos candidatos en la proporción de la proyección simple en esa región (como si esos votos desaparecieran). «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima».",
     tooltipSuffix: "votos (simulación impugnación rural)",
   },
   impugnacionLima: {
-    note: "Proyección simple (nacional + extranjero) sin los impugnados ONPE solo del departamento Lima: ese total se descuenta de Sánchez y de López Aliaga a nivel país en la proporción de su proyección simple dentro de Lima.",
+    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los impugnados ONPE solo del departamento Lima entre ambos candidatos en la proporción de la proyección simple dentro de Lima (como si esos votos desaparecieran).",
     tooltipSuffix: "votos (simulación impugnación Lima)",
   },
 };
@@ -808,8 +808,7 @@ function renderFfeDuelChart() {
   const source = ffeDuelChartData[dataKey] || ffeDuelChartData.actual;
 
   const useRuralFallback =
-    (ffeDuelChartMode === "rural" || ffeDuelChartMode === "impugnacionRural") &&
-    Boolean(source.isFallback);
+    ffeDuelChartMode === "rural" && Boolean(source.isFallback);
 
   const modeMeta = useRuralFallback
     ? FFE_DUEL_MODE_META.ruralFallback

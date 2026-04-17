@@ -444,9 +444,9 @@
       }
     }
     const impugnacionRural = {
-      sanchez: Math.max(0, Math.round(ruralNat.a - subImpRuralSanchez)),
-      rla: Math.max(0, Math.round(ruralNat.b - subImpRuralRla)),
-      isFallback: ruralStats.isFallback,
+      sanchez: Math.max(0, Math.round(simpleNat.a - subImpRuralSanchez)),
+      rla: Math.max(0, Math.round(simpleNat.b - subImpRuralRla)),
+      isFallback: false,
     };
 
     const limaRegion = regions.find(
