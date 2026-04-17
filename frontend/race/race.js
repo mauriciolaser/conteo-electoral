@@ -16,7 +16,6 @@
   const RELOAD_MS = 60_000;
   const API_RACE_LATEST_URL = "../api/v1/race/latest";
   const API_DASHBOARD_LATEST_URL = "../api/v1/dashboard/latest";
-  const LEGACY_BUNDLE_URL = "../history_bundle.json";
 
   const SPRITE_BASELINE_Y = 0.78;
   const SPRITE_DRAW_SCALE = 0.45;
@@ -136,18 +135,10 @@
         const snap = pickLatestSnapshot(json?.snapshot || json);
         if (snap) return computePcts(snap);
       } catch (_) {
-        try {
-          const r = await fetch(LEGACY_BUNDLE_URL, { cache: "no-store" });
-          if (!r.ok) throw new Error("legacy bundle status " + r.status);
-          const json = await r.json();
-          const snap = pickLatestSnapshot(json);
-          if (snap) return computePcts(snap);
-        } catch (_) {
-          const r = await fetch("./dummy.json", { cache: "no-store" });
-          const json = await r.json();
-          const snap = pickLatestSnapshot(json);
-          if (snap) return computePcts(snap);
-        }
+        const r = await fetch("./dummy.json", { cache: "no-store" });
+        const json = await r.json();
+        const snap = pickLatestSnapshot(json);
+        if (snap) return computePcts(snap);
       }
     }
     return { pctSanchez: 0, pctPorky: 0 };

@@ -3,19 +3,10 @@
 //  El build script reemplaza __BASE_URL__ con el valor real.
 //
 //  Estructura esperada en el servidor:
-//    <BASE_URL>/history_bundle.json
-//        Archivo principal. Contiene todos los snapshots filtrados
-//        (uno por bucket de 30 min) en { "snapshots": [ ...payloads ] }.
-//        Publicado por publish_raw_history() en publish.py.
-//        El cliente hace 1 solo request en lugar de N requests paralelos.
-//
-//    <BASE_URL>/history_index.json   (legacy — compatibilidad)
-//        Lista de timestamps. Ya no lo usa el cliente activo, se mantiene
-//        para sesiones con versiones anteriores cacheadas en el navegador.
-//
-//    <BASE_URL>/raw_history/<timestamp>/raw_region_results.json
-//        Archivos individuales por snapshot. El cliente ya no los descarga
-//        directamente; siguen en el servidor como fuente del bundle.
+//    <BASE_URL>/api/v1/dashboard/summary
+//    <BASE_URL>/api/v1/dashboard/latest
+//    <BASE_URL>/api/v1/race/latest
+//    <BASE_URL>/api/v1/timelapse/series
 // ─────────────────────────────────────────────
 const INJECTED_BASE_URL = '__BASE_URL__';
 
@@ -32,7 +23,6 @@ const PARTIES_CATALOG_URL = "./parties.json";
 const API_BASE_URL = BASE_URL ? `${BASE_URL}/api/v1` : "./api/v1";
 const API_DASHBOARD_SUMMARY_URL = `${API_BASE_URL}/dashboard/summary`;
 const API_DASHBOARD_LATEST_URL = `${API_BASE_URL}/dashboard/latest`;
-const LEGACY_HISTORY_BUNDLE_URL = BASE_URL ? `${BASE_URL}/history_bundle.json` : "";
 
 // ─────────────────────────────────────────────
 //  Paleta de colores por partido (igual a Python)
@@ -330,30 +320,42 @@ const MAIN_CHART_MODE_META = {
 
 const FFE_DUEL_MODE_META = {
   actual: {
-    note: "Votos válidos ya contabilizados (ONPE) para los dos candidatos, sumando todas las regiones y Peruanos en el extranjero. Barras: % sobre la suma de ambos.",
+    note: "Votos válidos ya contabilizados (ONPE) para los dos candidatos, sumando todas las regiones y Peruanos en el extranjero. Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos contados",
   },
   simple: {
-    note: "Proyección simple al 100% de actas por región (cada departamento y Peruanos en el extranjero), agregada a nivel nacional y extranjero para los dos candidatos.",
+    note: "Proyección simple al 100% de actas por región (cada departamento y Peruanos en el extranjero), agregada a nivel nacional y extranjero para los dos candidatos. Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos proyectados simple",
   },
   rural: {
-    note: "Proyección con sesgo rural en regiones donde lidera Sánchez (misma lógica que el Top 6 en modo voto rural). Los totales incluyen todas las regiones y el voto en el extranjero.",
+    note: "Proyección con sesgo rural en regiones donde lidera Sánchez (misma lógica que el Top 6 en modo voto rural). Los totales incluyen todas las regiones y el voto en el extranjero. Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos proyectados voto rural",
   },
   ruralFallback: {
-    note: "Voto rural sin regiones elegibles en este corte; coincide con la proyección simple agregada para el duelo (nacional + extranjero).",
+    note: "Voto rural sin regiones elegibles en este corte; coincide con la proyección simple agregada para el duelo (nacional + extranjero). Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos proyectados",
   },
   impugnacionRural: {
-    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los votos impugnados ONPE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga: en cada región el cupo se descuenta de ambos candidatos en la proporción de la proyección simple en esa región (como si esos votos desaparecieran). «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima».",
+    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los votos impugnados ONPE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga: en cada región el cupo se descuenta de ambos candidatos en la proporción de la proyección simple en esa región (como si esos votos desaparecieran). «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima». Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos (simulación impugnación rural)",
   },
   impugnacionLima: {
-    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los impugnados ONPE solo del departamento Lima entre ambos candidatos en la proporción de la proyección simple dentro de Lima (como si esos votos desaparecieran).",
+    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se restan los impugnados ONPE solo del departamento Lima entre ambos candidatos en la proporción de la proyección simple dentro de Lima (como si esos votos desaparecieran). Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos (simulación impugnación Lima)",
   },
 };
+
+function computePercentAxisMax(values) {
+  const maxValue = Math.max(0, ...values.map(v => Number(v) || 0));
+  const padded = maxValue * 1.15;
+  const raw = Math.max(1, padded);
+  let step = 1;
+  if (raw <= 5) step = 0.5;
+  else if (raw <= 20) step = 1;
+  else if (raw <= 50) step = 2;
+  else step = 5;
+  return Math.ceil(raw / step) * step;
+}
 
 const HALF_HOUR_MS = 30 * 60 * 1000;
 const SANCHEZ_PARTY = "JUNTOS POR EL PERU";
@@ -857,6 +859,7 @@ function renderFfeDuelChart() {
   const values = rows.map(r => r.pct);
   const votes = rows.map(r => r.votes);
   const colors = rows.map(r => r.color);
+  const axisMax = computePercentAxisMax(values);
   const borderWidths = rows.map((r, i) => (!isTie && i === winnerIndex ? 3 : 1));
   const borderColors = rows.map((r, i) => {
     if (!isTie && i === winnerIndex) return "rgba(255, 255, 255, 0.92)";
@@ -905,10 +908,11 @@ function renderFfeDuelChart() {
       },
       scales: {
         x: {
-          max: 100,
+          min: 0,
+          max: axisMax,
           ticks: {
             color: "#7b7f94",
-            callback: v => `${v}%`,
+            callback: v => `${Number(v).toFixed(1)}%`,
           },
           grid: { color: "#2a2d3a" },
         },
@@ -1488,14 +1492,10 @@ async function loadAndRender() {
     if (_firstLoad) showLoadingOverlay();
 
   // ── Carga de datos ─────────────────────────────────────────────────────────
-  // El pipeline publica history_bundle.json: un único archivo JSON con todos
-  // los snapshots filtrados (uno por bucket de 30 min) dentro de { snapshots: [] }.
-  //
   // Flujo:
-  //   1. Fetch de history_bundle.json (1 request)
-  //   2. Poblar _snapshotCache con los payloads del bundle
-  //   3. Si el fetch falla y hay snapshot en memoria → mantener vista actual
-  //   4. Si el fetch falla sin datos previos → mostrar error
+  //   1. Fetch de /api/v1/dashboard/summary y /api/v1/dashboard/latest
+  //   2. Si falla y hay snapshot en memoria → mantener vista actual
+  //   3. Si falla sin datos previos → usar data dummy local
   // ──────────────────────────────────────────────────────────────────────────
 
     let snapshots = null;
@@ -1524,24 +1524,6 @@ async function loadAndRender() {
         throw new Error("API dashboard/latest sin regiones válidas");
       }
     } catch (e) {
-      // Fallback 1: bundle legacy (pipeline antiguo) para pruebas en paralelo.
-      if (BASE_URL) {
-        try {
-          const bundle = await fetchJSON(LEGACY_HISTORY_BUNDLE_URL);
-          const incoming = Array.isArray(bundle.snapshots) ? bundle.snapshots : [];
-          for (const payload of incoming) {
-            const ts = _tsFromPayload(payload);
-            if (ts) _snapshotCache.set(ts, payload);
-          }
-          snapshots = buildSnapshotsFromRawPayloads(incoming);
-          if (snapshots.length) {
-            showError("API nueva no disponible. Mostrando datos del bundle legacy.");
-          }
-        } catch (_) {
-          // sin-op: continúa a fallback en memoria
-        }
-      }
-
       if (!fallbackUsed) {
         const fallback = pickFallbackForAttempt();
         if (fallback) {
@@ -1563,7 +1545,7 @@ async function loadAndRender() {
       if (!snapshots || snapshots.length === 0) {
         if (_firstLoad) hideLoadingOverlay();
         showError(
-          `No se pudo cargar la API ni el bundle legacy desde ${BASE_URL}. ` +
+          `No se pudo cargar la API desde ${BASE_URL}. ` +
           `Asegúrate de que el pipeline haya publicado los datos. (${e.message || e}). ` +
           `Usa "Actualizar" para reintentar.`
         );

@@ -11,9 +11,11 @@ from pathlib import Path
 def publish_frontend(project_root: Path, env_path: Path | None = None) -> None:
     """Regenera frontend/dist en runtime desde frontend/ y lo sube a DEPLOY_FRONTEND."""
     import sys
+
     sys.path.insert(0, str(project_root / "scripts"))
     try:
         from build_frontend import build as _build  # type: ignore[import]
+
         _build(project_root=project_root, env_path=env_path or (project_root / ".env"))
     except Exception as exc:
         print(f"[publish] frontend build error: {exc}")
@@ -31,7 +33,7 @@ def publish_frontend(project_root: Path, env_path: Path | None = None) -> None:
         return
 
     print(f"[publish] conectando FTP a {env.get('FTP_HOST', '?')}...")
-    ftp = _ftp_connect(env)
+    ftp = _ftp_connect(_build_ftp_env_from_prefix(env, prefix="FTP"))
     print("[publish] FTP conectado")
     base = _to_remote_dir(dest)
     all_files = [item for item in sorted(dist_dir.rglob("*")) if not item.is_dir()]
@@ -53,39 +55,14 @@ def publish_frontend(project_root: Path, env_path: Path | None = None) -> None:
 
 
 def _default_project_env_path() -> Path:
-    """Raíz del repo / .env (mismo criterio que publish_frontend)."""
     return Path(__file__).resolve().parent.parent / ".env"
 
 
-def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
-    """Sube raw_history/ e history_bundle.json bajo DEPLOY_FRONTEND en el servidor.
-
-    Estructura publicada:
-      <BASE_URL>/raw_history/<timestamp>/raw_region_results.json  ← archivos individuales
-      <BASE_URL>/history_bundle.json                              ← bundle consolidado (nuevo)
-      <BASE_URL>/history_index.json                               ← índice legacy (compatibilidad)
-
-    El cliente usa history_bundle.json como fuente primaria: un único request
-    trae todos los snapshots filtrados (uno por bucket de 30 min), eliminando
-    la tormenta de requests paralelos que causaba errores 429.
-
-    history_index.json se mantiene para compatibilidad con clientes antiguos
-    que puedan estar cacheados en el navegador.
-    """
-    env = _load_env_file(env_path or _default_project_env_path())
-    publish_legacy = _env_bool(env, "PUBLISH_LEGACY", default=True)
-    publish_api_shadow = _env_bool(env, "PUBLISH_API_SHADOW", default=False)
-
-    if not publish_legacy and not publish_api_shadow:
-        print("[publish] PUBLISH_LEGACY=false y PUBLISH_API_SHADOW=false — no hay nada que publicar")
-        return
-
+def _prepare_snapshots(output_dir: Path) -> tuple[list[str], list[str], list[dict[str, object]]]:
     local_history_root = output_dir / "raw_history"
     if not local_history_root.exists():
-        print(f"[publish] omitido: no existe {local_history_root}")
-        return
+        raise RuntimeError(f"[publish] omitido: no existe {local_history_root}")
 
-    # Calcular snapshots filtrados (un snapshot por bucket de 30 min)
     all_timestamps = sorted(
         d.name
         for d in local_history_root.iterdir()
@@ -93,7 +70,7 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
     )
     timestamps = _filter_half_hour_timestamps(all_timestamps)
 
-    snapshots_data = []
+    snapshots_data: list[dict[str, object]] = []
     for ts in timestamps:
         snapshot_file = local_history_root / ts / "raw_region_results.json"
         try:
@@ -101,69 +78,49 @@ def publish_raw_history(output_dir: Path, env_path: Path | None = None) -> None:
             snapshots_data.append(payload)
         except Exception as exc:
             print(f"[publish] advertencia: no se pudo leer {snapshot_file}: {exc}")
-
-    if publish_legacy:
-        _publish_legacy_history(
-            env=env,
-            output_dir=output_dir,
-            local_history_root=local_history_root,
-            all_timestamps=all_timestamps,
-            timestamps=timestamps,
-            snapshots_data=snapshots_data,
-        )
-    else:
-        print("[publish] PUBLISH_LEGACY=false — se omite publicación legacy")
-
-    if publish_api_shadow:
-        _publish_shadow_api(
-            env=env,
-            output_dir=output_dir,
-            all_timestamps=all_timestamps,
-            timestamps=timestamps,
-            snapshots_data=snapshots_data,
-        )
-    else:
-        print("[publish] PUBLISH_API_SHADOW=false — se omite publicación API shadow")
+    return all_timestamps, timestamps, snapshots_data
 
 
-# ── helpers ──────────────────────────────────────────────────────────────────
+def publish_api(output_dir: Path, env_path: Path | None = None) -> None:
+    env = _load_env_file(env_path or _default_project_env_path())
+    all_timestamps, timestamps, snapshots_data = _prepare_snapshots(output_dir)
 
-def _filter_half_hour_timestamps(timestamps: list[str]) -> list[str]:
-    """Devuelve un snapshot por bucket de 30 minutos (el más reciente de cada ventana).
+    api_deploy_path = env.get("API_DEPLOY_PATH", "").strip()
+    if not api_deploy_path:
+        raise RuntimeError("API_DEPLOY_PATH debe estar definido en .env")
 
-    Formato esperado: YYYYMMDD_HHMMSS (ej. 20260414_114625).
-    Timestamps que no coincidan con el formato se descartan.
-    """
-    buckets: dict[int, str] = {}
-    for ts in timestamps:
-        try:
-            dt = datetime.strptime(ts, "%Y%m%d_%H%M%S")
-        except ValueError:
-            continue
-        # Bucket = minutos totales desde epoch redondeados a 30
-        bucket = int(dt.timestamp()) // 1800
-        # Conservar el más reciente dentro del bucket
-        if bucket not in buckets or ts > buckets[bucket]:
-            buckets[bucket] = ts
-    return sorted(buckets.values())
+    artifacts = _build_api_artifacts(
+        snapshots=snapshots_data,
+        all_snapshots_count=len(all_timestamps),
+        filtered_snapshots_count=len(timestamps),
+    )
+    local_api_root = output_dir / "api"
+    _write_api_artifacts_to_disk(local_api_root, artifacts)
+
+    ftp_env = _build_ftp_env_from_prefix(env, prefix="API_FTP")
+    ftp = _ftp_connect(ftp_env)
+    base = _to_remote_dir(api_deploy_path)
+    try:
+        for rel_path, data in artifacts.items():
+            remote = f"{base}/{rel_path}" if base else rel_path
+            _ftp_upload_bytes(ftp, data, remote)
+    finally:
+        ftp.quit()
+    print(f"[publish-api] OK: {len(artifacts)} artefactos subidos -> {base}")
 
 
-def _publish_legacy_history(
-    *,
-    env: dict[str, str],
-    output_dir: Path,
-    local_history_root: Path,
-    all_timestamps: list[str],
-    timestamps: list[str],
-    snapshots_data: list[dict[str, object]],
-) -> None:
-    dest = env.get("DEPLOY_FRONTEND", "").strip()
-    if not dest:
-        print("[publish] DEPLOY_FRONTEND no definido en .env — raw_history legacy omitido")
-        return
+def deploy_raw_ftp(output_dir: Path, env_path: Path | None = None) -> None:
+    env = _load_env_file(env_path or _default_project_env_path())
+    all_timestamps, timestamps, snapshots_data = _prepare_snapshots(output_dir)
 
-    ftp = _ftp_connect(env)
-    base = _to_remote_dir(dest)
+    raw_path = env.get("FTP_RAW_PATH", "").strip()
+    if not raw_path:
+        raise RuntimeError("FTP_RAW_PATH debe estar definido en .env")
+
+    local_history_root = output_dir / "raw_history"
+    ftp_env = _build_ftp_env_from_prefix(env, prefix="FTP_RAW")
+    ftp = _ftp_connect(ftp_env)
+    base = _to_remote_dir(raw_path)
     remote_root = f"{base}/raw_history" if base else "raw_history"
     uploaded = skipped = 0
     try:
@@ -177,59 +134,30 @@ def _publish_legacy_history(
                 skipped += 1
 
         bundle_bytes = json.dumps({"snapshots": snapshots_data}, ensure_ascii=False).encode("utf-8")
-        bundle_remote = f"{base}/history_bundle.json" if base else "history_bundle.json"
+        bundle_remote = f"{base}/raw_bundle.json" if base else "raw_bundle.json"
         _ftp_upload_bytes(ftp, bundle_bytes, bundle_remote)
 
-        # Guardar copia local en output_dir para inspección
-        local_bundle = output_dir / "history_bundle.json"
+        local_bundle = output_dir / "raw_bundle.json"
         local_bundle.write_bytes(bundle_bytes)
-
-        # Índice legacy para clientes anteriores
-        index_bytes = json.dumps({"timestamps": timestamps}, ensure_ascii=False).encode("utf-8")
-        index_remote = f"{base}/history_index.json" if base else "history_index.json"
-        _ftp_upload_bytes(ftp, index_bytes, index_remote)
     finally:
         ftp.quit()
 
-    print(f"[publish] legacy raw_history OK: {uploaded} subidos, {skipped} sin cambios -> {remote_root}")
-    print(f"[publish] legacy history_bundle.json: {len(snapshots_data)}/{len(all_timestamps)} snapshots")
-    print(f"[publish] legacy history_index.json: {len(timestamps)}/{len(all_timestamps)} snapshots")
+    print(f"[deploy-raw] raw_history OK: {uploaded} subidos, {skipped} sin cambios -> {remote_root}")
+    print(f"[deploy-raw] raw_bundle.json: {len(snapshots_data)}/{len(all_timestamps)} snapshots")
+    print(f"[deploy-raw] buckets de 30 min utilizados: {len(timestamps)}")
 
 
-def _publish_shadow_api(
-    *,
-    env: dict[str, str],
-    output_dir: Path,
-    all_timestamps: list[str],
-    timestamps: list[str],
-    snapshots_data: list[dict[str, object]],
-) -> None:
-    api_deploy_path = env.get("API_DEPLOY_PATH", "").strip()
-    legacy_base = env.get("DEPLOY_FRONTEND", "").strip()
-    if not api_deploy_path and legacy_base:
-        api_deploy_path = f"{legacy_base.rstrip('/')}/api"
-    if not api_deploy_path:
-        print("[publish] API_DEPLOY_PATH no definido y no se pudo derivar desde DEPLOY_FRONTEND — API shadow omitida")
-        return
-
-    artifacts = _build_api_artifacts(
-        snapshots=snapshots_data,
-        all_snapshots_count=len(all_timestamps),
-        filtered_snapshots_count=len(timestamps),
-    )
-    local_api_root = output_dir / "api"
-    _write_api_artifacts_to_disk(local_api_root, artifacts)
-
-    ftp_env = _build_api_ftp_env(env)
-    ftp = _ftp_connect(ftp_env)
-    base = _to_remote_dir(api_deploy_path)
-    try:
-        for rel_path, data in artifacts.items():
-            remote = f"{base}/{rel_path}" if base else rel_path
-            _ftp_upload_bytes(ftp, data, remote)
-    finally:
-        ftp.quit()
-    print(f"[publish] API shadow OK: {len(artifacts)} artefactos subidos -> {base}")
+def _filter_half_hour_timestamps(timestamps: list[str]) -> list[str]:
+    buckets: dict[int, str] = {}
+    for ts in timestamps:
+        try:
+            dt = datetime.strptime(ts, "%Y%m%d_%H%M%S")
+        except ValueError:
+            continue
+        bucket = int(dt.timestamp()) // 1800
+        if bucket not in buckets or ts > buckets[bucket]:
+            buckets[bucket] = ts
+    return sorted(buckets.values())
 
 
 def _build_api_artifacts(
@@ -332,13 +260,17 @@ def _write_api_artifacts_to_disk(local_api_root: Path, artifacts: dict[str, byte
         target.write_bytes(data)
 
 
-def _build_api_ftp_env(env: dict[str, str]) -> dict[str, str]:
-    merged = dict(env)
-    merged["FTP_HOST"] = env.get("API_FTP_HOST", "").strip() or env.get("FTP_HOST", "").strip()
-    merged["FTP_USER"] = env.get("API_FTP_USER", "").strip() or env.get("FTP_USER", "").strip()
-    merged["FTP_PASSWORD"] = env.get("API_FTP_PASSWORD", "").strip() or env.get("FTP_PASSWORD", "").strip()
-    merged["FTP_PORT"] = env.get("API_FTP_PORT", "").strip() or env.get("FTP_PORT", "21").strip()
-    return merged
+def _build_ftp_env_from_prefix(env: dict[str, str], *, prefix: str) -> dict[str, str]:
+    host = env.get(f"{prefix}_HOST", "").strip()
+    user = env.get(f"{prefix}_USER", "").strip()
+    password = env.get(f"{prefix}_PASSWORD", "").strip()
+    port = env.get(f"{prefix}_PORT", "21").strip() or "21"
+    return {
+        "FTP_HOST": host,
+        "FTP_USER": user,
+        "FTP_PASSWORD": password,
+        "FTP_PORT": port,
+    }
 
 
 def _snapshot_epoch_ms(payload: dict[str, object]) -> int | None:
@@ -401,7 +333,6 @@ def _minify_snapshot(payload: dict[str, object] | None) -> dict[str, object]:
 
 
 def _impugnadas_resumen_from_payload(payload: dict[str, object]) -> dict[str, object] | None:
-    """Agrega bloques `impugnadas` por región para filas compactas de summary.json."""
     regions_in = payload.get("regions") or []
     if not isinstance(regions_in, list) or not regions_in:
         return None
@@ -508,18 +439,6 @@ def _canonical_party_name(name: str) -> str:
     return aliases.get(normalized, normalized)
 
 
-def _env_bool(env: dict[str, str], key: str, *, default: bool) -> bool:
-    raw = env.get(key)
-    if raw is None:
-        return default
-    value = str(raw).strip().lower()
-    if value in {"1", "true", "yes", "on"}:
-        return True
-    if value in {"0", "false", "no", "off"}:
-        return False
-    return default
-
-
 def _ftp_connect(env: dict[str, str]) -> FTP:
     host = env.get("FTP_HOST", "").strip()
     user = env.get("FTP_USER", "").strip()
@@ -534,7 +453,6 @@ def _ftp_connect(env: dict[str, str]) -> FTP:
 
 
 def _ftp_remote_size(ftp: FTP, remote: str) -> int | None:
-    """Devuelve el tamaño del archivo remoto, o None si no existe."""
     try:
         return ftp.size(remote)
     except Exception:  # noqa: BLE001
@@ -542,7 +460,6 @@ def _ftp_remote_size(ftp: FTP, remote: str) -> int | None:
 
 
 def _ftp_upload(ftp: FTP, local: Path, remote: str) -> bool:
-    """Sube local a remote solo si el tamaño difiere. Devuelve True si subió."""
     local_size = local.stat().st_size
     remote_size = _ftp_remote_size(ftp, remote)
     if remote_size == local_size:

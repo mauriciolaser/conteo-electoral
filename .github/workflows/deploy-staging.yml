@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy_data:
-        description: "Intentar publicar datos (requiere outputs/raw_history disponible)"
+        description: "Intentar publicar artefactos API (requiere outputs/raw_history disponible)"
         required: false
         default: false
         type: boolean
@@ -47,13 +47,16 @@ jobs:
           DEPLOY_FRONTEND=${{ vars.STAGING_DEPLOY_FRONTEND || 'staging.perulainen.com/conteo' }}
           BASE_URL=${{ vars.STAGING_BASE_URL || 'https://staging.perulainen.com/conteo' }}
           GA_ID=${{ vars.STAGING_GA_ID }}
-          PUBLISH_LEGACY=true
-          PUBLISH_API_SHADOW=true
           API_DEPLOY_PATH=${{ vars.STAGING_API_DEPLOY_PATH || 'api-elecciones.perulainen.com/staging/conteo/api' }}
           API_FTP_USER=${{ secrets.STAGING_API_FTP_USER || secrets.STAGING_FTP_USER }}
           API_FTP_HOST=${{ secrets.STAGING_API_FTP_HOST || secrets.STAGING_FTP_HOST }}
           API_FTP_PASSWORD=${{ secrets.STAGING_API_FTP_PASSWORD || secrets.STAGING_FTP_PASSWORD }}
           API_FTP_PORT=${{ vars.STAGING_API_FTP_PORT || vars.STAGING_FTP_PORT || '21' }}
+          FTP_RAW_PATH=${{ vars.STAGING_FTP_RAW_PATH || 'raw-elecciones-data/staging' }}
+          FTP_RAW_USER=${{ secrets.STAGING_FTP_RAW_USER || secrets.STAGING_FTP_USER }}
+          FTP_RAW_HOST=${{ secrets.STAGING_FTP_RAW_HOST || secrets.STAGING_FTP_HOST }}
+          FTP_RAW_PASSWORD=${{ secrets.STAGING_FTP_RAW_PASSWORD || secrets.STAGING_FTP_PASSWORD }}
+          FTP_RAW_PORT=${{ vars.STAGING_FTP_RAW_PORT || vars.STAGING_FTP_PORT || '21' }}
           CONTEO_API_ORIGIN_BASE=${{ vars.STAGING_CONTEO_API_ORIGIN_BASE || 'https://api-elecciones.perulainen.com/staging/conteo/api' }}
           CONTEO_API_TIMEOUT_SECONDS=${{ vars.STAGING_CONTEO_API_TIMEOUT_SECONDS || '6' }}
           EOF
@@ -68,7 +71,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_data }}
         run: |
           if [ -d outputs/raw_history ]; then
-            python -m election_counter --mode publish --env-file .env.staging
+            python -m election_counter --mode publish-api --env-file .env.staging
           else
-            echo "outputs/raw_history no existe en este job; se omite publish de datos."
+            echo "outputs/raw_history no existe en este job; se omite publish-api."
           fi

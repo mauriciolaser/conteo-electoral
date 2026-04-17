@@ -187,8 +187,10 @@ El frontend no consume `outputs/projection.json` para el Top 6 principal.
 
 Consume:
 
-1. `history_index.json`
-2. `raw_history/<timestamp>/raw_region_results.json`
+1. `/api/v1/dashboard/summary`
+2. `/api/v1/dashboard/latest`
+3. `/api/v1/race/latest`
+4. `/api/v1/timelapse/series`
 
 Con eso reconstruye en cliente:
 

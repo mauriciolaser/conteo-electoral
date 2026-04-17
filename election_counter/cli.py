@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 
 from election_counter.parsers import parse_padron
-from election_counter.publish import publish_frontend, publish_raw_history  # publish_frontend usado en deploy-frontend
+from election_counter.publish import deploy_raw_ftp, publish_api, publish_frontend
 from election_counter.projection import build_projection
 from election_counter.reporting import (
     build_base_scenario_chart,
@@ -24,7 +24,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Scraping + proyección ONPE")
     parser.add_argument(
         "--mode",
-        choices=["scrape", "project", "report", "full", "serve", "publish", "deploy-frontend", "vps"],
+        choices=["scrape", "project", "report", "full", "serve", "publish-api", "deploy-raw", "deploy-frontend", "vps"],
         default="full",
     )
     parser.add_argument("--data-dir", default="data")
@@ -41,7 +41,7 @@ def main() -> int:
     parser.add_argument("--host", default="0.0.0.0")
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--no-publish", action="store_true", default=False)
-    parser.add_argument("--env-file", default=None, help="Ruta al archivo .env para deploy/publish")
+    parser.add_argument("--env-file", default=None, help="Ruta al archivo .env para deploy")
     args = parser.parse_args()
 
     data_dir = Path(args.data_dir)
@@ -79,12 +79,20 @@ def main() -> int:
         )
         return 0
 
-    if args.mode == "publish":
+    if args.mode == "publish-api":
         if not args.no_publish:
             try:
-                publish_raw_history(output_dir=output_dir, env_path=env_path)
+                publish_api(output_dir=output_dir, env_path=env_path)
             except Exception as exc:  # noqa: BLE001
-                print(f"[publish] error: {exc}")
+                print(f"[publish-api] error: {exc}")
+        return 0
+
+    if args.mode == "deploy-raw":
+        if not args.no_publish:
+            try:
+                deploy_raw_ftp(output_dir=output_dir, env_path=env_path)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[deploy-raw] error: {exc}")
         return 0
 
     if args.mode in {"scrape", "full"}:
@@ -131,9 +139,9 @@ def main() -> int:
 
     if args.mode == "full" and not args.no_publish:
         try:
-            publish_raw_history(output_dir=output_dir, env_path=env_path)
+            publish_api(output_dir=output_dir, env_path=env_path)
         except Exception as exc:  # noqa: BLE001
-            print(f"[publish] error raw_history: {exc}")
+            print(f"[publish-api] error: {exc}")
 
     if args.mode == "serve":
         run_hud_server(output_dir=output_dir, host=args.host, port=args.port)

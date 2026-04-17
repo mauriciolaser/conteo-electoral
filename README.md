@@ -2,7 +2,7 @@
 
 Pipeline de scraping y proyección electoral ONPE con Python + Playwright.
 
-También incluye un frontend estático que consume `history_index.json` y los snapshots crudos publicados para mostrar:
+También incluye un frontend estático que consume `/api/v1/*` y snapshots crudos para mostrar:
 
 - `Procesamiento Actual`: votos válidos ya contabilizados.
 - `Interpolación`: proyección nacional lineal al 100% usando el último snapshot.

@@ -374,6 +374,19 @@
     return { sanchez, rla };
   }
 
+  function currentTotalValidVotes(latestPayload) {
+    const regions = latestPayload.regions || [];
+    let totalValid = 0;
+    for (const region of regions) {
+      for (const party of region.partidos || []) {
+        const raw = party.nombre || "";
+        if (isSpecial(raw)) continue;
+        totalValid += parseInt(party.votos, 10) || 0;
+      }
+    }
+    return totalValid;
+  }
+
   function twoHorseFromProjectedCandidates(projectedCandidates) {
     let sanchez = 0;
     let rla = 0;
@@ -478,49 +491,61 @@
       isFallback: false,
     };
 
-    const duoActual = Math.max(1, actual.sanchez + actual.rla);
-    const duoSimple = Math.max(1, simple.sanchez + simple.rla);
-    const duoRural = Math.max(1, rural.sanchez + rural.rla);
-    const duoImpR = Math.max(1, impugnacionRural.sanchez + impugnacionRural.rla);
-    const duoImpL = Math.max(1, impugnacionLima.sanchez + impugnacionLima.rla);
+    const duoActual = Math.max(0, actual.sanchez + actual.rla);
+    const duoSimple = Math.max(0, simple.sanchez + simple.rla);
+    const duoRural = Math.max(0, rural.sanchez + rural.rla);
+    const duoImpR = Math.max(0, impugnacionRural.sanchez + impugnacionRural.rla);
+    const duoImpL = Math.max(0, impugnacionLima.sanchez + impugnacionLima.rla);
+
+    const totalValidActual = Math.max(1, currentTotalValidVotes(latestPayload));
+    const totalValidSimple = Math.max(1, Number(nationalStats.totalValidProjectedVotes) || 0);
+    const totalValidRural = Math.max(1, Number(ruralStats.totalValidProjectedVotes) || 0);
+    const otherValidSimple = Math.max(0, totalValidSimple - duoSimple);
+    const totalValidImpR = Math.max(1, otherValidSimple + duoImpR);
+    const totalValidImpL = Math.max(1, otherValidSimple + duoImpL);
 
     return {
       actual: {
         sanchez: actual.sanchez,
         rla: actual.rla,
+        totalValid: totalValidActual,
         totalDuo: duoActual,
-        sanchezPct: (actual.sanchez / duoActual) * 100,
-        rlaPct: (actual.rla / duoActual) * 100,
+        sanchezPct: (actual.sanchez / totalValidActual) * 100,
+        rlaPct: (actual.rla / totalValidActual) * 100,
       },
       simple: {
         sanchez: simple.sanchez,
         rla: simple.rla,
+        totalValid: totalValidSimple,
         totalDuo: duoSimple,
-        sanchezPct: (simple.sanchez / duoSimple) * 100,
-        rlaPct: (simple.rla / duoSimple) * 100,
+        sanchezPct: (simple.sanchez / totalValidSimple) * 100,
+        rlaPct: (simple.rla / totalValidSimple) * 100,
       },
       rural: {
         sanchez: rural.sanchez,
         rla: rural.rla,
+        totalValid: totalValidRural,
         totalDuo: duoRural,
-        sanchezPct: (rural.sanchez / duoRural) * 100,
-        rlaPct: (rural.rla / duoRural) * 100,
+        sanchezPct: (rural.sanchez / totalValidRural) * 100,
+        rlaPct: (rural.rla / totalValidRural) * 100,
         isFallback: ruralStats.isFallback,
       },
       impugnacionRural: {
         sanchez: impugnacionRural.sanchez,
         rla: impugnacionRural.rla,
+        totalValid: totalValidImpR,
         totalDuo: duoImpR,
-        sanchezPct: (impugnacionRural.sanchez / duoImpR) * 100,
-        rlaPct: (impugnacionRural.rla / duoImpR) * 100,
+        sanchezPct: (impugnacionRural.sanchez / totalValidImpR) * 100,
+        rlaPct: (impugnacionRural.rla / totalValidImpR) * 100,
         isFallback: impugnacionRural.isFallback,
       },
       impugnacionLima: {
         sanchez: impugnacionLima.sanchez,
         rla: impugnacionLima.rla,
+        totalValid: totalValidImpL,
         totalDuo: duoImpL,
-        sanchezPct: (impugnacionLima.sanchez / duoImpL) * 100,
-        rlaPct: (impugnacionLima.rla / duoImpL) * 100,
+        sanchezPct: (impugnacionLima.sanchez / totalValidImpL) * 100,
+        rlaPct: (impugnacionLima.rla / totalValidImpL) * 100,
         isFallback: impugnacionLima.isFallback,
       },
     };

@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from election_counter.parsers import parse_padron
-from election_counter.publish import publish_raw_history
+from election_counter.publish import publish_api
 from election_counter.projection import build_projection
 from election_counter.reporting import (
     build_base_scenario_chart,
@@ -85,9 +85,9 @@ def run_vps_loop(
                 print(f"[vps] escrito: {trend_chart_path}")
 
             try:
-                publish_raw_history(output_dir=output_dir, env_path=env_path)
+                publish_api(output_dir=output_dir, env_path=env_path)
             except Exception as exc:  # noqa: BLE001
-                print(f"[vps] error publish raw_history: {exc}")
+                print(f"[vps] error publish-api: {exc}")
 
             heartbeat_path.write_text(
                 (
