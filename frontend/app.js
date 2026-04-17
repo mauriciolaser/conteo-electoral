@@ -349,13 +349,14 @@ let selectedRegionalCandidate = SANCHEZ_PARTY;
 //  Procesado de snapshots crudos
 // ─────────────────────────────────────────────
 function aggregateSnapshot(payload) {
-  /** Suma votos por partido en todas las regiones. */
+  /** Suma votos por partido en todas las regiones (clave canónica salvo blancos/nulos). */
   const totals = {};
   for (const region of payload.regions || []) {
     for (const p of region.partidos || []) {
       const name = (p.nombre || "").trim();
       if (!name) continue;
-      totals[name] = (totals[name] || 0) + (parseInt(p.votos) || 0);
+      const key = isSpecial(name) ? normalizeName(name) : canonicalPartyName(name);
+      totals[key] = (totals[key] || 0) + (parseInt(p.votos) || 0);
     }
   }
   return totals;
@@ -620,6 +621,42 @@ function renderMainChart() {
   }
   updateMainChartButtons();
 
+  let _mainChartTooltipDbgLeft = 4;
+
+  // #region agent log
+  (() => {
+    const rows = source.topCandidates.map(([rawName, rowVotes]) => {
+      const rowPct = source.totalValidVotes > 0 ? (rowVotes / source.totalValidVotes) * 100 : 0;
+      const canon = canonicalPartyName(rawName);
+      const canonSum = mainChartMode === "actual"
+        ? Object.entries(activeLatestSnapshot?.totals || {})
+          .filter(([k]) => !isSpecial(k) && canonicalPartyName(k) === canon)
+          .reduce((a, [, v]) => a + (Number(v) || 0), 0)
+        : null;
+      return {
+        rawName,
+        rowVotes,
+        rowPct,
+        canonSum,
+        rowVsCanonDelta: canonSum == null ? null : rowVotes - canonSum,
+      };
+    });
+    fetch("http://127.0.0.1:7303/ingest/d76e3171-59e4-4f5f-9a95-f9a288d2e142", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "21b9fa" },
+      body: JSON.stringify({
+        sessionId: "21b9fa",
+        runId: "post-fix",
+        hypothesisId: "H_chart_canonical",
+        location: "app.js:renderMainChart",
+        message: "Top6 values vs canonical sums on activeLatest.totals",
+        data: { mainChartMode, totalValidVotes: source.totalValidVotes, rows },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+  })();
+  // #endregion
+
   mainChartInstance = new Chart(ctx, {
     type: "bar",
     data: {
@@ -643,6 +680,30 @@ function renderMainChart() {
             label: ctx => {
               const pct = ctx.parsed.x.toFixed(2);
               const votes = formatInt(values[ctx.dataIndex]);
+              // #region agent log
+              if (_mainChartTooltipDbgLeft > 0) {
+                _mainChartTooltipDbgLeft -= 1;
+                fetch("http://127.0.0.1:7303/ingest/d76e3171-59e4-4f5f-9a95-f9a288d2e142", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "21b9fa" },
+                  body: JSON.stringify({
+                    sessionId: "21b9fa",
+                    runId: "post-fix",
+                    hypothesisId: "H_chartjs_tooltip",
+                    location: "app.js:mainChart.tooltip",
+                    message: "Tooltip index vs arrays",
+                    data: {
+                      dataIndex: ctx.dataIndex,
+                      parsedX: ctx.parsed.x,
+                      pctFromValues: pcts[ctx.dataIndex],
+                      votesRaw: values[ctx.dataIndex],
+                      label: fullLabels[ctx.dataIndex],
+                    },
+                    timestamp: Date.now(),
+                  }),
+                }).catch(() => {});
+              }
+              // #endregion
               return ` ${fullLabels[ctx.dataIndex]}: ${pct}% (${votes} ${modeMeta.tooltipSuffix})`;
             },
           },
@@ -1172,7 +1233,9 @@ function parseTotalsMap(rawTotals) {
   for (const [name, votes] of Object.entries(rawTotals || {})) {
     const partyName = String(name || "").trim();
     if (!partyName) continue;
-    totals[partyName] = Number.parseInt(votes, 10) || 0;
+    const v = Number.parseInt(votes, 10) || 0;
+    const key = isSpecial(partyName) ? normalizeName(partyName) : canonicalPartyName(partyName);
+    totals[key] = (totals[key] || 0) + v;
   }
   return totals;
 }
@@ -1208,6 +1271,7 @@ function buildSnapshotsFromApi(summaryPayload, latestPayload) {
     if (index >= 0) {
       snapshots[index] = {
         ...snapshots[index],
+        totals: aggregateSnapshot(latestPayload),
         payload: latestPayload,
       };
     } else if (!isNaN(fullLatestEntry.dt.getTime())) {
@@ -1378,6 +1442,36 @@ async function loadAndRender() {
         eligibleRegionCount: ruralStats.eligibleRegionCount,
       },
     };
+
+    // #region agent log
+    (() => {
+      const fresh = aggregateSnapshot(activeLatest.payload);
+      const freshStats = buildCurrentProcessingStats(fresh);
+      const t0 = currentStats.topCandidates[0];
+      const f0 = freshStats.topCandidates[0];
+      fetch("http://127.0.0.1:7303/ingest/d76e3171-59e4-4f5f-9a95-f9a288d2e142", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "21b9fa" },
+        body: JSON.stringify({
+          sessionId: "21b9fa",
+          runId: "post-fix",
+          hypothesisId: "H_api_merge_totals",
+          location: "app.js:loadAndRender",
+          message: "activeLatest.totals vs aggregateSnapshot(payload)",
+          data: {
+            extractedAt: activeLatest.payload?.metadata?.extracted_at_utc,
+            partyKeysActive: Object.keys(activeLatest.totals || {}).length,
+            partyKeysFresh: Object.keys(fresh).length,
+            totalValidActive: currentStats.totalValidVotes,
+            totalValidFresh: freshStats.totalValidVotes,
+            top0Active: t0 ? { name: t0[0], v: t0[1] } : null,
+            top0Fresh: f0 ? { name: f0[0], v: f0[1] } : null,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+    })();
+    // #endregion
 
     // 4. Renderizar
     updateStatusBar(activeLatest.payload, renderSnapshots);
