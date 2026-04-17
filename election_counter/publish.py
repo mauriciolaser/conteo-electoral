@@ -405,8 +405,8 @@ def _impugnadas_resumen_from_payload(payload: dict[str, object]) -> dict[str, ob
     regions_in = payload.get("regions") or []
     if not isinstance(regions_in, list) or not regions_in:
         return None
-    tot_v = tot_m = 0
-    lima_v = lima_m = 0
+    tot_v = tot_m = tot_p = 0
+    lima_v = lima_m = lima_p = 0
     fuentes: set[str] = set()
     seen_any = False
     for region in regions_in:
@@ -418,8 +418,10 @@ def _impugnadas_resumen_from_payload(payload: dict[str, object]) -> dict[str, ob
         seen_any = True
         v = int(imp.get("votos_impugnados") or 0)
         m = int(imp.get("mesas_impugnadas") or 0)
+        p = int(imp.get("votos_pendientes_contar") or 0)
         tot_v += v
         tot_m += m
+        tot_p += p
         fuente = str(imp.get("fuente_agregado") or "").strip()
         if fuente:
             fuentes.add(fuente)
@@ -427,6 +429,7 @@ def _impugnadas_resumen_from_payload(payload: dict[str, object]) -> dict[str, ob
         if bool(imp.get("es_lima_departamento")) or ub == "140000":
             lima_v += v
             lima_m += m
+            lima_p += p
     if not seen_any:
         return None
     if len(fuentes) == 1:
@@ -438,10 +441,13 @@ def _impugnadas_resumen_from_payload(payload: dict[str, object]) -> dict[str, ob
     return {
         "votos_impugnados_total": tot_v,
         "mesas_impugnadas_total": tot_m,
+        "votos_pendientes_contar_total": tot_p,
         "votos_impugnados_lima_depto": lima_v,
         "mesas_impugnadas_lima_depto": lima_m,
+        "votos_pendientes_contar_lima_depto": lima_p,
         "votos_impugnados_no_lima": tot_v - lima_v,
         "mesas_impugnadas_no_lima": tot_m - lima_m,
+        "votos_pendientes_contar_no_lima": tot_p - lima_p,
         "fuente_agregado": fuente_out,
     }
 

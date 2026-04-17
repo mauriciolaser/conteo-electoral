@@ -46,27 +46,6 @@ def _total_mesas_from_totales(tot: dict[str, object]) -> int | None:
     return None
 
 
-def _impugnadas_counts_from_totales(tot: dict[str, object]) -> tuple[int | None, int | None]:
-    """Busca contadores de impugnadas en el mismo payload de totales (si ONPE los expone)."""
-    mesas: int | None = None
-    votos: int | None = None
-    for key, raw in tot.items():
-        if not isinstance(key, str):
-            continue
-        lk = key.lower()
-        if "impugn" not in lk:
-            continue
-        if "voto" in lk or "emit" in lk:
-            v = _as_int(raw)
-            if v > 0:
-                votos = v if votos is None else max(votos, v)
-        elif "mesa" in lk or "acta" in lk:
-            v = _as_int(raw)
-            if v > 0:
-                mesas = v if mesas is None else max(mesas, v)
-    return mesas, votos
-
-
 def sanchez_leads_vs_renovacion(partidos: list[dict[str, object]]) -> bool:
     """True si Juntos por el Perú supera a Renovación Popular en votos válidos de la fila."""
     by_norm: dict[str, int] = {}
@@ -124,15 +103,21 @@ def impugnadas_summary_from_row(
     tot: dict[str, object],
 ) -> dict[str, object]:
     """Señales para planning/impugnadas.md (escenarios rural / Lima)."""
-    mesas_i, votos_i = _impugnadas_counts_from_totales(tot)
+    jee = jee_summary_from_totales(tot)
+    votos_revision_jne = _as_int(jee.get("votos_revision_jne"))
+    votos_pendientes_contar = _as_int(jee.get("votos_pendientes_contar"))
+    has_jee_votes = (votos_revision_jne > 0) or (votos_pendientes_contar > 0)
     return {
         "region": region_name,
         "ubigeo_departamento": ubigeo,
         "sanchez_lidera_sobre_renovacion": sanchez_leads_vs_renovacion(partidos),
         "es_lima_departamento": ubigeo == "140000",
-        "mesas_impugnadas": mesas_i if mesas_i is not None else 0,
-        "votos_impugnados": votos_i if votos_i is not None else 0,
-        "fuente_agregado": "totales_onpe" if (mesas_i is not None or votos_i is not None) else "sin_campo_en_totales",
+        # Impugnadas para proyección: usar votos en revisión JNE.
+        "mesas_impugnadas": 0,
+        "votos_impugnados": votos_revision_jne,
+        # Exponer también pendientes (no impugnados) porque son relevantes para análisis.
+        "votos_pendientes_contar": votos_pendientes_contar,
+        "fuente_agregado": "jee_totales_onpe" if has_jee_votes else "jee_sin_datos",
     }
 
 
@@ -180,5 +165,6 @@ def empty_impugnadas_block(
         "es_lima_departamento": ubigeo == "140000",
         "mesas_impugnadas": 0,
         "votos_impugnados": 0,
+        "votos_pendientes_contar": 0,
         "fuente_agregado": "fallback_sin_onpe",
     }

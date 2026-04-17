@@ -39,7 +39,12 @@ class OnpeRegionExtrasTests(unittest.TestCase):
         self.assertFalse(sanchez_leads_vs_renovacion(partidos))
 
     def test_impugnadas_desde_totales(self) -> None:
-        tot = {"mesasImpugnadas": 4, "votosImpugnados": 120}
+        tot = {
+            "totalVotosEmitidos": 1000,
+            "enviadasJee": 10,
+            "pendientesJee": 5,
+            "totalMesas": 100,
+        }
         imp = impugnadas_summary_from_row(
             region_name="LIMA",
             ubigeo="140000",
@@ -47,9 +52,21 @@ class OnpeRegionExtrasTests(unittest.TestCase):
             tot=tot,
         )
         self.assertTrue(imp["es_lima_departamento"])
-        self.assertEqual(imp["mesas_impugnadas"], 4)
-        self.assertEqual(imp["votos_impugnados"], 120)
-        self.assertEqual(imp["fuente_agregado"], "totales_onpe")
+        self.assertEqual(imp["mesas_impugnadas"], 0)
+        self.assertEqual(imp["votos_impugnados"], 100)
+        self.assertEqual(imp["votos_pendientes_contar"], 50)
+        self.assertEqual(imp["fuente_agregado"], "jee_totales_onpe")
+
+    def test_impugnadas_sin_datos(self) -> None:
+        imp = impugnadas_summary_from_row(
+            region_name="LIMA",
+            ubigeo="140000",
+            partidos=[],
+            tot={},
+        )
+        self.assertEqual(imp["votos_impugnados"], 0)
+        self.assertEqual(imp["votos_pendientes_contar"], 0)
+        self.assertEqual(imp["fuente_agregado"], "jee_sin_datos")
 
 
 if __name__ == "__main__":
