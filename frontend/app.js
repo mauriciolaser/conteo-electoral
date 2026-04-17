@@ -342,7 +342,7 @@ const FFE_DUEL_MODE_META = {
     tooltipSuffix: "votos proyectados",
   },
   impugnacionRural: {
-    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se descuenta solo del tramo en disputa JEE/JNE en departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga. El ajuste se aplica únicamente sobre la parte proyectada (no sobre votos ya contados). «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima». Barras: % sobre el total nacional válido del modo.",
+    note: "Parte de la proyección VOTO RURAL (nacional + extranjero). En departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga, la impugnación elimina votantes del tramo en disputa JEE/JNE y el recorte se reparte entre ambos en proporción al voto rural proyectado de esa región. «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima». Barras: % sobre el total nacional válido del modo.",
     tooltipSuffix: "votos (simulación impugnación rural)",
   },
   impugnacionLima: {
@@ -415,7 +415,7 @@ function updateFfeImpugnacionControls() {
   wrap.classList.remove("hidden");
   if (mode === "impugnacionRural") {
     label.textContent = "Impugnación Rural aplicada (%)";
-    if (subtitle) subtitle.textContent = "Descuento aplicado al bloque en disputa fuera de Lima.";
+    if (subtitle) subtitle.textContent = "Sobre base VOTO RURAL: descuento al bloque en disputa fuera de Lima, proporcional al voto rural proyectado.";
   } else {
     label.textContent = "Impugnación Lima aplicada (%)";
     if (subtitle) subtitle.textContent = "Descuento aplicado al bloque en disputa del departamento Lima.";

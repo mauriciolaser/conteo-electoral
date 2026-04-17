@@ -460,36 +460,32 @@
     let impRuralRla = 0;
     for (const region of regions) {
       const imp = regionImpugnadas(region);
-      const map = simpleByRegion[region.region || ""] || {};
-      const sSimple = votesForPartyInMap(map, SANCHEZ_PARTY);
-      const rSimple = votesForPartyInMap(map, RLA_PARTY);
+      const map = ruralByRegion[region.region || ""] || {};
+      const sRural = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const rRural = votesForPartyInMap(map, RLA_PARTY);
       const applies = imp.sanchezLidera && !isLimaDepartmentRegion(region);
       if (!applies) {
-        impRuralSanchez += sSimple;
-        impRuralRla += rSimple;
+        impRuralSanchez += sRural;
+        impRuralRla += rRural;
         continue;
       }
       const disputa = regionVotosEnDisputa(region) * impugnacionRuralFactor;
       if (disputa <= 0) {
-        impRuralSanchez += sSimple;
-        impRuralRla += rSimple;
+        impRuralSanchez += sRural;
+        impRuralRla += rRural;
         continue;
       }
-      const sActual = getCurrentPartyVotes(region, SANCHEZ_PARTY);
-      const rActual = getCurrentPartyVotes(region, RLA_PARTY);
-      const gS = Math.max(0, sSimple - sActual);
-      const gR = Math.max(0, rSimple - rActual);
-      const gPair = gS + gR;
-      if (gPair <= 0) {
-        impRuralSanchez += sSimple;
-        impRuralRla += rSimple;
+      const pair = sRural + rRural;
+      if (pair <= 0) {
+        impRuralSanchez += sRural;
+        impRuralRla += rRural;
         continue;
       }
-      const descuento = Math.min(disputa, gPair);
-      const dS = (descuento * gS) / gPair;
-      const dR = (descuento * gR) / gPair;
-      impRuralSanchez += Math.max(sActual, sSimple - dS);
-      impRuralRla += Math.max(rActual, rSimple - dR);
+      const descuento = Math.min(disputa, pair);
+      const dS = (descuento * sRural) / pair;
+      const dR = (descuento * rRural) / pair;
+      impRuralSanchez += Math.max(0, sRural - dS);
+      impRuralRla += Math.max(0, rRural - dR);
     }
     const impugnacionRural = {
       sanchez: Math.max(0, Math.round(impRuralSanchez)),
@@ -540,7 +536,8 @@
     const totalValidSimple = Math.max(1, Number(nationalStats.totalValidProjectedVotes) || 0);
     const totalValidRural = Math.max(1, Number(ruralStats.totalValidProjectedVotes) || 0);
     const otherValidSimple = Math.max(0, totalValidSimple - duoSimple);
-    const totalValidImpR = Math.max(1, otherValidSimple + duoImpR);
+    const otherValidRural = Math.max(0, totalValidRural - duoRural);
+    const totalValidImpR = Math.max(1, otherValidRural + duoImpR);
     const totalValidImpL = Math.max(1, otherValidSimple + duoImpL);
 
     return {

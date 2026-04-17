@@ -199,7 +199,7 @@
         <button type="button" id="mode-ffe-actual" class="mode-btn" data-tooltip="Votos válidos ya contabilizados para ambos candidatos. En barras: porcentaje del total nacional válido del modo.">ACTUAL</button>
         <button type="button" id="mode-ffe-simple" class="mode-btn" data-tooltip="Proyección lineal al 100% de actas por región (igual que proyección simple nacional). En barras: porcentaje del total nacional válido del modo.">SIMPLE</button>
         <button type="button" id="mode-ffe-rural" class="mode-btn" data-tooltip="Sesgo rural en regiones donde lidera Sánchez (igual que proyección voto rural). En barras: porcentaje del total nacional válido del modo.">VOTO RURAL</button>
-        <button type="button" id="mode-ffe-imp-rural" class="mode-btn" data-tooltip="Proyección simple nacional; en departamentos fuera de Lima donde Sánchez va primero, solo se descuenta del tramo en disputa JEE/JNE y únicamente sobre la parte proyectada (no sobre votos ya contados). «Rural» solo nombra ese conjunto de zonas. En barras: porcentaje del total nacional válido del modo.">IMPUGN. RURAL</button>
+        <button type="button" id="mode-ffe-imp-rural" class="mode-btn" data-tooltip="Parte de VOTO RURAL: en departamentos fuera de Lima donde Sánchez va primero, la impugnación elimina votantes del tramo en disputa JEE/JNE y el descuento se reparte entre ambos en proporción al voto rural proyectado de la región. En barras: porcentaje del total nacional válido del modo.">IMPUGN. RURAL</button>
         <button type="button" id="mode-ffe-imp-lima" class="mode-btn" data-tooltip="Proyección simple nacional; en Lima solo se descuenta del tramo en disputa JEE/JNE y únicamente sobre la parte proyectada (no sobre votos ya contados). En barras: porcentaje del total nacional válido del modo.">IMPUGN. LIMA</button>
       </div>
       <div id="ffe-imp-controls" class="ffe-imp-controls hidden" aria-live="polite">
@@ -339,10 +339,11 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <script src="projection-modes.js?v=20260417d"></script>
-  <script src="app.js?v=20260417d"></script>
+  <script src="projection-modes.js?v=20260417e"></script>
+  <script src="app.js?v=20260417e"></script>
 </body>
 </html>
+
 
 
 
