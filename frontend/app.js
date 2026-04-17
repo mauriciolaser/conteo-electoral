@@ -24,6 +24,8 @@ const API_BASE_URL = BASE_URL ? `${BASE_URL}/api/v1` : "./api/v1";
 const API_DASHBOARD_SUMMARY_URL = `${API_BASE_URL}/dashboard/summary`;
 const API_DASHBOARD_LATEST_URL = `${API_BASE_URL}/dashboard/latest`;
 
+console.log("Gracias por visitar esta aplicación. Te invito a revisar mis otros proyectos en https://perulainen.com\n¡Viva el Perú!");
+
 // ─────────────────────────────────────────────
 //  Paleta de colores por partido (igual a Python)
 // ─────────────────────────────────────────────
@@ -438,6 +440,19 @@ function getHalfHourSnapshots(snapshots) {
   return [...byBucket.values()].sort((a, b) => a.dt - b.dt);
 }
 
+function pickSnapshotForTrailingWindow(snapshots, latestSnap, windowMs) {
+  if (!Array.isArray(snapshots) || snapshots.length === 0 || !latestSnap?.dt) return null;
+  const cutoffMs = latestSnap.dt.getTime() - windowMs;
+  let best = null;
+  for (const snap of snapshots) {
+    if (!snap?.dt) continue;
+    if (snap.dt.getTime() <= cutoffMs) {
+      if (!best || snap.dt > best.dt) best = snap;
+    }
+  }
+  return best || snapshots[0];
+}
+
 function partyVotesInRegion(region, partyNameCanonical) {
   return (region.partidos || [])
     .filter(p => canonicalPartyName(p.nombre) === partyNameCanonical)
@@ -653,42 +668,6 @@ function renderMainChart() {
   }
   updateMainChartButtons();
 
-  let _mainChartTooltipDbgLeft = 4;
-
-  // #region agent log
-  (() => {
-    const rows = source.topCandidates.map(([rawName, rowVotes]) => {
-      const rowPct = source.totalValidVotes > 0 ? (rowVotes / source.totalValidVotes) * 100 : 0;
-      const canon = canonicalPartyName(rawName);
-      const canonSum = mainChartMode === "actual"
-        ? Object.entries(activeLatestSnapshot?.totals || {})
-          .filter(([k]) => !isSpecial(k) && canonicalPartyName(k) === canon)
-          .reduce((a, [, v]) => a + (Number(v) || 0), 0)
-        : null;
-      return {
-        rawName,
-        rowVotes,
-        rowPct,
-        canonSum,
-        rowVsCanonDelta: canonSum == null ? null : rowVotes - canonSum,
-      };
-    });
-    fetch("http://127.0.0.1:7303/ingest/d76e3171-59e4-4f5f-9a95-f9a288d2e142", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "21b9fa" },
-      body: JSON.stringify({
-        sessionId: "21b9fa",
-        runId: "post-fix",
-        hypothesisId: "H_chart_canonical",
-        location: "app.js:renderMainChart",
-        message: "Top6 values vs canonical sums on activeLatest.totals",
-        data: { mainChartMode, totalValidVotes: source.totalValidVotes, rows },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  })();
-  // #endregion
-
   mainChartInstance = new Chart(ctx, {
     type: "bar",
     data: {
@@ -712,30 +691,6 @@ function renderMainChart() {
             label: ctx => {
               const pct = ctx.parsed.x.toFixed(2);
               const votes = formatInt(values[ctx.dataIndex]);
-              // #region agent log
-              if (_mainChartTooltipDbgLeft > 0) {
-                _mainChartTooltipDbgLeft -= 1;
-                fetch("http://127.0.0.1:7303/ingest/d76e3171-59e4-4f5f-9a95-f9a288d2e142", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "21b9fa" },
-                  body: JSON.stringify({
-                    sessionId: "21b9fa",
-                    runId: "post-fix",
-                    hypothesisId: "H_chartjs_tooltip",
-                    location: "app.js:mainChart.tooltip",
-                    message: "Tooltip index vs arrays",
-                    data: {
-                      dataIndex: ctx.dataIndex,
-                      parsedX: ctx.parsed.x,
-                      pctFromValues: pcts[ctx.dataIndex],
-                      votesRaw: values[ctx.dataIndex],
-                      label: fullLabels[ctx.dataIndex],
-                    },
-                    timestamp: Date.now(),
-                  }),
-                }).catch(() => {});
-              }
-              // #endregion
               return ` ${fullLabels[ctx.dataIndex]}: ${pct}% (${votes} ${modeMeta.tooltipSuffix})`;
             },
           },
@@ -1058,8 +1013,9 @@ function renderGrowthRateChart(snapshots) {
   const rsDeltas  = [];
 
   for (let i = 1; i < hourlySnaps.length; i++) {
-    const prev = hourlySnaps[i - 1];
     const curr = hourlySnaps[i];
+    const prev = pickSnapshotForTrailingWindow(hourlySnaps, curr, ONE_HOUR_MS);
+    if (!prev) continue;
 
     const rlaOld = sumByNormalized(prev.totals, RLA_PARTY);
     const rsOld  = sumByNormalized(prev.totals, RS_PARTY);
@@ -1251,9 +1207,8 @@ function renderFrenteAFrente(latestPayload, snapshots) {
   if (rlaHourEl && rsHourEl && snapshots && snapshots.length >= 2) {
     const ONE_HOUR_MS = 60 * 60 * 1000;
     const latestSnap = snapshots[snapshots.length - 1];
-    const cutoff = latestSnap.dt.getTime() - ONE_HOUR_MS;
-    // El snapshot más antiguo dentro de la última hora (o el más antiguo disponible)
-    const oldSnap = snapshots.find(s => s.dt.getTime() >= cutoff) || snapshots[0];
+    const oldSnap = pickSnapshotForTrailingWindow(snapshots, latestSnap, ONE_HOUR_MS);
+    if (!oldSnap) return;
 
     const sumByNormalized = (totals, normalizedParty) =>
       Object.entries(totals)
@@ -1617,36 +1572,6 @@ async function loadAndRender() {
       ffeDuelChartData = null;
     }
 
-    // #region agent log
-    (() => {
-      const fresh = aggregateSnapshot(activeLatest.payload);
-      const freshStats = buildCurrentProcessingStats(fresh);
-      const t0 = currentStats.topCandidates[0];
-      const f0 = freshStats.topCandidates[0];
-      fetch("http://127.0.0.1:7303/ingest/d76e3171-59e4-4f5f-9a95-f9a288d2e142", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "21b9fa" },
-        body: JSON.stringify({
-          sessionId: "21b9fa",
-          runId: "post-fix",
-          hypothesisId: "H_api_merge_totals",
-          location: "app.js:loadAndRender",
-          message: "activeLatest.totals vs aggregateSnapshot(payload)",
-          data: {
-            extractedAt: activeLatest.payload?.metadata?.extracted_at_utc,
-            partyKeysActive: Object.keys(activeLatest.totals || {}).length,
-            partyKeysFresh: Object.keys(fresh).length,
-            totalValidActive: currentStats.totalValidVotes,
-            totalValidFresh: freshStats.totalValidVotes,
-            top0Active: t0 ? { name: t0[0], v: t0[1] } : null,
-            top0Fresh: f0 ? { name: f0[0], v: f0[1] } : null,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    })();
-    // #endregion
-
     // 4. Renderizar
     updateStatusBar(activeLatest.payload, renderSnapshots);
     renderMainChart();
@@ -1776,4 +1701,5 @@ document.addEventListener("DOMContentLoaded", () => {
   try { localStorage.removeItem("elec_snapshots_cache"); } catch (_) {}
 
   loadAndRender();
+  setInterval(loadAndRender, 60_000);
 });
