@@ -356,7 +356,7 @@ main {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 0.55rem 0.7rem;
-  margin: -0.15rem 0 0.7rem;
+  margin: 0.35rem 0 0.55rem;
   padding: 0.6rem 0.7rem;
   border-radius: 12px;
   background: linear-gradient(160deg, rgba(28, 36, 64, 0.72), rgba(18, 24, 44, 0.88));
@@ -1144,7 +1144,7 @@ canvas {
       padding: 0.45rem 0.6rem;
     }
 
-    #ffe-duel-mode-switch .mode-btn {
+    #ffe-projection-type-switch .mode-btn {
       flex: 1 1 calc(50% - 0.35rem);
       text-align: center;
       min-height: 38px;

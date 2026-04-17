@@ -440,6 +440,7 @@
 
   function buildHeadToHeadBundle(latestPayload, options = {}) {
     const regions = latestPayload.regions || [];
+    const projectionType = options.projectionType === "rural" ? "rural" : "simple";
     const impugnacionRuralPct = normalizeImpugnacionPct(options.impugnacionRuralPct, 100);
     const impugnacionLimaPct = normalizeImpugnacionPct(options.impugnacionLimaPct, 100);
     const impugnacionRuralFactor = impugnacionRuralPct / 100;
@@ -540,6 +541,54 @@
     const totalValidImpR = Math.max(1, otherValidRural + duoImpR);
     const totalValidImpL = Math.max(1, otherValidSimple + duoImpL);
 
+    const baseByRegion = projectionType === "rural" ? ruralByRegion : simpleByRegion;
+    const baseNat = projectionType === "rural" ? ruralNat : simpleNat;
+    const totalValidBase = projectionType === "rural" ? totalValidRural : totalValidSimple;
+
+    let combinedS = Number(baseNat.a) || 0;
+    let combinedR = Number(baseNat.b) || 0;
+    let totalDiscount = 0;
+
+    for (const region of regions) {
+      const imp = regionImpugnadas(region);
+      if (!imp.sanchezLidera || isLimaDepartmentRegion(region)) continue;
+      const map = baseByRegion[region.region || ""] || {};
+      const s = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const r = votesForPartyInMap(map, RLA_PARTY);
+      const pair = s + r;
+      if (pair <= 0) continue;
+      const disputa = regionVotosEnDisputa(region) * impugnacionRuralFactor;
+      if (disputa <= 0) continue;
+      const descuento = Math.min(disputa, pair);
+      const dS = (descuento * s) / pair;
+      const dR = (descuento * r) / pair;
+      combinedS = Math.max(0, combinedS - dS);
+      combinedR = Math.max(0, combinedR - dR);
+      totalDiscount += descuento;
+    }
+
+    if (limaRegion) {
+      const map = baseByRegion[limaRegion.region || ""] || {};
+      const s = votesForPartyInMap(map, SANCHEZ_PARTY);
+      const r = votesForPartyInMap(map, RLA_PARTY);
+      const pair = s + r;
+      if (pair > 0) {
+        const disputa = regionVotosEnDisputa(limaRegion) * impugnacionLimaFactor;
+        if (disputa > 0) {
+          const descuento = Math.min(disputa, pair);
+          const dS = (descuento * s) / pair;
+          const dR = (descuento * r) / pair;
+          combinedS = Math.max(0, combinedS - dS);
+          combinedR = Math.max(0, combinedR - dR);
+          totalDiscount += descuento;
+        }
+      }
+    }
+
+    const combinedSInt = Math.max(0, Math.round(combinedS));
+    const combinedRInt = Math.max(0, Math.round(combinedR));
+    const combinedTotalValid = Math.max(1, Math.round(Math.max(0, totalValidBase - totalDiscount)));
+
     return {
       actual: {
         sanchez: actual.sanchez,
@@ -585,6 +634,18 @@
         rlaPct: (impugnacionLima.rla / totalValidImpL) * 100,
         appliedPct: impugnacionLimaPct,
         isFallback: impugnacionLima.isFallback,
+      },
+      combined: {
+        projectionType,
+        sanchez: combinedSInt,
+        rla: combinedRInt,
+        totalValid: combinedTotalValid,
+        totalDuo: combinedSInt + combinedRInt,
+        sanchezPct: (combinedSInt / combinedTotalValid) * 100,
+        rlaPct: (combinedRInt / combinedTotalValid) * 100,
+        impugnacionRuralPct,
+        impugnacionLimaPct,
+        isFallback: projectionType === "rural" ? Boolean(ruralStats.isFallback) : false,
       },
     };
   }

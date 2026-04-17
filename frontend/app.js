@@ -296,12 +296,12 @@ let mainChartInstance = null;
 let ffeDuelChartInstance = null;
 let trendChartInstance = null;
 let mainChartMode = "actual";
-let ffeDuelChartMode = "actual";
+let ffeProjectionType = "simple";
 let mainChartData = null;
 let ffeDuelChartData = null;
-const ffeImpugnacionPctByMode = {
-  impugnacionRural: 100,
-  impugnacionLima: 100,
+const ffeImpugnacionPct = {
+  rural: 0,
+  lima: 0,
 };
 let activeLatestSnapshot = null; // snapshot visible más reciente aceptado por la UI
 let activeLatestSnapshotTs = Number.NEGATIVE_INFINITY;
@@ -324,30 +324,14 @@ const MAIN_CHART_MODE_META = {
   },
 };
 
-const FFE_DUEL_MODE_META = {
-  actual: {
-    note: "Votos válidos ya contabilizados (ONPE) para los dos candidatos, sumando todas las regiones y Peruanos en el extranjero. Barras: % sobre el total nacional válido del modo.",
-    tooltipSuffix: "votos contados",
-  },
+const FFE_PROJECTION_META = {
   simple: {
-    note: "Proyección simple al 100% de actas por región (cada departamento y Peruanos en el extranjero), agregada a nivel nacional y extranjero para los dos candidatos. Barras: % sobre el total nacional válido del modo.",
-    tooltipSuffix: "votos proyectados simple",
+    note: "Base SIMPLE: proyección lineal al 100% de actas por región. Luego se aplican impugnación rural y Lima como eliminación de votantes en disputa sobre esta base.",
+    tooltipSuffix: "votos proyectados (simple + impugnaciones)",
   },
   rural: {
-    note: "Proyección con sesgo rural en regiones donde lidera Sánchez (misma lógica que el Top 6 en modo voto rural). Los totales incluyen todas las regiones y el voto en el extranjero. Barras: % sobre el total nacional válido del modo.",
-    tooltipSuffix: "votos proyectados voto rural",
-  },
-  ruralFallback: {
-    note: "Voto rural sin regiones elegibles en este corte; coincide con la proyección simple agregada para el duelo (nacional + extranjero). Barras: % sobre el total nacional válido del modo.",
-    tooltipSuffix: "votos proyectados",
-  },
-  impugnacionRural: {
-    note: "Parte de la proyección VOTO RURAL (nacional + extranjero). En departamentos fuera de Lima donde Sánchez va primero frente a López Aliaga, la impugnación elimina votantes del tramo en disputa JEE/JNE y el recorte se reparte entre ambos en proporción al voto rural proyectado de esa región. «Rural» solo nombra ese conjunto de zonas. Lima va en «Impugnación Lima». Barras: % sobre el total nacional válido del modo.",
-    tooltipSuffix: "votos (simulación impugnación rural)",
-  },
-  impugnacionLima: {
-    note: "Misma proyección simple nacional (nacional + extranjero) que el modo SIMPLE, pero se descuenta solo del tramo en disputa JEE/JNE del departamento Lima entre ambos candidatos. El ajuste se aplica únicamente sobre la parte proyectada (no sobre votos ya contados). Barras: % sobre el total nacional válido del modo.",
-    tooltipSuffix: "votos (simulación impugnación Lima)",
+    note: "Base VOTO RURAL: proyección con sesgo rural. Luego se aplican impugnación rural y Lima como eliminación de votantes en disputa sobre esta base.",
+    tooltipSuffix: "votos proyectados (rural + impugnaciones)",
   },
 };
 
@@ -365,14 +349,8 @@ function computePercentAxisMax(values) {
 
 function clampImpugnacionPct(value) {
   const n = Number(value);
-  if (!Number.isFinite(n)) return 100;
+  if (!Number.isFinite(n)) return 0;
   return Math.max(0, Math.min(100, Math.round(n)));
-}
-
-function getActiveImpugnacionMode() {
-  if (ffeDuelChartMode === "impugnacionRural") return "impugnacionRural";
-  if (ffeDuelChartMode === "impugnacionLima") return "impugnacionLima";
-  return null;
 }
 
 function rebuildFfeDuelChartDataFromActiveSnapshot() {
@@ -386,46 +364,28 @@ function rebuildFfeDuelChartDataFromActiveSnapshot() {
     return;
   }
   ffeDuelChartData = window.ProjectionModes.buildHeadToHeadBundle(payload, {
-    impugnacionRuralPct: ffeImpugnacionPctByMode.impugnacionRural,
-    impugnacionLimaPct: ffeImpugnacionPctByMode.impugnacionLima,
+    projectionType: ffeProjectionType,
+    impugnacionRuralPct: ffeImpugnacionPct.rural,
+    impugnacionLimaPct: ffeImpugnacionPct.lima,
   });
 }
 
-function updateFfeImpPresetButtons(selectedPct) {
-  const buttons = document.querySelectorAll("#ffe-imp-presets .ffe-imp-preset");
-  for (const btn of buttons) {
-    const pct = clampImpugnacionPct(parseInt(btn.dataset.pct || "", 10));
-    const isActive = pct === selectedPct;
-    btn.classList.toggle("active", isActive);
-    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
-  }
+function updateFfeProjectionTypeButtons() {
+  const simpleBtn = document.getElementById("ffe-proj-simple");
+  const ruralBtn = document.getElementById("ffe-proj-rural");
+  if (simpleBtn) simpleBtn.classList.toggle("active", ffeProjectionType === "simple");
+  if (ruralBtn) ruralBtn.classList.toggle("active", ffeProjectionType === "rural");
 }
 
 function updateFfeImpugnacionControls() {
-  const wrap = document.getElementById("ffe-imp-controls");
-  const input = document.getElementById("ffe-imp-percent-input");
-  const label = document.getElementById("ffe-imp-percent-label");
-  const subtitle = document.getElementById("ffe-imp-subtitle");
-  if (!wrap || !input || !label) return;
-  const mode = getActiveImpugnacionMode();
-  if (!mode) {
-    wrap.classList.add("hidden");
-    return;
+  const ruralInput = document.getElementById("ffe-imp-rural-input");
+  const limaInput = document.getElementById("ffe-imp-lima-input");
+  if (ruralInput && document.activeElement !== ruralInput) {
+    ruralInput.value = String(clampImpugnacionPct(ffeImpugnacionPct.rural));
   }
-  wrap.classList.remove("hidden");
-  if (mode === "impugnacionRural") {
-    label.textContent = "Impugnación Rural aplicada (%)";
-    if (subtitle) subtitle.textContent = "Sobre base VOTO RURAL: descuento al bloque en disputa fuera de Lima, proporcional al voto rural proyectado.";
-  } else {
-    label.textContent = "Impugnación Lima aplicada (%)";
-    if (subtitle) subtitle.textContent = "Descuento aplicado al bloque en disputa del departamento Lima.";
+  if (limaInput && document.activeElement !== limaInput) {
+    limaInput.value = String(clampImpugnacionPct(ffeImpugnacionPct.lima));
   }
-  const currentPct = clampImpugnacionPct(ffeImpugnacionPctByMode[mode] ?? 100);
-  const nextValue = String(currentPct);
-  if (document.activeElement !== input) {
-    input.value = nextValue;
-  }
-  updateFfeImpPresetButtons(currentPct);
 }
 
 const HALF_HOUR_MS = 30 * 60 * 1000;
@@ -795,25 +755,12 @@ function renderMainChart() {
   });
 }
 
-function updateFfeDuelChartButtons() {
-  const pairs = [
-    ["actual", "mode-ffe-actual"],
-    ["simple", "mode-ffe-simple"],
-    ["rural", "mode-ffe-rural"],
-    ["impugnacionRural", "mode-ffe-imp-rural"],
-    ["impugnacionLima", "mode-ffe-imp-lima"],
-  ];
-  for (const [mode, id] of pairs) {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle("active", ffeDuelChartMode === mode);
-  }
-}
-
 function renderFfeDuelChart() {
   const canvas = document.getElementById("ffe-duel-chart");
   const noteEl = document.getElementById("ffe-duel-chart-note");
   const badgeClear = document.getElementById("ffe-duel-leader-badge");
   updateFfeImpugnacionControls();
+  updateFfeProjectionTypeButtons();
   if (!canvas || !ffeDuelChartData || typeof Chart === "undefined") {
     if (badgeClear) {
       badgeClear.textContent = "";
@@ -824,33 +771,14 @@ function renderFfeDuelChart() {
   const ctx = canvas.getContext("2d");
   if (ffeDuelChartInstance) ffeDuelChartInstance.destroy();
 
-  const keyByMode = {
-    actual: "actual",
-    simple: "simple",
-    rural: "rural",
-    impugnacionRural: "impugnacionRural",
-    impugnacionLima: "impugnacionLima",
-  };
-  const dataKey = keyByMode[ffeDuelChartMode] || "actual";
-  const source = ffeDuelChartData[dataKey] || ffeDuelChartData.actual;
-
-  const useRuralFallback =
-    ffeDuelChartMode === "rural" && Boolean(source.isFallback);
-
-  const modeMeta = useRuralFallback
-    ? FFE_DUEL_MODE_META.ruralFallback
-    : (FFE_DUEL_MODE_META[ffeDuelChartMode] || FFE_DUEL_MODE_META.actual);
+  const source = ffeDuelChartData.combined || ffeDuelChartData.simple;
+  const projectionType = source.projectionType === "rural" ? "rural" : "simple";
+  const modeMeta = FFE_PROJECTION_META[projectionType] || FFE_PROJECTION_META.simple;
   if (noteEl) {
-    const mode = getActiveImpugnacionMode();
-    const appliedPct = Number(source.appliedPct);
-    if (mode && Number.isFinite(appliedPct)) {
-      noteEl.textContent = `${modeMeta.note} Ajuste actual: ${Math.round(appliedPct)}%.`;
-    } else {
-      noteEl.textContent = modeMeta.note;
-    }
+    const impR = clampImpugnacionPct(source.impugnacionRuralPct);
+    const impL = clampImpugnacionPct(source.impugnacionLimaPct);
+    noteEl.textContent = `${modeMeta.note} Impugnación Rural: ${impR}% · Impugnación Lima: ${impL}%.`;
   }
-
-  updateFfeDuelChartButtons();
 
   const rlaVotes = Number(source.rla) || 0;
   const sanchezVotes = Number(source.sanchez) || 0;
@@ -1735,59 +1663,51 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const ffeModeBindings = [
-    ["mode-ffe-actual", "actual"],
-    ["mode-ffe-simple", "simple"],
-    ["mode-ffe-rural", "rural"],
-    ["mode-ffe-imp-rural", "impugnacionRural"],
-    ["mode-ffe-imp-lima", "impugnacionLima"],
-  ];
-  for (const [id, mode] of ffeModeBindings) {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.addEventListener("click", () => {
-        ffeDuelChartMode = mode;
-        renderFfeDuelChart();
-      });
-    }
+  const projSimpleBtn = document.getElementById("ffe-proj-simple");
+  const projRuralBtn = document.getElementById("ffe-proj-rural");
+  if (projSimpleBtn) {
+    projSimpleBtn.addEventListener("click", () => {
+      ffeProjectionType = "simple";
+      rebuildFfeDuelChartDataFromActiveSnapshot();
+      renderFfeDuelChart();
+    });
+  }
+  if (projRuralBtn) {
+    projRuralBtn.addEventListener("click", () => {
+      ffeProjectionType = "rural";
+      rebuildFfeDuelChartDataFromActiveSnapshot();
+      renderFfeDuelChart();
+    });
   }
 
-  const ffeImpInput = document.getElementById("ffe-imp-percent-input");
-  const applyFfeImpPct = rawValue => {
-    const mode = getActiveImpugnacionMode();
-    if (!mode) return;
-    const cleaned = String(rawValue ?? "").replace(/[^\d]/g, "");
-    const pct = cleaned ? clampImpugnacionPct(parseInt(cleaned, 10)) : (ffeImpugnacionPctByMode[mode] ?? 100);
-    ffeImpugnacionPctByMode[mode] = pct;
-    if (ffeImpInput) ffeImpInput.value = String(pct);
-    rebuildFfeDuelChartDataFromActiveSnapshot();
-    renderFfeDuelChart();
-  };
-  if (ffeImpInput) {
-    ffeImpInput.addEventListener("input", () => {
-      const cleaned = String(ffeImpInput.value || "").replace(/[^\d]/g, "");
-      if (cleaned !== ffeImpInput.value) ffeImpInput.value = cleaned;
+  const bindImpInput = (id, key) => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    const apply = rawValue => {
+      const cleaned = String(rawValue ?? "").replace(/[^\d]/g, "");
+      const pct = cleaned ? clampImpugnacionPct(parseInt(cleaned, 10)) : (ffeImpugnacionPct[key] ?? 0);
+      ffeImpugnacionPct[key] = pct;
+      input.value = String(pct);
+      rebuildFfeDuelChartDataFromActiveSnapshot();
+      renderFfeDuelChart();
+    };
+    input.addEventListener("input", () => {
+      const cleaned = String(input.value || "").replace(/[^\d]/g, "");
+      if (cleaned !== input.value) input.value = cleaned;
       if (!cleaned) return;
-      applyFfeImpPct(cleaned);
+      apply(cleaned);
     });
-    ffeImpInput.addEventListener("blur", () => {
-      applyFfeImpPct(ffeImpInput.value || "");
-    });
-    ffeImpInput.addEventListener("keydown", ev => {
+    input.addEventListener("blur", () => apply(input.value || ""));
+    input.addEventListener("keydown", ev => {
       if (ev.key === "Enter") {
         ev.preventDefault();
-        applyFfeImpPct(ffeImpInput.value || "");
-        ffeImpInput.blur();
+        apply(input.value || "");
+        input.blur();
       }
     });
-  }
-
-  const ffeImpPresetBtns = document.querySelectorAll("#ffe-imp-presets .ffe-imp-preset");
-  for (const btn of ffeImpPresetBtns) {
-    btn.addEventListener("click", () => {
-      applyFfeImpPct(btn.dataset.pct || "100");
-    });
-  }
+  };
+  bindImpInput("ffe-imp-rural-input", "rural");
+  bindImpInput("ffe-imp-lima-input", "lima");
 
   // ¿Qué es esto? toggle
   const qeeBtn = document.getElementById("que-es-esto-btn");
