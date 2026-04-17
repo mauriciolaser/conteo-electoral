@@ -330,27 +330,27 @@ const MAIN_CHART_MODE_META = {
 
 const FFE_DUEL_MODE_META = {
   actual: {
-    note: "Votos válidos ya contabilizados (ONPE) para los dos candidatos. Barras: % sobre la suma de ambos.",
+    note: "Votos válidos ya contabilizados (ONPE) para los dos candidatos, sumando todas las regiones y Peruanos en el extranjero. Barras: % sobre la suma de ambos.",
     tooltipSuffix: "votos contados",
   },
   simple: {
-    note: "Proyección simple al 100% de actas por región, agregada a nivel nacional para los dos candidatos.",
+    note: "Proyección simple al 100% de actas por región (cada departamento y Peruanos en el extranjero), agregada a nivel nacional y extranjero para los dos candidatos.",
     tooltipSuffix: "votos proyectados simple",
   },
   rural: {
-    note: "Proyección con sesgo rural en regiones donde lidera Sánchez (misma lógica que el Top 6 en modo voto rural).",
+    note: "Proyección con sesgo rural en regiones donde lidera Sánchez (misma lógica que el Top 6 en modo voto rural). Los totales incluyen todas las regiones y el voto en el extranjero.",
     tooltipSuffix: "votos proyectados voto rural",
   },
   ruralFallback: {
-    note: "Voto rural sin regiones elegibles en este corte; coincide con la proyección simple agregada para el duelo.",
+    note: "Voto rural sin regiones elegibles en este corte; coincide con la proyección simple agregada para el duelo (nacional + extranjero).",
     tooltipSuffix: "votos proyectados",
   },
   impugnacionRural: {
-    note: "Desde voto rural: se restan los votos impugnados (ONPE) en regiones donde Sánchez lidera sobre López Aliaga, sin bajar el total regional de Sánchez por debajo de cero.",
+    note: "Proyección simple (nacional + extranjero) sin contar los votos impugnados que ONPE reporta en departamentos donde Sánchez va delante de López Aliaga: se descuentan del total proyectado de Sánchez, acotado al voto simple de Sánchez en cada una de esas regiones.",
     tooltipSuffix: "votos (simulación impugnación rural)",
   },
   impugnacionLima: {
-    note: "Desde voto rural: se restan los votos impugnados del departamento Lima entre ambos, en proporción a su proyección rural en Lima.",
+    note: "Proyección simple (nacional + extranjero) sin contar los votos impugnados que ONPE reporta en el departamento Lima: ese cupo se reparte entre ambos en la misma proporción que su proyección simple solo en Lima.",
     tooltipSuffix: "votos (simulación impugnación Lima)",
   },
 };
@@ -807,11 +807,7 @@ function renderFfeDuelChart() {
   const dataKey = keyByMode[ffeDuelChartMode] || "actual";
   const source = ffeDuelChartData[dataKey] || ffeDuelChartData.actual;
 
-  const useRuralFallback =
-    (ffeDuelChartMode === "rural" ||
-      ffeDuelChartMode === "impugnacionRural" ||
-      ffeDuelChartMode === "impugnacionLima") &&
-    Boolean(source.isFallback);
+  const useRuralFallback = ffeDuelChartMode === "rural" && Boolean(source.isFallback);
 
   const modeMeta = useRuralFallback
     ? FFE_DUEL_MODE_META.ruralFallback
@@ -843,19 +839,26 @@ function renderFfeDuelChart() {
       color: partyColor("JUNTOS POR EL PERU", 1),
     },
   ];
+
+  const isTie = rows.length >= 2 && rows[0].votes === rows[1].votes;
+  const voteDiff = rows.length >= 2 ? Math.abs(rows[0].votes - rows[1].votes) : 0;
+  const winnerRow = !isTie ? rows.reduce((best, r) => (r.votes > best.votes ? r : best), rows[0]) : null;
+
+  // Chart.js horizontal (indexAxis y): primera categoría abajo, última arriba.
+  // Orden ascendente por votos → el que va ganando queda arriba.
   rows.sort((a, b) => {
-    if (b.votes !== a.votes) return b.votes - a.votes;
+    if (a.votes !== b.votes) return a.votes - b.votes;
     return String(a.key).localeCompare(String(b.key));
   });
 
-  const isTie = rows.length >= 2 && rows[0].votes === rows[1].votes;
+  const winnerIndex = !isTie ? rows.length - 1 : -1;
   const labels = rows.map(r => r.label);
   const values = rows.map(r => r.pct);
   const votes = rows.map(r => r.votes);
   const colors = rows.map(r => r.color);
-  const borderWidths = rows.map((r, i) => (!isTie && i === 0 ? 3 : 1));
+  const borderWidths = rows.map((r, i) => (!isTie && i === winnerIndex ? 3 : 1));
   const borderColors = rows.map((r, i) => {
-    if (!isTie && i === 0) return "rgba(255, 255, 255, 0.92)";
+    if (!isTie && i === winnerIndex) return "rgba(255, 255, 255, 0.92)";
     return `${r.color}cc`;
   });
 
@@ -864,11 +867,10 @@ function renderFfeDuelChart() {
     badgeEl.classList.toggle("ffe-duel-leader-badge--tie", isTie);
     if (isTie) {
       badgeEl.innerHTML = "<span>Empate en votos válidos (este modo).</span>";
-    } else {
-      const w = rows[0];
+    } else if (winnerRow) {
       badgeEl.innerHTML =
         `<span class="ffe-duel-crown" aria-hidden="true">👑</span>` +
-        `<span>Va ganando: <strong>${w.shortLabel}</strong> (${formatInt(w.votes)} votos)</span>`;
+        `<span>Gana: <strong>${winnerRow.shortLabel}</strong> · +${formatInt(voteDiff)} votos de diferencia</span>`;
     }
   }
 
@@ -894,7 +896,7 @@ function renderFfeDuelChart() {
           callbacks: {
             label: ctx => {
               const i = ctx.dataIndex;
-              const lead = !isTie && i === 0 ? " · 1.er lugar" : "";
+              const lead = !isTie && i === winnerIndex ? " · 1.er lugar" : "";
               return ` ${labels[i]}: ${values[i].toFixed(2)}% (${formatInt(votes[i])} ${modeMeta.tooltipSuffix})${lead}`;
             },
           },
@@ -910,7 +912,6 @@ function renderFfeDuelChart() {
           grid: { color: "#2a2d3a" },
         },
         y: {
-          reverse: true,
           ticks: { color: "#e8eaf0", font: { size: 11 } },
           grid: { display: false },
         },

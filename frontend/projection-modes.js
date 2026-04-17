@@ -409,21 +409,21 @@
     const simple = twoHorseFromProjectedCandidates(nationalStats.projectedCandidates);
     const rural = twoHorseFromProjectedCandidates(ruralStats.projectedCandidates);
 
-    const ruralByRegion = buildRuralProjectionByRegion(latestPayload);
-    const ruralNat = sumTwoHorseFromRegionalMaps(ruralByRegion, regions, SANCHEZ_PARTY, RLA_PARTY);
+    const simpleByRegion = buildSimpleProjectionByRegion(latestPayload);
+    const simpleNat = sumTwoHorseFromRegionalMaps(simpleByRegion, regions, SANCHEZ_PARTY, RLA_PARTY);
 
-    let subRuralImp = 0;
+    let subImpRuralSanchez = 0;
     for (const region of regions) {
       const imp = regionImpugnadas(region);
       if (!imp.sanchezLidera || imp.votosImpugnados <= 0) continue;
-      const map = ruralByRegion[region.region || ""] || {};
+      const map = simpleByRegion[region.region || ""] || {};
       const sReg = votesForPartyInMap(map, SANCHEZ_PARTY);
-      subRuralImp += Math.min(imp.votosImpugnados, Math.round(sReg));
+      subImpRuralSanchez += Math.min(imp.votosImpugnados, Math.round(sReg));
     }
     const impugnacionRural = {
-      sanchez: Math.max(0, ruralNat.a - subRuralImp),
-      rla: ruralNat.b,
-      isFallback: ruralStats.isFallback,
+      sanchez: Math.max(0, Math.round(simpleNat.a - subImpRuralSanchez)),
+      rla: Math.round(simpleNat.b),
+      isFallback: false,
     };
 
     const limaRegion = regions.find(
@@ -437,7 +437,7 @@
     if (limaRegion) {
       const vi = regionImpugnadas(limaRegion).votosImpugnados;
       const limaName = limaRegion.region || "";
-      const map = ruralByRegion[limaName] || {};
+      const map = simpleByRegion[limaName] || {};
       const sL = votesForPartyInMap(map, SANCHEZ_PARTY);
       const rL = votesForPartyInMap(map, RLA_PARTY);
       const pair = sL + rL;
@@ -450,9 +450,9 @@
       }
     }
     const impugnacionLima = {
-      sanchez: Math.max(0, Math.round(ruralNat.a - subLimaS)),
-      rla: Math.max(0, Math.round(ruralNat.b - subLimaR)),
-      isFallback: ruralStats.isFallback,
+      sanchez: Math.max(0, Math.round(simpleNat.a - subLimaS)),
+      rla: Math.max(0, Math.round(simpleNat.b - subLimaR)),
+      isFallback: false,
     };
 
     const duoActual = Math.max(1, actual.sanchez + actual.rla);
