@@ -8,7 +8,7 @@
 //    <BASE_URL>/api/v1/race/latest
 //    <BASE_URL>/api/v1/timelapse/series
 // ─────────────────────────────────────────────
-const INJECTED_BASE_URL = '__BASE_URL__';
+const INJECTED_BASE_URL = "https://perulainen.com/conteo";
 
 function resolveBaseUrl(rawValue) {
   const raw = String(rawValue || "").trim();

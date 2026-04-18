@@ -1,7 +1,7 @@
 {
   "metadata": {
     "source_url": "https://resultadoelectoral.onpe.gob.pe/main/presidenciales",
-    "extracted_at_utc": "2026-04-18T09:21:41.111435+00:00",
+    "extracted_at_utc": "2026-04-18T08:53:00.862903+00:00",
     "actas_pct_global": 93.414,
     "mode": "live",
     "warnings": [],
@@ -3073,11 +3073,11 @@
       "source": "onpe_live_backend",
       "ubigeo": "130000",
       "jee": {
-        "enviadas_jee_actas": 169,
-        "pendientes_jee_actas": 0,
+        "enviadas_jee_actas": 168,
+        "pendientes_jee_actas": 1,
         "total_mesas_o_actas": 3590,
-        "votos_revision_jne": 36716,
-        "votos_pendientes_contar": 0,
+        "votos_revision_jne": 36498,
+        "votos_pendientes_contar": 217,
         "prorrateo": "totalVotosEmitidos_por_acta_sobre_total_mesas"
       },
       "impugnadas": {
@@ -3086,8 +3086,8 @@
         "sanchez_lidera_sobre_renovacion": true,
         "es_lima_departamento": false,
         "mesas_impugnadas": 0,
-        "votos_impugnados": 36716,
-        "votos_pendientes_contar": 0,
+        "votos_impugnados": 36498,
+        "votos_pendientes_contar": 217,
         "fuente_agregado": "jee_totales_onpe"
       }
     },
