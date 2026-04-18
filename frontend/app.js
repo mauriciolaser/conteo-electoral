@@ -1392,6 +1392,11 @@ function setCozyMode(enabled) {
   const cozyToggle = document.getElementById("cozy-toggle");
   if (cozyToggle) {
     cozyToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+    const cozyToggleText = cozyToggle.querySelector(".cozy-toggle-text");
+    if (cozyToggleText) {
+      cozyToggleText.textContent = enabled ? "Modo Slop" : "Modo Cozy";
+    }
+    cozyToggle.setAttribute("aria-label", enabled ? "Activar modo slop" : "Activar modo cozy");
   }
   try {
     localStorage.setItem(COZY_STORAGE_KEY, enabled ? "1" : "0");
