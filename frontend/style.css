@@ -1433,6 +1433,15 @@ canvas {
       text-align: center;
       min-height: 38px;
     }
+
+    .footer-text {
+      font-size: clamp(0.68rem, 3.2vw, 0.8rem);
+      white-space: nowrap;
+    }
+
+    .footer-separator {
+      margin: 0 0.3rem;
+    }
   }
 
   /* Chart section: no side overflow, but allow tooltip overflow vertically */
