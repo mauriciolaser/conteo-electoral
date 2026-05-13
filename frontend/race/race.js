@@ -23,7 +23,7 @@
       sanchez: { src: "./assets/sanchez-sheet.png", frames: 11, w: 256, h: 171, label: "JUNTOS POR EL PERU" },
     },
     finish: {
-      pxPerHundredthPp: 1.0,
+      pxPerHundredthPp: 1.2,
       parallaxEnabled: false,
       porky: { src: "./assets/porky_crying_sheet.png", frames: 18, w: 170, h: 170, label: "RENOVACION POPULAR" },
       sanchez: { src: "./assets/sanchez_jumping_sheet.png", frames: 13, w: 170, h: 170, label: "JUNTOS POR EL PERU" },
