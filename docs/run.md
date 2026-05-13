@@ -90,6 +90,7 @@ FTP_PORT=21
 DEPLOY_FRONTEND=perulainen.com/conteo
 BASE_URL=https://www.perulainen.com/conteo
 RACE_MODE=default
+DEV=false
 GA_ID=G-XXXXXXXXXX
 
 # API publish
@@ -121,3 +122,4 @@ CONTEO_API_TIMEOUT_SECONDS=6
 
 - `RACE_MODE=default`: mantiene el comportamiento actual de `frontend/race/`.
 - `RACE_MODE=finish`: desactiva el parallax, usa `sanchez_jumping_sheet` y `porky_crying_sheet`, y exagera más la separación entre candidatos.
+- `DEV=true`: en `frontend/race/` imprime en consola las coordenadas exactas de ambos personajes y la distancia en píxeles entre ellos. Solo se inyecta en builds de desarrollo.

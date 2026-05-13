@@ -6,8 +6,8 @@ Uso:
 
 `frontend/` es la fuente de verdad en desarrollo.
 Este script recrea `frontend/dist/` en cada ejecución, copia todo el contenido
-de `frontend/` (excepto `frontend/dist/`) e inyecta BASE_URL en app.js y
-RACE_MODE en frontend/race/race.js.
+de `frontend/` (excepto `frontend/dist/`) e inyecta BASE_URL y RACE_MODE en app.js,
+además de RACE_MODE y RACE_IS_DEV en frontend/race/race.js.
 También inserta el snippet de Google Analytics en index.html si existe GA_ID.
 """
 from __future__ import annotations
@@ -114,6 +114,7 @@ def build(project_root: Path | None = None, env_path: Path | None = None) -> Non
             f"RACE_MODE inválido en {resolved_env_path}: {race_mode!r}.\n"
             "Valores permitidos: default, finish"
         )
+    is_dev = env.get("DEV", "").strip().lower() in {"1", "true", "yes", "on", "dev", "development"}
 
     src = root / "frontend"
     dist = src / "dist"
@@ -162,8 +163,14 @@ def build(project_root: Path | None = None, env_path: Path | None = None) -> Non
         value=base_url,
         target_name="frontend/app.js",
     )
+    app_out = inject_placeholder_literal(
+        app_out,
+        placeholder="__RACE_MODE__",
+        value=race_mode,
+        target_name="frontend/app.js",
+    )
     (dist / "app.js").write_text(app_out, encoding="utf-8")
-    print(f"[build] app.js -> BASE_URL={base_url}")
+    print(f"[build] app.js -> BASE_URL={base_url}, RACE_MODE={race_mode}")
 
     print(f"[build] procesando race/race.js (RACE_MODE={race_mode})...")
     race_js_src = (src / "race" / "race.js").read_text(encoding="utf-8")
@@ -173,8 +180,14 @@ def build(project_root: Path | None = None, env_path: Path | None = None) -> Non
         value=race_mode,
         target_name="frontend/race/race.js",
     )
+    race_js_out = inject_placeholder_literal(
+        race_js_out,
+        placeholder="__RACE_IS_DEV__",
+        value="true" if is_dev else "false",
+        target_name="frontend/race/race.js",
+    )
     (dist / "race" / "race.js").write_text(race_js_out, encoding="utf-8")
-    print(f"[build] race/race.js -> RACE_MODE={race_mode}")
+    print(f"[build] race/race.js -> RACE_MODE={race_mode}, DEV={is_dev}")
 
     ga_id = env.get("GA_ID", "").strip()
     print(f"[build] procesando index.html (GA_ID={'definido' if ga_id else 'no definido'})...")

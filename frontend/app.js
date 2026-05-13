@@ -9,6 +9,7 @@
 //    <BASE_URL>/api/v1/timelapse/series
 // ─────────────────────────────────────────────
 const INJECTED_BASE_URL = '__BASE_URL__';
+const INJECTED_RACE_MODE = "__RACE_MODE__";
 
 function resolveBaseUrl(rawValue) {
   const raw = String(rawValue || "").trim();
@@ -18,7 +19,15 @@ function resolveBaseUrl(rawValue) {
   return unquoted.replace(/\/+$/, "");
 }
 
+function resolveRaceMode(rawValue) {
+  const raw = String(rawValue || "").trim().toLowerCase();
+  if (!raw || raw === "__RACE_MODE__") return "default";
+  return raw === "finish" ? "finish" : "default";
+}
+
 const BASE_URL = resolveBaseUrl(INJECTED_BASE_URL);
+const RACE_MODE = resolveRaceMode(INJECTED_RACE_MODE);
+const IS_FINISH_MODE = RACE_MODE === "finish";
 const PARTIES_CATALOG_URL = "./parties.json";
 const API_BASE_URL = BASE_URL ? `${BASE_URL}/api/v1` : "./api/v1";
 const API_DASHBOARD_SUMMARY_URL = `${API_BASE_URL}/dashboard/summary`;
@@ -287,6 +296,30 @@ function showError(msg) {
 
 function hideError() {
   document.getElementById("error-msg").classList.add("hidden");
+}
+
+function setElementHidden(id, hidden) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.hidden = hidden;
+  el.classList.toggle("hidden", hidden);
+}
+
+function applyFinishModeFrontendTweaks() {
+  if (!IS_FINISH_MODE) return;
+  mainChartMode = "actual";
+  ffeProjectionType = "simple";
+  setElementHidden("main-chart-mode-switch", true);
+  setElementHidden("ffe-duel-heading", true);
+  setElementHidden("ffe-duel-chart-note", true);
+  setElementHidden("ffe-projection-type-switch", true);
+  setElementHidden("ffe-imp-rural-controls", true);
+  setElementHidden("ffe-imp-lima-controls", true);
+  setElementHidden("ffe-imp-extranjero-controls", true);
+  setElementHidden("ffe-imp-resto-controls", true);
+  setElementHidden("ffe-duel-leader-badge", true);
+  setElementHidden("ffe-duel-chart-container", true);
+  setElementHidden("growth-rate-section", true);
 }
 
 // ─────────────────────────────────────────────
@@ -736,6 +769,8 @@ function renderMainChart() {
   const ctx = canvas.getContext("2d");
   if (mainChartInstance) mainChartInstance.destroy();
 
+  const effectiveMainChartMode = IS_FINISH_MODE ? "actual" : mainChartMode;
+  if (mainChartMode !== effectiveMainChartMode) mainChartMode = effectiveMainChartMode;
   const source = getMainChartSourceForCurrentMode();
   if (!source) return;
   const displayItems = source.topCandidates.map(([name]) => getPartyDisplayMeta(name));
@@ -744,11 +779,11 @@ function renderMainChart() {
   const values = source.topCandidates.map(([, votes]) => votes);
   const pcts = values.map(v => source.totalValidVotes > 0 ? (v / source.totalValidVotes * 100) : 0);
   const colors = fullLabels.map((name, i) => partyColor(name, i));
-  const selectedModeSource = mainChartData[mainChartMode] || mainChartData.actual;
-  const hasRuralFallback = mainChartMode === "rural" && Boolean(selectedModeSource?.isFallback);
+  const selectedModeSource = mainChartData[effectiveMainChartMode] || mainChartData.actual;
+  const hasRuralFallback = effectiveMainChartMode === "rural" && Boolean(selectedModeSource?.isFallback);
   const modeMeta = hasRuralFallback
     ? MAIN_CHART_MODE_META.ruralFallback
-    : (MAIN_CHART_MODE_META[mainChartMode] || MAIN_CHART_MODE_META.actual);
+    : (MAIN_CHART_MODE_META[effectiveMainChartMode] || MAIN_CHART_MODE_META.actual);
   if (noteEl) {
     noteEl.textContent = modeMeta.note;
   }
@@ -817,6 +852,18 @@ function renderFfeDuelChart() {
   const canvas = document.getElementById("ffe-duel-chart");
   const noteEl = document.getElementById("ffe-duel-chart-note");
   const badgeClear = document.getElementById("ffe-duel-leader-badge");
+  if (IS_FINISH_MODE) {
+    if (ffeDuelChartInstance) {
+      ffeDuelChartInstance.destroy();
+      ffeDuelChartInstance = null;
+    }
+    if (badgeClear) {
+      badgeClear.textContent = "";
+      badgeClear.classList.remove("ffe-duel-leader-badge--tie");
+    }
+    if (noteEl) noteEl.textContent = "";
+    return;
+  }
   updateFfeImpugnacionControls();
   updateFfeProjectionTypeButtons();
   if (!canvas || !ffeDuelChartData || typeof Chart === "undefined") {
@@ -1715,7 +1762,7 @@ async function loadAndRender() {
 
     // Gráfico de ritmo de crecimiento horario
     const growthContainer = document.getElementById("growth-rate-chart-container");
-    if (growthContainer) {
+    if (growthContainer && !IS_FINISH_MODE) {
       if (!document.getElementById("growth-rate-chart")) {
         growthContainer.innerHTML = `<canvas id="growth-rate-chart"></canvas>`;
       }
@@ -1738,6 +1785,7 @@ async function loadAndRender() {
 document.addEventListener("DOMContentLoaded", () => {
   document.body.classList.add("header-compact");
   initCozyModeToggle();
+  applyFinishModeFrontendTweaks();
 
   const actualBtn = document.getElementById("mode-actual");
   const interpolationBtn = document.getElementById("mode-interpolation");
