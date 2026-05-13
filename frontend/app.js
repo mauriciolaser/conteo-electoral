@@ -1392,7 +1392,11 @@ function setCozyMode(enabled) {
   const cozyToggle = document.getElementById("cozy-toggle");
   if (cozyToggle) {
     cozyToggle.setAttribute("aria-pressed", enabled ? "true" : "false");
+    const cozyToggleIcon = cozyToggle.querySelector(".cozy-toggle-icon");
     const cozyToggleText = cozyToggle.querySelector(".cozy-toggle-text");
+    if (cozyToggleIcon) {
+      cozyToggleIcon.textContent = enabled ? "🤖" : "🦄";
+    }
     if (cozyToggleText) {
       cozyToggleText.textContent = enabled ? "Modo Slop" : "Modo Cozy";
     }
