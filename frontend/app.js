@@ -309,6 +309,11 @@ function applyFinishModeFrontendTweaks() {
   if (!IS_FINISH_MODE) return;
   mainChartMode = "actual";
   ffeProjectionType = "simple";
+  const top3Section = document.getElementById("top3-section");
+  const faceToFaceSection = document.getElementById("pending-votes-section");
+  if (top3Section && faceToFaceSection && top3Section.nextElementSibling !== faceToFaceSection) {
+    top3Section.insertAdjacentElement("afterend", faceToFaceSection);
+  }
   setElementHidden("main-chart-mode-switch", true);
   setElementHidden("ffe-duel-heading", true);
   setElementHidden("ffe-duel-chart-note", true);

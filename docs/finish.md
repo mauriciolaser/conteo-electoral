@@ -76,7 +76,15 @@ En `default`:
 
 ### 2. Frente a Frente
 
-En `finish` se oculta por completo la subsección de `Proyección e Impugnaciones`.
+En `finish`, la sección `Frente a Frente` se mueve para quedar inmediatamente debajo de `Top 3 Nacional`.
+
+Reordenamiento:
+
+- `#pending-votes-section` se reubica justo después de `#top3-section`
+
+Este cambio es solo de runtime y solo aplica en `finish`. El HTML base no cambia de orden para `default`.
+
+Además, en `finish` se oculta por completo la subsección de `Proyección e Impugnaciones`.
 
 Elementos ocultos:
 
