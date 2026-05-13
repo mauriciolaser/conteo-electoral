@@ -2,6 +2,7 @@
   "use strict";
 
   const INJECTED_RACE_MODE = "__RACE_MODE__";
+  const INJECTED_RACE_IS_DEV = "__RACE_IS_DEV__";
   const LAYERS = [
     { key: "back",  src: "./assets/track-back.png",  speed: 8 },
     { key: "fence", src: "./assets/track-fence.png", speed: 28 },
@@ -17,19 +18,23 @@
   const SPRITE_DRAW_SCALE = 0.45;
   const RACE_MODES = {
     default: {
+      separationModel: "linear",
       pxPerHundredthPp: 0.5,
       parallaxEnabled: true,
       porky: { src: "./assets/porky-sheet.png", frames: 13, w: 256, h: 170, label: "RENOVACION POPULAR" },
       sanchez: { src: "./assets/sanchez-sheet.png", frames: 11, w: 256, h: 171, label: "JUNTOS POR EL PERU" },
     },
     finish: {
-      pxPerHundredthPp: 2.0,
+      separationModel: "logarithmic",
+      minSeparationPx: 100,
+      logSeparationScale: 50,
       parallaxEnabled: false,
       porky: { src: "./assets/porky_crying_sheet.png", frames: 18, w: 170, h: 170, label: "RENOVACION POPULAR" },
       sanchez: { src: "./assets/sanchez_jumping_sheet.png", frames: 13, w: 170, h: 170, label: "JUNTOS POR EL PERU" },
     },
   };
   const raceMode = resolveRaceMode(INJECTED_RACE_MODE);
+  const isDev = resolveDevFlag(INJECTED_RACE_IS_DEV);
   const modeConfig = RACE_MODES[raceMode];
   const PORKY = modeConfig.porky;
   const SANCHEZ = modeConfig.sanchez;
@@ -42,12 +47,17 @@
     porky:   { pct: 0, posX: 0.5, frame: 0 },
     lastFrameTickMs: 0,
     lastTickMs: 0,
+    lastDebugSnapshot: "",
     layerOffsets: LAYERS.map(() => 0),
   };
 
   function resolveRaceMode(raw) {
     const normalized = String(raw || "").trim().toLowerCase();
     return Object.prototype.hasOwnProperty.call(RACE_MODES, normalized) ? normalized : "default";
+  }
+
+  function resolveDevFlag(raw) {
+    return String(raw || "").trim().toLowerCase() === "true";
   }
 
   function loadImage(src) {
@@ -98,7 +108,7 @@
     const diff = Math.abs(pctSanchez - pctPorky);
     const drawW = Math.max(PORKY.w, SANCHEZ.w) * SPRITE_DRAW_SCALE;
     const maxSeparationPx = canvas.width - drawW;
-    const desiredPx = (diff / 0.01) * modeConfig.pxPerHundredthPp;
+    const desiredPx = computeDesiredSeparationPx(diff);
     const separationPx = Math.min(desiredPx, maxSeparationPx);
     const separation = separationPx / canvas.width;
     const leadX = 0.5 + 0.5 * separation;
@@ -111,6 +121,91 @@
       state.porky.posX = leadX;
       state.sanchez.posX = trailX;
     }
+
+    logDevPositions();
+  }
+
+  function computeDesiredSeparationPx(diffPctPoints) {
+    if (diffPctPoints <= 0) return 0;
+    if (modeConfig.separationModel === "logarithmic") {
+      const diffHundredths = diffPctPoints / 0.01;
+      return modeConfig.minSeparationPx + Math.log1p(diffHundredths) * modeConfig.logSeparationScale;
+    }
+    return (diffPctPoints / 0.01) * modeConfig.pxPerHundredthPp;
+  }
+
+  function getRunnerMetrics(cfg, runner) {
+    const drawW = cfg.w * SPRITE_DRAW_SCALE;
+    const drawH = cfg.h * SPRITE_DRAW_SCALE;
+    const centerX = runner.posX * canvas.width;
+    const drawX = Math.round(centerX - drawW / 2);
+    const drawY = Math.round(canvas.height * SPRITE_BASELINE_Y - drawH);
+    return {
+      centerX,
+      centerY: drawY + drawH / 2,
+      drawX,
+      drawY,
+      drawW,
+      drawH,
+    };
+  }
+
+  function logDevPositions() {
+    if (!isDev) return;
+
+    const sanchezMetrics = getRunnerMetrics(SANCHEZ, state.sanchez);
+    const porkyMetrics = getRunnerMetrics(PORKY, state.porky);
+    const centerGapPx = Math.abs(sanchezMetrics.centerX - porkyMetrics.centerX);
+    const spriteGapPx = Math.max(
+      0,
+      Math.max(sanchezMetrics.drawX, porkyMetrics.drawX) -
+      Math.min(sanchezMetrics.drawX + sanchezMetrics.drawW, porkyMetrics.drawX + porkyMetrics.drawW)
+    );
+    const debugSnapshot = [
+      raceMode,
+      state.sanchez.pct.toFixed(4),
+      state.porky.pct.toFixed(4),
+      sanchezMetrics.centerX.toFixed(2),
+      porkyMetrics.centerX.toFixed(2),
+      centerGapPx.toFixed(2),
+      spriteGapPx.toFixed(2),
+    ].join("|");
+
+    if (debugSnapshot === state.lastDebugSnapshot) return;
+    state.lastDebugSnapshot = debugSnapshot;
+
+    console.groupCollapsed("[race][dev] character coordinates");
+    console.table([
+      {
+        candidate: "sanchez",
+        pct: Number(state.sanchez.pct.toFixed(4)),
+        centerX: Number(sanchezMetrics.centerX.toFixed(2)),
+        centerY: Number(sanchezMetrics.centerY.toFixed(2)),
+        drawX: sanchezMetrics.drawX,
+        drawY: sanchezMetrics.drawY,
+        width: Number(sanchezMetrics.drawW.toFixed(2)),
+        height: Number(sanchezMetrics.drawH.toFixed(2)),
+      },
+      {
+        candidate: "porky",
+        pct: Number(state.porky.pct.toFixed(4)),
+        centerX: Number(porkyMetrics.centerX.toFixed(2)),
+        centerY: Number(porkyMetrics.centerY.toFixed(2)),
+        drawX: porkyMetrics.drawX,
+        drawY: porkyMetrics.drawY,
+        width: Number(porkyMetrics.drawW.toFixed(2)),
+        height: Number(porkyMetrics.drawH.toFixed(2)),
+      },
+    ]);
+    console.log("[race][dev] pixel gaps", {
+      centerGapPx: Number(centerGapPx.toFixed(2)),
+      spriteGapPx: Number(spriteGapPx.toFixed(2)),
+      desiredSeparationPx: Number(computeDesiredSeparationPx(Math.abs(state.sanchez.pct - state.porky.pct)).toFixed(2)),
+      voteDiffPctPoints: Number(Math.abs(state.sanchez.pct - state.porky.pct).toFixed(4)),
+      separationModel: modeConfig.separationModel,
+      mode: raceMode,
+    });
+    console.groupEnd();
   }
 
   function pickLatestSnapshot(payload) {
