@@ -21,16 +21,16 @@
       separationModel: "linear",
       pxPerHundredthPp: 0.5,
       parallaxEnabled: true,
-      porky: { src: "./assets/porky-sheet.png", frames: 13, w: 256, h: 170, label: "RENOVACION POPULAR" },
-      sanchez: { src: "./assets/sanchez-sheet.png", frames: 11, w: 256, h: 171, label: "JUNTOS POR EL PERU" },
+      porky: { src: "./assets/porky-sheet.png", frames: 13, w: 256, h: 170, yOffsetPx: 0, label: "RENOVACION POPULAR" },
+      sanchez: { src: "./assets/sanchez-sheet.png", frames: 11, w: 256, h: 171, yOffsetPx: 0, label: "JUNTOS POR EL PERU" },
     },
     finish: {
       separationModel: "logarithmic",
       minSeparationPx: 100,
       logSeparationScale: 50,
       parallaxEnabled: false,
-      porky: { src: "./assets/porky_crying_sheet.png", frames: 18, w: 170, h: 170, label: "RENOVACION POPULAR" },
-      sanchez: { src: "./assets/sanchez_jumping_sheet.png", frames: 13, w: 170, h: 170, label: "JUNTOS POR EL PERU" },
+      porky: { src: "./assets/porky_crying_sheet.png", frames: 18, w: 170, h: 170, yOffsetPx: 10, label: "RENOVACION POPULAR" },
+      sanchez: { src: "./assets/sanchez_jumping_sheet.png", frames: 13, w: 170, h: 170, yOffsetPx: 0, label: "JUNTOS POR EL PERU" },
     },
   };
   const raceMode = resolveRaceMode(INJECTED_RACE_MODE);
@@ -139,7 +139,7 @@
     const drawH = cfg.h * SPRITE_DRAW_SCALE;
     const centerX = runner.posX * canvas.width;
     const drawX = Math.round(centerX - drawW / 2);
-    const drawY = Math.round(canvas.height * SPRITE_BASELINE_Y - drawH);
+    const drawY = Math.round(canvas.height * SPRITE_BASELINE_Y - drawH + (cfg.yOffsetPx || 0));
     return {
       centerX,
       centerY: drawY + drawH / 2,
@@ -274,7 +274,7 @@
     const drawH = cfg.h * SPRITE_DRAW_SCALE;
     const cx = runner.posX * canvas.width;
     const x = Math.round(cx - drawW / 2);
-    const y = Math.round(canvas.height * SPRITE_BASELINE_Y - drawH);
+    const y = Math.round(canvas.height * SPRITE_BASELINE_Y - drawH + (cfg.yOffsetPx || 0));
     const sx = runner.frame * cfg.w;
     ctx.drawImage(img, sx, 0, cfg.w, cfg.h, x, y, drawW, drawH);
     const isLeader = runner.pct >= Math.max(state.sanchez.pct, state.porky.pct);
