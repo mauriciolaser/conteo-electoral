@@ -6,7 +6,8 @@ Uso:
 
 `frontend/` es la fuente de verdad en desarrollo.
 Este script recrea `frontend/dist/` en cada ejecución, copia todo el contenido
-de `frontend/` (excepto `frontend/dist/`) e inyecta BASE_URL en app.js.
+de `frontend/` (excepto `frontend/dist/`) e inyecta BASE_URL en app.js y
+RACE_MODE en frontend/race/race.js.
 También inserta el snippet de Google Analytics en index.html si existe GA_ID.
 """
 from __future__ import annotations
@@ -71,6 +72,26 @@ def build_ga_snippet(ga_id: str) -> str:
     )
 
 
+def inject_placeholder_literal(
+    content: str,
+    *,
+    placeholder: str,
+    value: str,
+    target_name: str,
+) -> str:
+    out, replaced_count = re.subn(
+        rf"""(['"]){re.escape(placeholder)}\1""",
+        json.dumps(value),
+        content,
+        count=1,
+    )
+    if replaced_count == 0:
+        out, replaced_count = re.subn(re.escape(placeholder), value, content, count=1)
+    if replaced_count == 0:
+        raise ValueError(f"No se encontró placeholder {placeholder} en {target_name}")
+    return out
+
+
 def build(project_root: Path | None = None, env_path: Path | None = None) -> None:
     root = project_root or Path(__file__).resolve().parent.parent
     resolved_env_path = env_path or (root / ".env")
@@ -86,6 +107,12 @@ def build(project_root: Path | None = None, env_path: Path | None = None) -> Non
             f"BASE_URL (o WEB_BASE_URL) no está definida en {resolved_env_path}.\n"
             "Añade una línea como:\n"
             "  BASE_URL=https://perulainen.com/conteo-elecciones"
+        )
+    race_mode = env.get("RACE_MODE", "").strip().lower() or "default"
+    if race_mode not in {"default", "finish"}:
+        raise ValueError(
+            f"RACE_MODE inválido en {resolved_env_path}: {race_mode!r}.\n"
+            "Valores permitidos: default, finish"
         )
 
     src = root / "frontend"
@@ -129,22 +156,25 @@ def build(project_root: Path | None = None, env_path: Path | None = None) -> Non
 
     print("[build] procesando app.js...")
     app_src = (src / "app.js").read_text(encoding="utf-8")
-    # Reemplazo robusto:
-    # - Si el placeholder está entre comillas ('__BASE_URL__' o "__BASE_URL__"),
-    #   inyectamos un literal JSON válido (comillas y escapes correctos).
-    # - Fallback para placeholder sin comillas.
-    app_out, replaced_count = re.subn(
-        r"""(['"])__BASE_URL__\1""",
-        json.dumps(base_url),
+    app_out = inject_placeholder_literal(
         app_src,
-        count=1,
+        placeholder="__BASE_URL__",
+        value=base_url,
+        target_name="frontend/app.js",
     )
-    if replaced_count == 0:
-        app_out, replaced_count = re.subn(r"__BASE_URL__", base_url, app_src, count=1)
-    if replaced_count == 0:
-        raise ValueError("No se encontró placeholder __BASE_URL__ en frontend/app.js")
     (dist / "app.js").write_text(app_out, encoding="utf-8")
     print(f"[build] app.js -> BASE_URL={base_url}")
+
+    print(f"[build] procesando race/race.js (RACE_MODE={race_mode})...")
+    race_js_src = (src / "race" / "race.js").read_text(encoding="utf-8")
+    race_js_out = inject_placeholder_literal(
+        race_js_src,
+        placeholder="__RACE_MODE__",
+        value=race_mode,
+        target_name="frontend/race/race.js",
+    )
+    (dist / "race" / "race.js").write_text(race_js_out, encoding="utf-8")
+    print(f"[build] race/race.js -> RACE_MODE={race_mode}")
 
     ga_id = env.get("GA_ID", "").strip()
     print(f"[build] procesando index.html (GA_ID={'definido' if ga_id else 'no definido'})...")

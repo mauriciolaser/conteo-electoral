@@ -37,6 +37,7 @@ jobs:
           FTP_PASSWORD=${{ secrets.FTP_PASSWORD }}
           DEPLOY_FRONTEND=${{ secrets.DEPLOY_FRONTEND }}
           BASE_URL=${{ secrets.BASE_URL }}
+          RACE_MODE=${{ secrets.RACE_MODE || 'default' }}
           GA_ID=${{ secrets.GA_ID }}
           EOF
 

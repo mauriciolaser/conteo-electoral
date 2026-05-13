@@ -1,24 +1,38 @@
 (function () {
   "use strict";
 
+  const INJECTED_RACE_MODE = "__RACE_MODE__";
   const LAYERS = [
     { key: "back",  src: "./assets/track-back.png",  speed: 8 },
     { key: "fence", src: "./assets/track-fence.png", speed: 28 },
     { key: "track", src: "./assets/track-track.png", speed: 90 },
     { key: "front", src: "./assets/track-front.png", speed: 180 },
   ];
-  const SLOT_W = 256;
-  const PORKY = { src: "./assets/porky-sheet.png", frames: 13, w: SLOT_W, h: 170, label: "RENOVACION POPULAR" };
-  const SANCHEZ = { src: "./assets/sanchez-sheet.png", frames: 11, w: SLOT_W, h: 171, label: "JUNTOS POR EL PERU" };
-
   const FRAME_FPS = 10;
-  const PX_PER_HUNDREDTH_PP = 0.5;
   const RELOAD_MS = 60_000;
   const API_RACE_LATEST_URL = "../api/v1/race/latest";
   const API_DASHBOARD_LATEST_URL = "../api/v1/dashboard/latest";
 
   const SPRITE_BASELINE_Y = 0.78;
   const SPRITE_DRAW_SCALE = 0.45;
+  const RACE_MODES = {
+    default: {
+      pxPerHundredthPp: 0.5,
+      parallaxEnabled: true,
+      porky: { src: "./assets/porky-sheet.png", frames: 13, w: 256, h: 170, label: "RENOVACION POPULAR" },
+      sanchez: { src: "./assets/sanchez-sheet.png", frames: 11, w: 256, h: 171, label: "JUNTOS POR EL PERU" },
+    },
+    finish: {
+      pxPerHundredthPp: 1.0,
+      parallaxEnabled: false,
+      porky: { src: "./assets/porky_crying_sheet.png", frames: 18, w: 170, h: 170, label: "RENOVACION POPULAR" },
+      sanchez: { src: "./assets/sanchez_jumping_sheet.png", frames: 13, w: 170, h: 170, label: "JUNTOS POR EL PERU" },
+    },
+  };
+  const raceMode = resolveRaceMode(INJECTED_RACE_MODE);
+  const modeConfig = RACE_MODES[raceMode];
+  const PORKY = modeConfig.porky;
+  const SANCHEZ = modeConfig.sanchez;
 
   const canvas = document.getElementById("race-canvas");
   const ctx = canvas.getContext("2d");
@@ -30,6 +44,11 @@
     lastTickMs: 0,
     layerOffsets: LAYERS.map(() => 0),
   };
+
+  function resolveRaceMode(raw) {
+    const normalized = String(raw || "").trim().toLowerCase();
+    return Object.prototype.hasOwnProperty.call(RACE_MODES, normalized) ? normalized : "default";
+  }
 
   function loadImage(src) {
     return new Promise((resolve, reject) => {
@@ -77,9 +96,9 @@
     state.porky.pct = pctPorky;
 
     const diff = Math.abs(pctSanchez - pctPorky);
-    const drawW = SLOT_W * SPRITE_DRAW_SCALE;
+    const drawW = Math.max(PORKY.w, SANCHEZ.w) * SPRITE_DRAW_SCALE;
     const maxSeparationPx = canvas.width - drawW;
-    const desiredPx = (diff / 0.01) * PX_PER_HUNDREDTH_PP;
+    const desiredPx = (diff / 0.01) * modeConfig.pxPerHundredthPp;
     const separationPx = Math.min(desiredPx, maxSeparationPx);
     const separation = separationPx / canvas.width;
     const leadX = 0.5 + 0.5 * separation;
@@ -238,8 +257,10 @@
         state.lastFrameTickMs = nowMs;
       }
 
-      for (let i = 0; i < LAYERS.length; i++) {
-        state.layerOffsets[i] += LAYERS[i].speed * dt;
+      if (modeConfig.parallaxEnabled) {
+        for (let i = 0; i < LAYERS.length; i++) {
+          state.layerOffsets[i] += LAYERS[i].speed * dt;
+        }
       }
 
       ctx.fillStyle = "#000";

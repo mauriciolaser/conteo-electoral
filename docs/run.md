@@ -89,6 +89,7 @@ FTP_PASSWORD=...
 FTP_PORT=21
 DEPLOY_FRONTEND=perulainen.com/conteo
 BASE_URL=https://www.perulainen.com/conteo
+RACE_MODE=default
 GA_ID=G-XXXXXXXXXX
 
 # API publish
@@ -115,3 +116,8 @@ CONTEO_API_TIMEOUT_SECONDS=6
 - `--no-publish`: desactiva publish automático dentro de `full`.
 - `--allow-fallback`: habilita fallback sintético si ONPE no carga.
 - `--env-file .env.staging`: ejecuta con entorno staging.
+
+## Modo visual de la carrera
+
+- `RACE_MODE=default`: mantiene el comportamiento actual de `frontend/race/`.
+- `RACE_MODE=finish`: desactiva el parallax, usa `sanchez_jumping_sheet` y `porky_crying_sheet`, y exagera más la separación entre candidatos.
